@@ -40,8 +40,8 @@ app.get('/test_api', async function (req, res){
 app.get('/', function (req, res) {
   res.send('Hello World!');
 });
-app.listen(3000, function () {
-  console.log('Server listening on port 3000!');
+app.listen(3001, function () {
+  console.log('Server listening on port 3001!');
 });
 
 module.exports = app;
