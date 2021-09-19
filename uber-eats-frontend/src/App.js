@@ -1,23 +1,28 @@
 import React from 'react';
-// import logo from './logo.svg';
-import styled from 'styled-components';
+// import styled from 'styled-components';
+import logo from './uber-eats.svg';
 import './App.css';
 import { UserLogin } from './components/userlogin';
-
-const LoginContainer = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-`;
+import 'bootstrap/dist/css/bootstrap.css';
 
 function App() {
   return (
-    <LoginContainer>
-      <UserLogin />
-    </LoginContainer>
+    <body>
+      <div className="container">
+        <div className="container-fluid text-center">
+          <h3 className="margin">
+            <img src={logo} alt="UEL" width={200} height={35} />
+          </h3>
+          <br />
+          <br />
+        </div>
+      </div>
+      <div className="container-fluid text-center">
+        <div className="col-sm-8">
+          <UserLogin />
+        </div>
+      </div>
+    </body>
   );
 }
 
