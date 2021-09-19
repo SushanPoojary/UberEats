@@ -1,15 +1,17 @@
 import React from 'react';
+// import ReactDOM from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.css';
-import styled from 'styled-components';
+// import userReg from './userReg.jsx';
 import {
   BrowserRouter as Router,
   Link,
   Route,
   Switch,
 } from 'react-router-dom';
+import styled from 'styled-components';
 import history from './history';
 // eslint-disable-next-line import/no-cycle
-import { userReg } from './userReg';
+import { UserLogin } from './index';
 
 const HeadText = styled.h2`
     font-size: 30px;
@@ -31,7 +33,13 @@ const OverallText = styled.h2`
     // margin: 0;
     //padding-left: 150px;
 `;
-export class UserLogin extends React.Component {
+
+export class userReg extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
   render() {
     return (
       <div className="container">
@@ -39,7 +47,7 @@ export class UserLogin extends React.Component {
           <div className="col-xs" />
           <div className="col-xs">
             <HeadText>
-              Welcome back
+              Let&apos;s get started
               <br />
               <br />
             </HeadText>
@@ -49,7 +57,7 @@ export class UserLogin extends React.Component {
           <div className="col-xs" />
           <div className="col-xs">
             <OverallText>
-              Sign in with your email address.
+              Enter your details(required).
               <br />
             </OverallText>
           </div>
@@ -59,7 +67,7 @@ export class UserLogin extends React.Component {
           <div className="col-xs">
             <OverallText>
               <form>
-                <input type="email" name="email" placeholder=" Email " style={{ width: '390px', height: '35px' }} />
+                <input type="text" name="name" placeholder=" Name " style={{ width: '390px', height: '35px' }} required />
                 <br />
               </form>
             </OverallText>
@@ -70,7 +78,29 @@ export class UserLogin extends React.Component {
           <div className="col-xs">
             <OverallText>
               <form>
-                <input type="password" name="password" placeholder=" Password " style={{ width: '390px', height: '35px' }} />
+                <input type="tel" name="contact" placeholder=" Contact Number " style={{ width: '390px', height: '35px' }} required />
+                <br />
+              </form>
+            </OverallText>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-xs" />
+          <div className="col-xs">
+            <OverallText>
+              <form>
+                <input type="email" name="email" placeholder=" Email " style={{ width: '390px', height: '35px' }} required />
+                <br />
+              </form>
+            </OverallText>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-xs" />
+          <div className="col-xs">
+            <OverallText>
+              <form>
+                <input type="password" name="password" placeholder=" Password " style={{ width: '390px', height: '35px' }} required />
                 <br />
                 <br />
               </form>
@@ -82,7 +112,7 @@ export class UserLogin extends React.Component {
           <div className="col-xs">
             <OverallText>
               <form>
-                <input type="submit" value="Login" style={{ width: '390px', height: '35px', backgroundColor: '#7bb420' }} />
+                <input type="submit" value="Register" style={{ width: '390px', height: '35px', backgroundColor: '#7bb420' }} />
               </form>
             </OverallText>
           </div>
@@ -91,11 +121,11 @@ export class UserLogin extends React.Component {
           <div className="col-xs" />
           <div className="col-xs">
             <OverallText>
-              New to Uber?
+              Already have an account?
               <Router forceRefresh>
-                <Link to="/userReg" onClick={() => history.push('/userReg')} style={{ color: 'green' }}> Create an account</Link>
+                <Link to="/login" onClick={() => history.push('/login')} style={{ color: 'green' }}> Login</Link>
                 <Switch>
-                  <Route exact path="/userReg" component={userReg} />
+                  <Route exact path="/login" component={UserLogin} />
                 </Switch>
               </Router>
             </OverallText>
