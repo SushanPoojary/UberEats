@@ -2,6 +2,7 @@ import React from 'react';
 // import ReactDOM from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.css';
 // import userReg from './userReg.jsx';
+import Axios from 'axios';
 import {
   BrowserRouter as Router,
   Link,
@@ -37,86 +38,97 @@ const OverallText = styled.h2`
 export class userReg extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      username: '',
+    };
+  }
+
+  handleInputChange(event) {
+    console.log(event.target.value);
+    this.setState({
+      username: event.target.value,
+    });
+  }
+
+  handleSubmit = () => {
+    console.log('This is Reg');
+    Axios.post('http://localhost:3001/userReg', {
+      // eslint-disable-next-line react/destructuring-assignment
+      usernameReg: this.state.username,
+    }).then((response) => {
+      console.log(response);
+    });
   }
 
   render() {
     return (
       <div className="container">
-        <div className="row">
-          <div className="col-xs" />
-          <div className="col-xs">
-            <HeadText>
-              Let&apos;s get started
-              <br />
-              <br />
-            </HeadText>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-xs" />
-          <div className="col-xs">
-            <OverallText>
-              Enter your details(required).
-              <br />
-            </OverallText>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-xs" />
-          <div className="col-xs">
-            <OverallText>
-              <form>
-                <input type="text" name="name" placeholder=" Name " style={{ width: '390px', height: '35px' }} required />
+        <form onSubmit={this.handleSubmit}>
+          <div className="row">
+            <div className="col-xs" />
+            <div className="col-xs">
+              <HeadText>
+                Let&apos;s get started
                 <br />
-              </form>
-            </OverallText>
+                <br />
+              </HeadText>
+            </div>
           </div>
-        </div>
-        <div className="row">
-          <div className="col-xs" />
-          <div className="col-xs">
-            <OverallText>
-              <form>
+          <div className="row">
+            <div className="col-xs" />
+            <div className="col-xs">
+              <OverallText>
+                Enter your details(required).
+                <br />
+              </OverallText>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-xs" />
+            <div className="col-xs">
+              <OverallText>
+                <input type="text" name="username" placeholder=" Name " style={{ width: '390px', height: '35px' }} onChange={this.handleInputChange.bind(this)} required />
+                <br />
+              </OverallText>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-xs" />
+            <div className="col-xs">
+              <OverallText>
                 <input type="tel" name="contact" placeholder=" Contact Number " style={{ width: '390px', height: '35px' }} required />
                 <br />
-              </form>
-            </OverallText>
+              </OverallText>
+            </div>
           </div>
-        </div>
-        <div className="row">
-          <div className="col-xs" />
-          <div className="col-xs">
-            <OverallText>
-              <form>
+          <div className="row">
+            <div className="col-xs" />
+            <div className="col-xs">
+              <OverallText>
                 <input type="email" name="email" placeholder=" Email " style={{ width: '390px', height: '35px' }} required />
                 <br />
-              </form>
-            </OverallText>
+              </OverallText>
+            </div>
           </div>
-        </div>
-        <div className="row">
-          <div className="col-xs" />
-          <div className="col-xs">
-            <OverallText>
-              <form>
+          <div className="row">
+            <div className="col-xs" />
+            <div className="col-xs">
+              <OverallText>
                 <input type="password" name="password" placeholder=" Password " style={{ width: '390px', height: '35px' }} required />
                 <br />
                 <br />
-              </form>
-            </OverallText>
+              </OverallText>
+            </div>
           </div>
-        </div>
-        <div className="row">
-          <div className="col-xs" />
-          <div className="col-xs">
-            <OverallText>
-              <form>
-                <input type="submit" value="Register" style={{ width: '390px', height: '35px', backgroundColor: '#7bb420' }} />
-              </form>
-            </OverallText>
+          <div className="row">
+            <div className="col-xs" />
+            <div className="col-xs">
+              <OverallText>
+                <input type="button" value="Register" style={{ width: '390px', height: '35px', backgroundColor: '#7bb420' }} onClick={this.handleSubmit} />
+              </OverallText>
+            </div>
           </div>
-        </div>
+        </form>
         <div className="row">
           <div className="col-xs" />
           <div className="col-xs">

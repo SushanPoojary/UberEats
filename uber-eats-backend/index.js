@@ -1,7 +1,10 @@
 var express = require('express');
 var app = express();
+app.use(express.json());
 var mysql = require('mysql');
 var constants = require('./config.json');
+var cors = require('cors');
+app.use(cors());
 
 // var connection = mysql.createConnection({})
 var connection = mysql.createPool({
@@ -36,6 +39,15 @@ app.get('/test_api', async function (req, res){
   })
 })
 
+app.post('/userReg', (req, res)=> {
+  const username = req.body.usernameReg
+  console.log("here");
+  connection.query("INSERT INTO uber_eats.test(name) VALUES (?)", [username], 
+  (err, results) => {
+    console.log(err);
+    console.log(results);
+  })
+})
 
 app.get('/', function (req, res) {
   res.send('Hello World!');
