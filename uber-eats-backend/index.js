@@ -40,9 +40,23 @@ app.get('/test_api', async function (req, res){
 })
 
 app.post('/userReg', (req, res)=> {
-  const username = req.body.usernameReg
+  const username = req.body.username
+  const usercontact = req.body.contact
+  const useremail = req.body.email
+  const userpassword = req.body.password
   console.log("here");
-  connection.query("INSERT INTO uber_eats.test(name) VALUES (?)", [username], 
+  connection.query("INSERT INTO uber_eats.test(name, contact, email, password) VALUES (?,?,?,?)", [username, usercontact, useremail, userpassword], 
+  (err, results) => {
+    console.log(err);
+    console.log(results);
+  })
+})
+
+app.post('/login', (req, res)=> {
+  const useremail = req.body.email
+  const userpassword = req.body.password
+  console.log("here");
+  connection.query("SELECT email,password FROM uber_eats.test WHERE email = ? AND password = ?", [useremail, userpassword], 
   (err, results) => {
     console.log(err);
     console.log(results);

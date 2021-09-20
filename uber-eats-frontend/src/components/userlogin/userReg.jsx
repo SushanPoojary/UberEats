@@ -1,7 +1,7 @@
+/* eslint-disable react/destructuring-assignment */
 import React from 'react';
 // import ReactDOM from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.css';
-// import userReg from './userReg.jsx';
 import Axios from 'axios';
 import {
   BrowserRouter as Router,
@@ -40,21 +40,33 @@ export class userReg extends React.Component {
     super(props);
     this.state = {
       username: '',
+      contact: '',
+      email: '',
+      password: '',
     };
   }
 
-  handleInputChange(event) {
+  handleInputChange = (event) => {
     console.log(event.target.value);
     this.setState({
-      username: event.target.value,
+      [event.target.name]: event.target.value,
     });
   }
 
-  handleSubmit = () => {
-    console.log('This is Reg');
+  handleSubmit = (event) => {
+    event.preventDefault();
+    const {
+      username,
+      contact,
+      email,
+      password,
+    } = this.state;
+    console.log(username, contact, email, password);
     Axios.post('http://localhost:3001/userReg', {
-      // eslint-disable-next-line react/destructuring-assignment
-      usernameReg: this.state.username,
+      username,
+      contact,
+      email,
+      password,
     }).then((response) => {
       console.log(response);
     });
@@ -96,7 +108,7 @@ export class userReg extends React.Component {
             <div className="col-xs" />
             <div className="col-xs">
               <OverallText>
-                <input type="tel" name="contact" placeholder=" Contact Number " style={{ width: '390px', height: '35px' }} required />
+                <input type="tel" name="contact" placeholder=" Contact Number " style={{ width: '390px', height: '35px' }} onChange={this.handleInputChange.bind(this)} required />
                 <br />
               </OverallText>
             </div>
@@ -105,7 +117,7 @@ export class userReg extends React.Component {
             <div className="col-xs" />
             <div className="col-xs">
               <OverallText>
-                <input type="email" name="email" placeholder=" Email " style={{ width: '390px', height: '35px' }} required />
+                <input type="email" name="email" placeholder=" Email " style={{ width: '390px', height: '35px' }} onChange={this.handleInputChange.bind(this)} required />
                 <br />
               </OverallText>
             </div>
@@ -114,7 +126,7 @@ export class userReg extends React.Component {
             <div className="col-xs" />
             <div className="col-xs">
               <OverallText>
-                <input type="password" name="password" placeholder=" Password " style={{ width: '390px', height: '35px' }} required />
+                <input type="password" name="password" placeholder=" Password " style={{ width: '390px', height: '35px' }} onChange={this.handleInputChange.bind(this)} required />
                 <br />
                 <br />
               </OverallText>
