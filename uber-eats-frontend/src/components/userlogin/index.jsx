@@ -1,6 +1,8 @@
+/* eslint-disable */
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import styled from 'styled-components';
+import cookie from 'react-cookies';
 import Axios from 'axios';
 import {
   BrowserRouter as Router,
@@ -8,6 +10,7 @@ import {
   Route,
   Switch,
 } from 'react-router-dom';
+import { Redirect } from 'react-router';
 import history from './history';
 // eslint-disable-next-line import/no-cycle
 import { userReg } from './userReg';
@@ -32,13 +35,21 @@ const OverallText = styled.h2`
     // margin: 0;
     //padding-left: 150px;
 `;
+
 export class UserLogin extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       email: '',
       password: '',
+      authFlag: false,
     };
+  }
+
+  componentWillMount() {
+    this.setState({
+      authFlag : false
+    });
   }
 
   handleInputChange = (event) => {
@@ -55,16 +66,31 @@ export class UserLogin extends React.Component {
       password,
     } = this.state;
     console.log(email, password);
+    Axios.defaults.withCredentials = true;
     Axios.post('http://localhost:3001/login', {
       email,
       password,
     }).then((response) => {
-      console.log(response);
+      console.log('Status Code : ', response.status);
+      if (response.status === 200) {
+        this.setState({
+          authFlag: true
+        });
+      } else {
+        this.setState({
+          authFlag: false
+        });
+      }
     });
   }
 
   render() {
+    let redirectVar = null;
+    if (cookie.load('cookie')) {
+      redirectVar = <Redirect to= "/navbar" />
+    }
     return (
+      <div>{redirectVar}
       <div className="container">
         <form>
           <div className="row">
@@ -128,7 +154,7 @@ export class UserLogin extends React.Component {
             </div>
           </div>
         </form>
-      </div>
+      </div></div>
     );
   }
 }
