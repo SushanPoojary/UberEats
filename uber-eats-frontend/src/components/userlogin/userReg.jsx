@@ -1,3 +1,4 @@
+/* eslint-disable */
 /* eslint-disable react/destructuring-assignment */
 import React from 'react';
 // import ReactDOM from 'react-dom';
@@ -8,7 +9,9 @@ import {
   Link,
   Route,
   Switch,
+  useHistory,
 } from 'react-router-dom';
+import { Redirect } from 'react-router';
 import styled from 'styled-components';
 import history from './history';
 // eslint-disable-next-line import/no-cycle
@@ -43,8 +46,19 @@ export class userReg extends React.Component {
       contact: '',
       email: '',
       password: '',
+      register: false,
+      redirect: null,
     };
+    
   }
+  
+  componentDidMount() {
+    this.setState({
+      // eslint-disable-next-line react/no-unused-state
+      register: false,
+    });
+  }
+
 
   handleInputChange = (event) => {
     console.log(event.target.value);
@@ -52,6 +66,8 @@ export class userReg extends React.Component {
       [event.target.name]: event.target.value,
     });
   }
+
+
 
   handleSubmit = (event) => {
     event.preventDefault();
@@ -68,15 +84,28 @@ export class userReg extends React.Component {
       email,
       password,
     }).then((response) => {
+      console.log('Status Code : ', response.status);
       console.log(response);
+      this.setState({
+        redirect: true,
+      });
+      
+      // props.history.push('/login');
+      // <Redirect to='/login'/>
     });
   }
 
   render() {
+    let redirectVar = null;
+    if (this.state.redirect) {
+      redirectVar = <Redirect to="/login" />;
+    }
     return (
-      <div className="container">
-        <form onSubmit={this.handleSubmit}>
-          <div className="row">
+      <div>
+        {redirectVar}
+        <div className="container">
+          <form onSubmit={this.handleSubmit}>
+            <div className="row">
             <div className="col-xs" />
             <div className="col-xs">
               <HeadText>
@@ -141,7 +170,7 @@ export class userReg extends React.Component {
             </div>
           </div>
         </form>
-        <div className="row">
+          <div className="row">
           <div className="col-xs" />
           <div className="col-xs">
             <OverallText>
@@ -154,6 +183,7 @@ export class userReg extends React.Component {
               </Router>
             </OverallText>
           </div>
+        </div>
         </div>
       </div>
     );

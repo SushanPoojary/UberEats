@@ -67,6 +67,7 @@ app.post('/userReg', (req, res)=> {
   (err, results) => {
     console.log(err);
     console.log(results);
+    res.send(results);
   })
 })
 

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import styled from 'styled-components';
@@ -42,13 +41,15 @@ export class UserLogin extends React.Component {
     this.state = {
       email: '',
       password: '',
+      // eslint-disable-next-line react/no-unused-state
       authFlag: false,
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.setState({
-      authFlag : false
+      // eslint-disable-next-line react/no-unused-state
+      authFlag: false,
     });
   }
 
@@ -74,11 +75,13 @@ export class UserLogin extends React.Component {
       console.log('Status Code : ', response.status);
       if (response.status === 200) {
         this.setState({
-          authFlag: true
+          // eslint-disable-next-line react/no-unused-state
+          authFlag: true,
         });
       } else {
         this.setState({
-          authFlag: false
+          // eslint-disable-next-line react/no-unused-state
+          authFlag: false,
         });
       }
     });
@@ -87,74 +90,76 @@ export class UserLogin extends React.Component {
   render() {
     let redirectVar = null;
     if (cookie.load('cookie')) {
-      redirectVar = <Redirect to= "/navbar" />
+      redirectVar = <Redirect to="/navbar" />;
     }
     return (
-      <div>{redirectVar}
-      <div className="container">
-        <form>
-          <div className="row">
-            <div className="col-xs" />
-            <div className="col-xs">
-              <HeadText>
-                Welcome back
-                <br />
-                <br />
-              </HeadText>
+      <div>
+        {redirectVar}
+        <div className="container">
+          <form>
+            <div className="row">
+              <div className="col-xs" />
+              <div className="col-xs">
+                <HeadText>
+                  Welcome back
+                  <br />
+                  <br />
+                </HeadText>
+              </div>
             </div>
-          </div>
-          <div className="row">
-            <div className="col-xs" />
-            <div className="col-xs">
-              <OverallText>
-                Sign in with your email address.
-                <br />
-              </OverallText>
+            <div className="row">
+              <div className="col-xs" />
+              <div className="col-xs">
+                <OverallText>
+                  Sign in with your email address.
+                  <br />
+                </OverallText>
+              </div>
             </div>
-          </div>
-          <div className="row">
-            <div className="col-xs" />
-            <div className="col-xs">
-              <OverallText>
-                <input type="email" name="email" placeholder=" Email " style={{ width: '390px', height: '35px' }} onChange={this.handleInputChange.bind(this)} />
-                <br />
-              </OverallText>
+            <div className="row">
+              <div className="col-xs" />
+              <div className="col-xs">
+                <OverallText>
+                  <input type="email" name="email" placeholder=" Email " style={{ width: '390px', height: '35px' }} onChange={this.handleInputChange.bind(this)} />
+                  <br />
+                </OverallText>
+              </div>
             </div>
-          </div>
-          <div className="row">
-            <div className="col-xs" />
-            <div className="col-xs">
-              <OverallText>
-                <input type="password" name="password" placeholder=" Password " style={{ width: '390px', height: '35px' }} onChange={this.handleInputChange.bind(this)} />
-                <br />
-                <br />
-              </OverallText>
+            <div className="row">
+              <div className="col-xs" />
+              <div className="col-xs">
+                <OverallText>
+                  <input type="password" name="password" placeholder=" Password " style={{ width: '390px', height: '35px' }} onChange={this.handleInputChange.bind(this)} />
+                  <br />
+                  <br />
+                </OverallText>
+              </div>
             </div>
-          </div>
-          <div className="row">
-            <div className="col-xs" />
-            <div className="col-xs">
-              <OverallText>
-                <input type="button" value="Login" style={{ width: '390px', height: '35px', backgroundColor: '#7bb420' }} onClick={this.handleSubmit} />
-              </OverallText>
+            <div className="row">
+              <div className="col-xs" />
+              <div className="col-xs">
+                <OverallText>
+                  <input type="button" value="Login" style={{ width: '390px', height: '35px', backgroundColor: '#7bb420' }} onClick={this.handleSubmit} />
+                </OverallText>
+              </div>
             </div>
-          </div>
-          <div className="row">
-            <div className="col-xs" />
-            <div className="col-xs">
-              <OverallText>
-                New to Uber?
-                <Router forceRefresh>
-                  <Link to="/userReg" onClick={() => history.push('/userReg')} style={{ color: 'green' }}> Create an account</Link>
-                  <Switch>
-                    <Route exact path="/userReg" component={userReg} />
-                  </Switch>
-                </Router>
-              </OverallText>
+            <div className="row">
+              <div className="col-xs" />
+              <div className="col-xs">
+                <OverallText>
+                  New to Uber?
+                  <Router forceRefresh>
+                    <Link to="/userReg" onClick={() => history.push('/userReg')} style={{ color: 'green' }}> Create an account</Link>
+                    <Switch>
+                      <Route exact path="/userReg" component={userReg} />
+                    </Switch>
+                  </Router>
+                </OverallText>
+              </div>
             </div>
-          </div>
-        </form>
-      </div></div>
+          </form>
+        </div>
+      </div>
     );
   }
 }
