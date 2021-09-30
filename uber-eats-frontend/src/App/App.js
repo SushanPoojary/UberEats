@@ -9,6 +9,8 @@ import { PrivateRoute } from '../_components';
 import { HomePage } from '../HomePage';
 import { LoginPage } from '../LoginPage';
 import { RegisterPage } from '../RegisterPage';
+import { ResLoginPage } from '../LoginPage/ResLoginPage';
+import { ResRegisterPage } from '../RegisterPage/ResRegisterPage';
 import 'bootstrap/dist/css/bootstrap.css';
 
 class App extends React.Component {
@@ -38,6 +40,8 @@ class App extends React.Component {
                                 <PrivateRoute exact path="/" component={HomePage} />
                                 <Route path="/login" component={LoginPage} />
                                 <Route path="/register" component={RegisterPage} />
+                                <Route path="/reslogin" component={ResLoginPage} />
+                                <Route path="/resregister" component={ResRegisterPage} />
                                 <Redirect from="*" to="/" />
                             </Switch>
                         </Router>

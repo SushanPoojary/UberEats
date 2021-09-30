@@ -1,6 +1,6 @@
 /* eslint-disable */
 export const alertConstants = {
-    SUCCESS: 'ALERT_SUCCESS',
-    ERROR: 'ALERT_ERROR',
-    CLEAR: 'ALERT_CLEAR'
+    SUCCESS: 'Success',
+    ERROR: 'Error',
+    CLEAR: 'Clear'
 };

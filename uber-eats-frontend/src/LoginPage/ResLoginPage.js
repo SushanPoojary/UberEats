@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 
 import { userActions } from '../_actions';
 
-class LoginPage extends React.Component {
+class ResLoginPage extends React.Component {
     constructor(props) {
         super(props);
 
@@ -43,7 +43,7 @@ class LoginPage extends React.Component {
         return (
             <div className="col-md-6 col-md-offset-3">
                 <br />
-                <h2>Login</h2>
+                <h3>Restaurant Login</h3>
                 <form name="form" onSubmit={this.handleSubmit}>
                     <div className={'form-group' + (submitted && !email ? ' has-error' : '')}>
                         <label htmlFor="email">Email</label>
@@ -62,10 +62,8 @@ class LoginPage extends React.Component {
                     <br />
                     <div className="form-group">
                         <button className="btn btn-primary">Login</button>
-                        <Link to="/register" className="btn btn-link">Register</Link>
-                    </div>
-                    <div className="form-group">
-                        <Link to="/reslogin" className="btn btn-link">Restaurant?</Link>
+                        <Link to="/resregister" className="btn btn-link">Register</Link>
+                        <Link to="/login" className="btn btn-link">User?</Link>
                     </div>
                 </form>
             </div>
@@ -83,5 +81,5 @@ const actionCreators = {
     logout: userActions.logout
 };
 
-const connectedLoginPage = connect(mapState, actionCreators)(LoginPage);
-export { connectedLoginPage as LoginPage };
+const connectedResLoginPage = connect(mapState, actionCreators)(ResLoginPage);
+export { connectedResLoginPage as ResLoginPage };
