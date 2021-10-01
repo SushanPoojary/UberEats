@@ -9,7 +9,7 @@ function App() {
     <div className="container">
       <div className="container-fluid text-center">
         <h3 className="margin">
-          <img src={logo} alt="UEL" width={200} height={35} />
+          <img src={logo} alt="UEL" width={200} height={30} />
         </h3>
       </div>
     </div>
