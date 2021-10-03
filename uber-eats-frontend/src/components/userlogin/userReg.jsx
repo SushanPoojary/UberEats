@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable prefer-destructuring */
 /* eslint-disable react/destructuring-assignment */
 import React from 'react';
 // import ReactDOM from 'react-dom';
@@ -9,7 +9,6 @@ import {
   Link,
   Route,
   Switch,
-  useHistory,
 } from 'react-router-dom';
 import { Redirect } from 'react-router';
 import styled from 'styled-components';
@@ -46,28 +45,112 @@ export class userReg extends React.Component {
       contact: '',
       email: '',
       password: '',
-      register: false,
+      // register: false,
       redirect: null,
+      usernameValid: '',
+      contactValid: '',
+      emailValid: '',
+      passwordValid: '',
+      usernameError: '',
+      contactError: '',
+      emailError: '',
+      passwordError: '',
     };
-    
+    this.usernameInputHandler = this.usernameInputHandler.bind(this);
+    this.contactInputHandler = this.contactInputHandler.bind(this);
+    this.emailInputHandler = this.emailInputHandler.bind(this);
+    this.passwordInputHandler = this.passwordInputHandler.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
-  
-  componentDidMount() {
+
+  // componentDidMount() {
+  //   this.setState({
+  //     // eslint-disable-next-line react/no-unused-state
+  //     register: false,
+  //   });
+  // }
+
+  handleValidation() {
+    // console.log('validation');
+    const {
+      usernameValid,
+      contactValid,
+      emailValid,
+      passwordValid,
+    } = this.state;
+    const usernameError = usernameValid ? '' : 'Name cannot be empty.';
+    const contactError = contactValid ? '' : 'Contact is invalid';
+    const emailError = emailValid ? '' : 'Email is invalid';
+    const passwordError = passwordValid ? '' : 'Password cannot be blank.';
     this.setState({
-      // eslint-disable-next-line react/no-unused-state
-      register: false,
+      usernameError,
+      contactError,
+      emailError,
+      passwordError,
     });
   }
 
-
-  handleInputChange = (event) => {
+  usernameInputHandler = (event) => {
     console.log(event.target.value);
-    this.setState({
-      [event.target.name]: event.target.value,
-    });
+    const username = event.target.value;
+    if (username !== '') {
+      this.setState({
+        username,
+        usernameValid: true,
+      });
+    } else {
+      this.setState({
+        usernameValid: false,
+      });
+    }
   }
 
+  contactInputHandler = (event) => {
+    console.log(event.target.value);
+    const contact = event.target.value;
+    const contactRegExp = new RegExp(/^[0-9\b]+$/);
+    if (contact !== '' && contactRegExp.test(contact) && contact.length === 10) {
+      this.setState({
+        contact,
+        contactValid: true,
+      });
+    } else {
+      this.setState({
+        contactValid: false,
+      });
+    }
+  }
 
+  emailInputHandler = (event) => {
+    console.log(event.target.value);
+    const email = event.target.value;
+    const emailRegExp = new RegExp('.+@.+\\..+');
+    if (email !== '' && emailRegExp.test(email)) {
+      this.setState({
+        email,
+        emailValid: true,
+      });
+    } else {
+      this.setState({
+        emailValid: false,
+      });
+    }
+  }
+
+  passwordInputHandler = (event) => {
+    console.log(event.target.value);
+    const password = event.target.value;
+    if (password !== '') {
+      this.setState({
+        password,
+        passwordValid: true,
+      });
+    } else {
+      this.setState({
+        passwordValid: false,
+      });
+    }
+  }
 
   handleSubmit = (event) => {
     event.preventDefault();
@@ -89,10 +172,10 @@ export class userReg extends React.Component {
       this.setState({
         redirect: true,
       });
-      
+
       // props.history.push('/login');
       // <Redirect to='/login'/>
-    });
+    }); this.handleValidation();
   }
 
   render() {
@@ -100,90 +183,106 @@ export class userReg extends React.Component {
     if (this.state.redirect) {
       redirectVar = <Redirect to="/login" />;
     }
+    const usernameError = this.state.usernameError;
+    const contactError = this.state.contactError;
+    const emailError = this.state.emailError;
+    const passwordError = this.state.passwordError;
     return (
       <div>
         {redirectVar}
         <div className="container">
           <form onSubmit={this.handleSubmit}>
             <div className="row">
-            <div className="col-xs" />
-            <div className="col-xs">
-              <HeadText>
-                Let&apos;s get started
-                <br />
-                <br />
-              </HeadText>
+              <div className="col-xs" />
+              <div className="col-xs">
+                <HeadText>
+                  Let&apos;s get started
+                  <br />
+                  <br />
+                </HeadText>
+              </div>
             </div>
-          </div>
+            <div className="row">
+              <div className="col-xs" />
+              <div className="col-xs">
+                <OverallText>
+                  Enter your details(required).
+                  <br />
+                </OverallText>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-xs" />
+              <div className="col-xs">
+                <OverallText>
+                  <input type="text" name="username" placeholder=" Name " style={{ width: '390px', height: '35px' }} onChange={this.usernameInputHandler} required />
+                  <span style={{ color: 'red' }}>
+                    {usernameError}
+                  </span>
+                  <br />
+                </OverallText>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-xs" />
+              <div className="col-xs">
+                <OverallText>
+                  <input type="tel" name="contact" placeholder=" Contact Number " style={{ width: '390px', height: '35px' }} onChange={this.contactInputHandler} required />
+                  <span style={{ color: 'red' }}>
+                    {contactError}
+                  </span>
+                  <br />
+                </OverallText>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-xs" />
+              <div className="col-xs">
+                <OverallText>
+                  <input type="email" name="email" placeholder=" Email " style={{ width: '390px', height: '35px' }} onChange={this.emailInputHandler} required />
+                  <span style={{ color: 'red' }}>
+                    {emailError}
+                  </span>
+                  <br />
+                </OverallText>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-xs" />
+              <div className="col-xs">
+                <OverallText>
+                  <input type="password" name="password" placeholder=" Password " style={{ width: '390px', height: '35px' }} onChange={this.passwordInputHandler} required />
+                  <span style={{ color: 'red' }}>
+                    {passwordError}
+                  </span>
+                  <br />
+                  <br />
+                </OverallText>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-xs" />
+              <div className="col-xs">
+                <OverallText>
+                  <input type="button" value="Register" style={{ width: '390px', height: '35px', backgroundColor: '#7bb420' }} onClick={this.handleSubmit} />
+                </OverallText>
+              </div>
+            </div>
+          </form>
           <div className="row">
             <div className="col-xs" />
             <div className="col-xs">
               <OverallText>
-                Enter your details(required).
-                <br />
+                Already have an account?
+                <Router forceRefresh>
+                  <Link to="/login" onClick={() => history.push('/login')} style={{ color: 'green' }}> Login</Link>
+                  <Switch>
+                    <Route exact path="/login" component={UserLogin} />
+                  </Switch>
+                </Router>
               </OverallText>
             </div>
           </div>
-          <div className="row">
-            <div className="col-xs" />
-            <div className="col-xs">
-              <OverallText>
-                <input type="text" name="username" placeholder=" Name " style={{ width: '390px', height: '35px' }} onChange={this.handleInputChange.bind(this)} required />
-                <br />
-              </OverallText>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-xs" />
-            <div className="col-xs">
-              <OverallText>
-                <input type="tel" name="contact" placeholder=" Contact Number " style={{ width: '390px', height: '35px' }} onChange={this.handleInputChange.bind(this)} required />
-                <br />
-              </OverallText>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-xs" />
-            <div className="col-xs">
-              <OverallText>
-                <input type="email" name="email" placeholder=" Email " style={{ width: '390px', height: '35px' }} onChange={this.handleInputChange.bind(this)} required />
-                <br />
-              </OverallText>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-xs" />
-            <div className="col-xs">
-              <OverallText>
-                <input type="password" name="password" placeholder=" Password " style={{ width: '390px', height: '35px' }} onChange={this.handleInputChange.bind(this)} required />
-                <br />
-                <br />
-              </OverallText>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-xs" />
-            <div className="col-xs">
-              <OverallText>
-                <input type="button" value="Register" style={{ width: '390px', height: '35px', backgroundColor: '#7bb420' }} onClick={this.handleSubmit} />
-              </OverallText>
-            </div>
-          </div>
-        </form>
-          <div className="row">
-          <div className="col-xs" />
-          <div className="col-xs">
-            <OverallText>
-              Already have an account?
-              <Router forceRefresh>
-                <Link to="/login" onClick={() => history.push('/login')} style={{ color: 'green' }}> Login</Link>
-                <Switch>
-                  <Route exact path="/login" component={UserLogin} />
-                </Switch>
-              </Router>
-            </OverallText>
-          </div>
-        </div>
         </div>
       </div>
     );

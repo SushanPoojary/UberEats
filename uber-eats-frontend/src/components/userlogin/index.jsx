@@ -1,3 +1,5 @@
+/* eslint-disable prefer-destructuring */
+/* eslint-disable react/destructuring-assignment */
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import styled from 'styled-components';
@@ -10,6 +12,7 @@ import {
   Switch,
 } from 'react-router-dom';
 import { Redirect } from 'react-router';
+import { Form } from 'react-bootstrap';
 import history from './history';
 // eslint-disable-next-line import/no-cycle
 import { userReg } from './userReg';
@@ -41,62 +44,132 @@ export class UserLogin extends React.Component {
     this.state = {
       email: '',
       password: '',
-      // eslint-disable-next-line react/no-unused-state
       authFlag: false,
+      authMessage: '',
+      emailValid: '',
+      passwordValid: '',
+      redirectHome: '',
+      emailError: '',
+      passwordError: '',
+      authMessageE: '',
     };
+    this.emailInputHandler = this.emailInputHandler.bind(this);
+    this.passwordInputHandler = this.passwordInputHandler.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  componentDidMount() {
+  handleValidation() {
+    // console.log('validation');
+    const {
+      emailValid,
+      passwordValid,
+      authFlag,
+      authMessage,
+    } = this.state;
+    const emailError = emailValid ? '' : 'Email is invalid';
+    const passwordError = passwordValid ? '' : 'Password is invalid';
+    const authMessageE = authFlag ? '' : authMessage;
     this.setState({
-      // eslint-disable-next-line react/no-unused-state
-      authFlag: false,
+      emailError,
+      passwordError,
+      authMessageE,
     });
   }
 
-  handleInputChange = (event) => {
+  emailInputHandler = (event) => {
     console.log(event.target.value);
-    this.setState({
-      [event.target.name]: event.target.value,
-    });
+    const email = event.target.value;
+    const emailRegExp = new RegExp('.+@.+\\..+');
+    if (email !== '' && emailRegExp.test(email)) {
+      this.setState({
+        email,
+        emailValid: true,
+      });
+    } else {
+      this.setState({
+        emailValid: false,
+      });
+    }
+  }
+
+  passwordInputHandler = (event) => {
+    console.log(event.target.value);
+    const password = event.target.value;
+    if (password !== '') {
+      this.setState({
+        password,
+        passwordValid: true,
+      });
+    } else {
+      this.setState({
+        passwordValid: false,
+      });
+    }
   }
 
   handleSubmit = (event) => {
     event.preventDefault();
-    const {
-      email,
-      password,
-    } = this.state;
-    console.log(email, password);
-    Axios.defaults.withCredentials = true;
-    Axios.post('http://localhost:3001/login', {
-      email,
-      password,
-    }).then((response) => {
-      console.log('Status Code : ', response.status);
-      if (response.status === 200) {
-        this.setState({
-          // eslint-disable-next-line react/no-unused-state
-          authFlag: true,
-        });
-      } else {
-        this.setState({
-          // eslint-disable-next-line react/no-unused-state
-          authFlag: false,
-        });
-      }
-    });
+    const logdata = {
+      email: this.state.email,
+      password: this.state.password,
+    };
+
+    console.log(logdata);
+    // Axios.defaults.withCredentials = true;
+    Axios.post('http://localhost:3001/login', logdata)
+      .then((response) => {
+        console.log('Status Code : ', response.status);
+        if (response.status === 200) {
+          const status = response.data.status;
+          if (status === 200) {
+            const token = response.data.token;
+            localStorage.setItem('ubereatsUserToken', token);
+            this.setState({
+              authFlag: true,
+              authMessage: '',
+              redirectHome: <Redirect to="/" />,
+            });
+          } else if (status === 403) {
+            this.setState({
+              authFlag: false,
+              authMessage: 'Invalid Credentials',
+            });
+          } else if (status === 404) {
+            this.setState({
+              authFlag: false,
+              authMessage: response.data.message,
+            });
+          } else {
+            this.setState({
+              authFlag: false,
+              authMessage: response.data.message,
+            });
+          }
+        } else {
+          this.setState({
+            authFlag: false,
+            authMessage: 'DB Error',
+          });
+        }
+      }); this.handleValidation();
   }
 
   render() {
     let redirectVar = null;
     if (cookie.load('cookie')) {
-      redirectVar = <Redirect to="/navbar" />;
+      console.log('cookie');
+      redirectVar = <Redirect to="/" />;
     }
+    const redirectHome = this.state.redirectHome;
+    const emailError = this.state.emailError;
+    const passwordError = this.state.passwordError;
+    const authMessageE = this.state.authMessageE;
     return (
       <div>
         {redirectVar}
+        {redirectHome}
         <div className="container">
-          <form>
+          <Form>
             <div className="row">
               <div className="col-xs" />
               <div className="col-xs">
@@ -120,7 +193,10 @@ export class UserLogin extends React.Component {
               <div className="col-xs" />
               <div className="col-xs">
                 <OverallText>
-                  <input type="email" name="email" placeholder=" Email " style={{ width: '390px', height: '35px' }} onChange={this.handleInputChange.bind(this)} />
+                  <input type="email" name="email" placeholder=" Email " style={{ width: '390px', height: '35px' }} onChange={this.emailInputHandler} />
+                  <span style={{ color: 'red' }}>
+                    {emailError}
+                  </span>
                   <br />
                 </OverallText>
               </div>
@@ -129,8 +205,14 @@ export class UserLogin extends React.Component {
               <div className="col-xs" />
               <div className="col-xs">
                 <OverallText>
-                  <input type="password" name="password" placeholder=" Password " style={{ width: '390px', height: '35px' }} onChange={this.handleInputChange.bind(this)} />
+                  <input type="password" name="password" placeholder=" Password " style={{ width: '390px', height: '35px' }} onChange={this.passwordInputHandler} />
+                  <span style={{ color: 'red' }}>
+                    {passwordError}
+                  </span>
                   <br />
+                  <span style={{ color: 'red' }}>
+                    {authMessageE}
+                  </span>
                   <br />
                 </OverallText>
               </div>
@@ -143,21 +225,16 @@ export class UserLogin extends React.Component {
                 </OverallText>
               </div>
             </div>
-            <div className="row">
-              <div className="col-xs" />
-              <div className="col-xs">
-                <OverallText>
-                  New to Uber?
-                  <Router forceRefresh>
-                    <Link to="/userReg" onClick={() => history.push('/userReg')} style={{ color: 'green' }}> Create an account</Link>
-                    <Switch>
-                      <Route exact path="/userReg" component={userReg} />
-                    </Switch>
-                  </Router>
-                </OverallText>
-              </div>
-            </div>
-          </form>
+            <OverallText>
+              New to Uber?
+              <Router forceRefresh>
+                <Link to="/userReg" onClick={() => history.push('/userReg')} style={{ color: 'green' }}> Create an account</Link>
+                <Switch>
+                  <Route exact path="/userReg" component={userReg} />
+                </Switch>
+              </Router>
+            </OverallText>
+          </Form>
         </div>
       </div>
     );

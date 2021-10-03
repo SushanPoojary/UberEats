@@ -61,14 +61,14 @@ class NavBar extends Component {
               <NavDropdown.Item href="/prevorder">Previous Orders</NavDropdown.Item>
               <NavDropdown.Item href="/profile">Profile</NavDropdown.Item>
               <NavDropdown.Divider />
-              <NavDropdown.Item onClick={this.handleUserLogout} href="/">Logout</NavDropdown.Item>
+              <NavDropdown.Item onClick={this.handleUserLogout} href="/login">Logout</NavDropdown.Item>
             </NavDropdown>
           </Form>
         );
       } else {
         console.log('No Active sesh!');
         navBarButtons = (
-          <Form className="offset-sm-8" inline>
+          <Form className="offset-sm-9" inline>
             <Button variant="success" style={buttonStyle} href="/login">Login</Button>
             <Button variant="outline-success" style={buttonStyle} href="/userReg">Sign Up</Button>
             <Button variant="primary" style={buttonStyle} href="/reslogin">Business?</Button>
@@ -77,8 +77,8 @@ class NavBar extends Component {
       }
       return (
         <div>
-          <Navbar className="offset-sm-1" bg="white" expand="lg">
-            <Navbar.Brand href="/home" bsPrefix="mainNavBrand-logo">UberEats</Navbar.Brand>
+          <Navbar bg="transparent" expand="lg">
+            <Navbar.Brand href="/" bsPrefix="mainNavBrand-logo">UberEats</Navbar.Brand>
             {navBarButtons}
           </Navbar>
         </div>

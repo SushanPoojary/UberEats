@@ -5,7 +5,10 @@ var session = require('express-session');
 var mysql = require('mysql');
 var constants = require('./config.json');
 var cors = require('cors');
+var jwt = require('jsonwebtoken');
 app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
+
+const JWT_KEY = 'UberEatsSK#07'
 
 // var connection = mysql.createConnection({})
 var connection = mysql.createPool({
@@ -62,13 +65,16 @@ app.post('/userReg', (req, res)=> {
   const usercontact = req.body.contact
   const useremail = req.body.email
   const userpassword = req.body.password
-  console.log("here");
+  console.log("Reg here");
+  console.log(username)
+  if(username != '' && usercontact != '' && useremail != '' && userpassword != ''){
   connection.query("INSERT INTO uber_eats.test(name, contact, email, password) VALUES (?,?,?,?)", [username, usercontact, useremail, userpassword], 
   (err, results) => {
     console.log(err);
     console.log(results);
     res.send(results);
-  })
+  });
+}
 })
 
 app.post('/login', (req, res)=> {
@@ -84,11 +90,64 @@ app.post('/login', (req, res)=> {
     } 
     if (results.length > 0) {
       res.cookie('cookie',constants.DB.username,{maxAge: 900000, httpOnly: false, path : '/'});
-      res.send(results);
+      let token = jwt.sign({useremail: useremail}, JWT_KEY);
+      res.json({
+        "status": 200,
+        "token": token
+      });
+      // res.send(results);
       // console.log("Idhar?")
-      req.session.dbUser = dbUser;
-      console.log(req.session.dbUser);
+      // req.session.dbUser = dbUser;
+      // console.log(req.session.dbUser);
+      // console.log(results);
+      return;
+    } else {
+      res.send(results)
       console.log(results);
+    }
+  })
+})
+
+app.post('/resReg', (req, res)=> {
+  const username = req.body.username
+  const userlocation = req.body.location
+  const useremail = req.body.email
+  const userpassword = req.body.password
+  console.log("Reg here");
+  console.log(username)
+  if(username != '' && userlocation != '' && useremail != '' && userpassword != ''){
+  connection.query("INSERT INTO uber_eats.restest(name, email, password, location) VALUES (?,?,?,?)", [username, useremail, userpassword, userlocation], 
+  (err, results) => {
+    console.log(err);
+    console.log(results);
+    res.send(results);
+  });
+}
+})
+
+app.post('/reslogin', (req, res)=> {
+  const useremail = req.body.email
+  const userpassword = req.body.password
+  const dbUser = (useremail, userpassword)
+  console.log("here");
+  connection.query("SELECT email,password FROM uber_eats.restest WHERE email = ? AND password = ?", [useremail, userpassword], 
+  (err, results) => {
+    if (err) {
+      res.send({err: err});
+      console.log(err);
+    } 
+    if (results.length > 0) {
+      res.cookie('cookie',constants.DB.username,{maxAge: 900000, httpOnly: false, path : '/'});
+      let token = jwt.sign({useremail: useremail}, JWT_KEY);
+      res.json({
+        "status": 200,
+        "token": token
+      });
+      // res.send(results);
+      // console.log("Idhar?")
+      // req.session.dbUser = dbUser;
+      // console.log(req.session.dbUser);
+      // console.log(results);
       return;
     } else {
       res.send(results)
