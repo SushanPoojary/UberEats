@@ -1,7 +1,7 @@
 // /* eslint-disable */
 import React, { Component } from 'react';
 // import { Link } from 'react-router-dom';
-// import cookie from 'react-cookies';
+import cookie from 'react-cookies';
 // import { Redirect } from 'react-router';
 import 'bootstrap/dist/css/bootstrap.css';
 // import { Glyphicon } from 'react-bootstrap';
@@ -25,11 +25,12 @@ class NavBar extends Component {
 
     handleLogout = () => {
       localStorage.removeItem('ubereatsResToken');
-      // cookie.remove('cookie', { path: '/' });
+      cookie.remove('cookie', { path: '/' });
     }
 
     handleUserLogout = () => {
       localStorage.removeItem('ubereatsUserToken');
+      cookie.remove('cookie', { path: '/' });
     }
 
     render() {
@@ -44,6 +45,7 @@ class NavBar extends Component {
           <Form className="offset-sm-9" inline>
             {/* <Button variant="link" style={btnStyle} href='/reshome'>Home</Button> */}
             <NavDropdown title="Restaurant Account" id="nav-dropdown">
+              <NavDropdown.Item href="/reshome">Home</NavDropdown.Item>
               <NavDropdown.Item href="/resprofile">Profile</NavDropdown.Item>
               <NavDropdown.Item href="/additem">Add Menu Item</NavDropdown.Item>
               <NavDropdown.Divider />
@@ -59,7 +61,7 @@ class NavBar extends Component {
             <NavDropdown title="Account" id="nav-dropdown">
               <NavDropdown.Item href="/order">Order</NavDropdown.Item>
               <NavDropdown.Item href="/prevorder">Previous Orders</NavDropdown.Item>
-              <NavDropdown.Item href="/profile">Profile</NavDropdown.Item>
+              <NavDropdown.Item href="/userprofile">Profile</NavDropdown.Item>
               <NavDropdown.Divider />
               <NavDropdown.Item onClick={this.handleUserLogout} href="/login">Logout</NavDropdown.Item>
             </NavDropdown>
@@ -78,7 +80,6 @@ class NavBar extends Component {
       return (
         <div>
           <Navbar bg="transparent" expand="lg">
-            <Navbar.Brand href="/" bsPrefix="mainNavBrand-logo">UberEats</Navbar.Brand>
             {navBarButtons}
           </Navbar>
         </div>

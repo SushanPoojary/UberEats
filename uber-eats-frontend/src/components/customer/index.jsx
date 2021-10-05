@@ -15,7 +15,8 @@ import { Redirect } from 'react-router';
 import { Form } from 'react-bootstrap';
 import history from './history';
 // eslint-disable-next-line import/no-cycle
-import { resReg } from './resReg';
+import { userReg } from './userReg';
+import NavBar from '../../NavBar';
 
 const HeadText = styled.h2`
     font-size: 30px;
@@ -38,7 +39,7 @@ const OverallText = styled.h2`
     //padding-left: 150px;
 `;
 
-export class resLogin extends React.Component {
+export class UserLogin extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -53,7 +54,7 @@ export class resLogin extends React.Component {
       passwordError: '',
       authMessageE: '',
     };
-    // this.emailInputHandler = this.emailInputHandler.bind(this);
+    this.emailInputHandler = this.emailInputHandler.bind(this);
     this.passwordInputHandler = this.passwordInputHandler.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -115,15 +116,15 @@ export class resLogin extends React.Component {
     };
 
     console.log(logdata);
-    // Axios.defaults.withCredentials = true;
-    Axios.post('http://localhost:3001/reslogin', logdata)
+    Axios.defaults.withCredentials = true;
+    Axios.post('http://localhost:3001/login', logdata)
       .then((response) => {
         console.log('Status Code : ', response.status);
         if (response.status === 200) {
-          const { status } = response.data;
+          const status = response.data.status;
           if (status === 200) {
-            const { token } = response.data;
-            localStorage.setItem('ubereatsResToken', token);
+            const token = response.data.token;
+            localStorage.setItem('ubereatsUserToken', token);
             this.setState({
               authFlag: true,
               authMessage: '',
@@ -157,6 +158,7 @@ export class resLogin extends React.Component {
   render() {
     let redirectVar = null;
     if (cookie.load('cookie')) {
+      console.log('cookie');
       redirectVar = <Redirect to="/" />;
     }
     const redirectHome = this.state.redirectHome;
@@ -167,6 +169,7 @@ export class resLogin extends React.Component {
       <div>
         {redirectVar}
         {redirectHome}
+        <NavBar />
         <div className="container">
           <Form>
             <div className="row">
@@ -192,7 +195,7 @@ export class resLogin extends React.Component {
               <div className="col-xs" />
               <div className="col-xs">
                 <OverallText>
-                  <input type="email" name="email" placeholder=" Email " style={{ width: '390px', height: '35px' }} onChange={this.emailInputHandler.bind(this)} />
+                  <input type="email" name="email" placeholder=" Email " style={{ width: '390px', height: '35px' }} onChange={this.emailInputHandler} />
                   <span style={{ color: 'red' }}>
                     {emailError}
                   </span>
@@ -227,9 +230,9 @@ export class resLogin extends React.Component {
             <OverallText>
               New to Uber?
               <Router forceRefresh>
-                <Link to="/resReg" onClick={() => history.push('/resReg')} style={{ color: 'green' }}> Create an account</Link>
+                <Link to="/userReg" onClick={() => history.push('/userReg')} style={{ color: 'green' }}> Create an account</Link>
                 <Switch>
-                  <Route exact path="/resReg" component={resReg} />
+                  <Route exact path="/userReg" component={userReg} />
                 </Switch>
               </Router>
             </OverallText>

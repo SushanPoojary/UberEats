@@ -2,13 +2,23 @@ var express = require('express');
 var app = express();
 app.use(express.json());
 var session = require('express-session');
+
 var mysql = require('mysql');
 var constants = require('./config.json');
 var cors = require('cors');
 var jwt = require('jsonwebtoken');
 app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
 
-const JWT_KEY = 'UberEatsSK#07'
+const JWT_KEY = 'UberEatsSP#07'
+
+app.use(session({
+  secret              : 'ubereats',
+  resave              : false, // Forces the session to be saved back to the session store, even if the session was never modified during the request
+  saveUninitialized   : false, // Force to save uninitialized session to db. A session is uninitialized when it is new but not modified.
+  duration            : 60 * 60 * 1000,    // Overall duration of Session : 30 minutes : 1800 seconds
+  activeDuration      :  5 * 60 * 1000,
+}));
+
 
 // var connection = mysql.createConnection({})
 var connection = mysql.createPool({
@@ -20,13 +30,6 @@ var connection = mysql.createPool({
   connectionLimit: 99
 });
 
-app.use(session({
-  secret              : 'ubereats',
-  resave              : false, // Forces the session to be saved back to the session store, even if the session was never modified during the request
-  saveUninitialized   : false, // Force to save uninitialized session to db. A session is uninitialized when it is new but not modified.
-  duration            : 60 * 60 * 1000,    // Overall duration of Session : 30 minutes : 1800 seconds
-  activeDuration      :  5 * 60 * 1000
-}));
 
 app.use(function(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
@@ -90,11 +93,17 @@ app.post('/login', (req, res)=> {
     } 
     if (results.length > 0) {
       res.cookie('cookie',constants.DB.username,{maxAge: 900000, httpOnly: false, path : '/'});
+      req.session.email = results[0].email;
+      req.session.isLoggedIn = true;
+      console.log(req.session.email);
+      console.log(req.session.isLoggedIn);
+      req.session.save();   
       let token = jwt.sign({useremail: useremail}, JWT_KEY);
       res.json({
         "status": 200,
         "token": token
       });
+      res.end("Successful Login!");
       // res.send(results);
       // console.log("Idhar?")
       // req.session.dbUser = dbUser;
@@ -102,7 +111,9 @@ app.post('/login', (req, res)=> {
       // console.log(results);
       return;
     } else {
-      res.send(results)
+      res.json({
+        "status": 403
+      })
       console.log(results);
     }
   })
@@ -134,15 +145,21 @@ app.post('/reslogin', (req, res)=> {
   (err, results) => {
     if (err) {
       res.send({err: err});
-      console.log(err);
+      console.log("Error");
     } 
     if (results.length > 0) {
       res.cookie('cookie',constants.DB.username,{maxAge: 900000, httpOnly: false, path : '/'});
+      req.session.email = results[0].email;
+      req.session.isLoggedIn = true;
+      console.log(req.session.email);
+      console.log(req.session.isLoggedIn);
+      req.session.save();   
       let token = jwt.sign({useremail: useremail}, JWT_KEY);
       res.json({
         "status": 200,
         "token": token
       });
+      res.end("Successful Login!");
       // res.send(results);
       // console.log("Idhar?")
       // req.session.dbUser = dbUser;
@@ -150,17 +167,101 @@ app.post('/reslogin', (req, res)=> {
       // console.log(results);
       return;
     } else {
-      res.send(results)
-      console.log(results);
+      res.json({
+        "status": 403
+      })
+      console.log("Error1");
     }
   })
 })
 
-app.get('/', function (req, res) {
-  res.send('Hello World!');
+
+
+app.get('/resProfile', (req, res) => {
+  console.log('Res Profile')
+  console.log(req.session);
+  if (!req.session.isLoggedIn) {
+      res.sendStatus(404);
+      console.log("Not Logged In");
+  } else {
+      let profileSQL = "SELECT * FROM uber_eats.restest WHERE email = ?";
+      connection.query(profileSQL, [req.session.email], (err, results) => {
+          if (err) {
+              throw err;
+          } else if (results.length > 0) {
+              console.log(results);
+              res.status(200).send(results);
+          } else {
+              console.log("Can't find user for profile page!");
+          }
+      });
+  }
 });
-app.listen(3001, function () {
-  console.log('Server listening on port 3001!');
+
+app.post('/resupdateProfile', (req, res) => {
+  console.log('Res Update profile')
+  console.log(req.body);
+  const {name, location, description, contact, timing } = req.body;
+  if (!req.session.isLoggedIn) {
+      console.log("User has to be logged in to update profile...");
+  } else {
+      let updateProfile = "UPDATE uber_eats.restest " + "SET name = ?, location = ?, description = ?, contact = ?, timings = ? WHERE email = ?";
+      connection.query(updateProfile, [name, location, description, contact, timing, req.session.email], (err, res) => {
+          if (err) {
+              throw err;
+          } else {
+              console.log('Updated Profile Successfully!');
+          }
+      });
+  }
 });
+
+app.get('/userProfile', (req, res) => {
+  console.log('user Profile')
+  console.log(req.session);
+  if (!req.session.isLoggedIn) {
+      res.sendStatus(404);
+      console.log("Not Logged In");
+  } else {
+      let profileSQL = "SELECT * FROM uber_eats.test WHERE email = ?";
+      connection.query(profileSQL, [req.session.email], (err, results) => {
+          if (err) {
+              throw err;
+          } else if (results.length > 0) {
+              console.log(results);
+              res.status(200).send(results);
+          } else {
+              console.log("Can't find user for profile page!");
+          }
+      });
+  }
+});
+
+app.post('/updateProfile', (req, res) => {
+  console.log('Update profile')
+  console.log(req.body);
+  const {name, location, description, contact, timing } = req.body;
+  if (!req.session.isLoggedIn) {
+      console.log("User has to be logged in to update profile...");
+  } else {
+      let updateProfile = "UPDATE uber_eats.test " + "SET name = ?, location = ?, description = ?, contact = ?, timings = ? WHERE email = ?";
+      connection.query(updateProfile, [name, location, description, contact, timing, req.session.email], (err, res) => {
+          if (err) {
+              throw err;
+          } else {
+              console.log('Updated Profile Successfully!');
+          }
+      });
+  }
+});
+
+// app.get('/', function (req, res) {
+//   res.send('Hello World!');
+// });
+// app.listen(3001, function () {
+//   console.log('Server listening on port 3001!');
+// });
+
+app.listen(3001, () => console.log('Server listening on port 3001'));
 
 module.exports = app;

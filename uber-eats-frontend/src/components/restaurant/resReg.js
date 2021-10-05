@@ -14,7 +14,8 @@ import { Redirect } from 'react-router';
 import styled from 'styled-components';
 import history from './history';
 // eslint-disable-next-line import/no-cycle
-import { UserLogin } from './index';
+import { resLogin } from './index';
+import NavBar from '../../NavBar';
 
 const HeadText = styled.h2`
     font-size: 30px;
@@ -37,27 +38,27 @@ const OverallText = styled.h2`
     //padding-left: 150px;
 `;
 
-export class userReg extends React.Component {
+export class resReg extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       username: '',
-      contact: '',
+      location: '',
       email: '',
       password: '',
       // register: false,
       redirect: null,
       usernameValid: '',
-      contactValid: '',
+      locationValid: '',
       emailValid: '',
       passwordValid: '',
       usernameError: '',
-      contactError: '',
+      locationError: '',
       emailError: '',
       passwordError: '',
     };
     this.usernameInputHandler = this.usernameInputHandler.bind(this);
-    this.contactInputHandler = this.contactInputHandler.bind(this);
+    this.locationInputHandler = this.locationInputHandler.bind(this);
     this.emailInputHandler = this.emailInputHandler.bind(this);
     this.passwordInputHandler = this.passwordInputHandler.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -74,17 +75,17 @@ export class userReg extends React.Component {
     // console.log('validation');
     const {
       usernameValid,
-      contactValid,
+      locationValid,
       emailValid,
       passwordValid,
     } = this.state;
     const usernameError = usernameValid ? '' : 'Name cannot be empty.';
-    const contactError = contactValid ? '' : 'Contact is invalid';
+    const locationError = locationValid ? '' : 'Location cannot be empty.';
     const emailError = emailValid ? '' : 'Email is invalid';
     const passwordError = passwordValid ? '' : 'Password cannot be blank.';
     this.setState({
       usernameError,
-      contactError,
+      locationError,
       emailError,
       passwordError,
     });
@@ -105,21 +106,21 @@ export class userReg extends React.Component {
     }
   }
 
-  contactInputHandler = (event) => {
-    console.log(event.target.value);
-    const contact = event.target.value;
-    const contactRegExp = new RegExp(/^[0-9\b]+$/);
-    if (contact !== '' && contactRegExp.test(contact) && contact.length === 10) {
-      this.setState({
-        contact,
-        contactValid: true,
-      });
-    } else {
-      this.setState({
-        contactValid: false,
-      });
-    }
-  }
+  // contactInputHandler = (event) => {
+  //   console.log(event.target.value);
+  //   const contact = event.target.value;
+  //   const contactRegExp = new RegExp(/^[0-9\b]+$/);
+  //   if (contact !== '' && contactRegExp.test(contact) && contact.length === 10) {
+  //     this.setState({
+  //       contact,
+  //       contactValid: true,
+  //     });
+  //   } else {
+  //     this.setState({
+  //       contactValid: false,
+  //     });
+  //   }
+  // }
 
   emailInputHandler = (event) => {
     console.log(event.target.value);
@@ -152,18 +153,33 @@ export class userReg extends React.Component {
     }
   }
 
+  locationInputHandler = (event) => {
+    console.log(event.target.value);
+    const location = event.target.value;
+    if (location !== '') {
+      this.setState({
+        location,
+        locationValid: true,
+      });
+    } else {
+      this.setState({
+        locationValid: false,
+      });
+    }
+  }
+
   handleSubmit = (event) => {
     event.preventDefault();
     const {
       username,
-      contact,
+      location,
       email,
       password,
     } = this.state;
-    console.log(username, contact, email, password);
-    Axios.post('http://localhost:3001/userReg', {
+    console.log(username, location, email, password);
+    Axios.post('http://localhost:3001/resReg', {
       username,
-      contact,
+      location,
       email,
       password,
     }).then((response) => {
@@ -181,22 +197,23 @@ export class userReg extends React.Component {
   render() {
     let redirectVar = null;
     if (this.state.redirect) {
-      redirectVar = <Redirect to="/login" />;
+      redirectVar = <Redirect to="/reslogin" />;
     }
     const usernameError = this.state.usernameError;
-    const contactError = this.state.contactError;
+    const locationError = this.state.locationError;
     const emailError = this.state.emailError;
     const passwordError = this.state.passwordError;
     return (
       <div>
         {redirectVar}
+        <NavBar />
         <div className="container">
           <form onSubmit={this.handleSubmit}>
             <div className="row">
               <div className="col-xs" />
               <div className="col-xs">
                 <HeadText>
-                  Let&apos;s get started
+                  Let&apos;s register your business
                   <br />
                   <br />
                 </HeadText>
@@ -206,7 +223,7 @@ export class userReg extends React.Component {
               <div className="col-xs" />
               <div className="col-xs">
                 <OverallText>
-                  Enter your details(required).
+                  Enter details.
                   <br />
                 </OverallText>
               </div>
@@ -215,21 +232,9 @@ export class userReg extends React.Component {
               <div className="col-xs" />
               <div className="col-xs">
                 <OverallText>
-                  <input type="text" name="username" placeholder=" Name " style={{ width: '390px', height: '35px' }} onChange={this.usernameInputHandler} required />
+                  <input type="text" name="username" placeholder=" Restaurant Name " style={{ width: '390px', height: '35px' }} onChange={this.usernameInputHandler} required />
                   <span style={{ color: 'red' }}>
                     {usernameError}
-                  </span>
-                  <br />
-                </OverallText>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-xs" />
-              <div className="col-xs">
-                <OverallText>
-                  <input type="tel" name="contact" placeholder=" Contact Number " style={{ width: '390px', height: '35px' }} onChange={this.contactInputHandler} required />
-                  <span style={{ color: 'red' }}>
-                    {contactError}
                   </span>
                   <br />
                 </OverallText>
@@ -256,6 +261,18 @@ export class userReg extends React.Component {
                     {passwordError}
                   </span>
                   <br />
+                </OverallText>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-xs" />
+              <div className="col-xs">
+                <OverallText>
+                  <input type="text" name="location" placeholder=" Restaurant Location " style={{ width: '390px', height: '35px' }} onChange={this.locationInputHandler} required />
+                  <span style={{ color: 'red' }}>
+                    {locationError}
+                  </span>
+                  <br />
                   <br />
                 </OverallText>
               </div>
@@ -273,11 +290,11 @@ export class userReg extends React.Component {
             <div className="col-xs" />
             <div className="col-xs">
               <OverallText>
-                Already have an account?
+                Already a partner?
                 <Router forceRefresh>
-                  <Link to="/login" onClick={() => history.push('/login')} style={{ color: 'green' }}> Login</Link>
+                  <Link to="/reslogin" onClick={() => history.push('/reslogin')} style={{ color: 'green' }}> Login</Link>
                   <Switch>
-                    <Route exact path="/login" component={UserLogin} />
+                    <Route exact path="/reslogin" component={resLogin} />
                   </Switch>
                 </Router>
               </OverallText>
