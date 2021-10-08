@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 /* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
 import { Redirect } from 'react-router';
@@ -38,6 +39,8 @@ class resProfile extends Component {
       picture: '',
       dishes: '',
       timing: '',
+      authMessage: true,
+      authMessageE: '',
     };
     this.handleChange = this.handleChange.bind(this);
   }
@@ -64,11 +67,25 @@ class resProfile extends Component {
       this.setState({ [e.target.name]: e.target.value });
     }
 
+    handleValidation() {
+      // console.log('validation');
+      const {
+        authMessage,
+      } = this.state;
+      const authMessageE = authMessage ? 'Profile Updated' : 'Error Updating Profile';
+      this.setState({
+        authMessageE,
+      });
+    }
+
     updateProfile = (data) => {
       Axios.post('http://localhost:3001/resupdateProfile', data)
         .then((res) => {
           if (res) {
             console.log('Updated');
+            this.setState({
+              authMessage: true,
+            });
             // this.setState({ name: data.name });
             // this.setState({ location: data.location });
             // this.setState({ description: data.description });
@@ -79,7 +96,11 @@ class resProfile extends Component {
           }
         }).catch((err) => {
           console.log(`Restaurant Update Profile: ${err}`);
+          this.setState({
+            authMessage: false,
+          });
         });
+      this.handleValidation();
     }
 
     updateRes = (e) => {
@@ -101,6 +122,7 @@ class resProfile extends Component {
       if (!cookie.load('cookie')) {
         redirectVar = <Redirect to="/reslogin" />;
       }
+      const authMessageE = this.state.authMessageE;
       return (
         <div>
           <NavBar />
@@ -169,6 +191,9 @@ class resProfile extends Component {
                     <br />
                     <input type="text" name="timing" defaultValue={this.state.timing} placeholder=" Restaurant Timing " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
                     <br />
+                    <span style={{ color: 'green' }}>
+                      {authMessageE}
+                    </span>
                   </OverallText>
                 </div>
               </div>

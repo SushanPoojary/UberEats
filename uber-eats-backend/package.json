@@ -25,5 +25,9 @@
     "routes": "^2.1.0",
     "session-file-store": "^1.5.0",
     "sha1": "^1.1.1"
+  },
+  "devDependencies": {
+    "babel-preset-es2015-node5": "^1.2.0",
+    "babel-preset-es2015-node6": "^0.4.0"
   }
 }

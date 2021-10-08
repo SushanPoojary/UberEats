@@ -52,10 +52,12 @@ export class userReg extends React.Component {
       contactValid: '',
       emailValid: '',
       passwordValid: '',
+      emailDup: '',
       usernameError: '',
       contactError: '',
       emailError: '',
       passwordError: '',
+      emailDupError: '',
     };
     this.usernameInputHandler = this.usernameInputHandler.bind(this);
     this.contactInputHandler = this.contactInputHandler.bind(this);
@@ -78,16 +80,19 @@ export class userReg extends React.Component {
       contactValid,
       emailValid,
       passwordValid,
+      emailDup,
     } = this.state;
     const usernameError = usernameValid ? '' : 'Name cannot be empty.';
     const contactError = contactValid ? '' : 'Contact is invalid';
     const emailError = emailValid ? '' : 'Email is invalid';
     const passwordError = passwordValid ? '' : 'Password cannot be blank.';
+    const emailDupError = emailDup ? '' : 'Email already exists.';
     this.setState({
       usernameError,
       contactError,
       emailError,
       passwordError,
+      emailDupError,
     });
   }
 
@@ -170,9 +175,18 @@ export class userReg extends React.Component {
     }).then((response) => {
       console.log('Status Code : ', response.status);
       console.log(response);
-      this.setState({
-        redirect: true,
-      });
+      const status = response.data.status;
+      if (status === 1062) {
+        this.setState({
+          redirect: false,
+          emailDup: true,
+        });
+      } else {
+        this.setState({
+          redirect: true,
+          emailDup: false,
+        });
+      }
 
       // props.history.push('/login');
       // <Redirect to='/login'/>
@@ -188,6 +202,7 @@ export class userReg extends React.Component {
     const contactError = this.state.contactError;
     const emailError = this.state.emailError;
     const passwordError = this.state.passwordError;
+    const emailDupError = this.state.emailDupError;
     return (
       <div>
         {redirectVar}
@@ -244,6 +259,9 @@ export class userReg extends React.Component {
                   <input type="email" name="email" placeholder=" Email " style={{ width: '390px', height: '35px' }} onChange={this.emailInputHandler} required />
                   <span style={{ color: 'red' }}>
                     {emailError}
+                  </span>
+                  <span style={{ color: 'red' }}>
+                    {emailDupError}
                   </span>
                   <br />
                 </OverallText>

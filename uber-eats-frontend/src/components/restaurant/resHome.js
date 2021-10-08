@@ -53,7 +53,7 @@ export class resHome extends React.Component {
                       <Card.Text>
                         Add and Edit Dishes in the Menu.
                       </Card.Text>
-                      <Button variant="primary" href="/additem" block>Menu</Button>
+                      <Button variant="primary" href="/resadditems" block>Menu</Button>
                     </Card.Body>
                   </Card>
                 </Col>

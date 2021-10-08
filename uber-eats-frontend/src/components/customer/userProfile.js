@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 /* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
 import { Redirect } from 'react-router';
@@ -42,6 +43,8 @@ class userProfile extends Component {
       email: '',
       contact: '',
       picture: '',
+      authMessage: true,
+      authMessageE: '',
     };
     this.handleChange = this.handleChange.bind(this);
   }
@@ -71,22 +74,33 @@ class userProfile extends Component {
       this.setState({ [e.target.name]: e.target.value });
     }
 
+    handleValidation() {
+    // console.log('validation');
+      const {
+        authMessage,
+      } = this.state;
+      const authMessageE = authMessage ? 'Profile Updated' : 'Error Updating Profile';
+      this.setState({
+        authMessageE,
+      });
+    }
+
     updateProfile = (data) => {
       Axios.post('http://localhost:3001/updateProfile', data)
         .then((res) => {
           if (res) {
             console.log('Updated');
-            // this.setState({ name: data.name });
-            // this.setState({ location: data.location });
-            // this.setState({ description: data.description });
-            // this.setState({ contact: data.contact });
-            // this.setState({ picture: data.picture });
-            // this.setState({ dishes: data.dishes });
-            // this.setState({ timing: data.timing });
+            this.setState({
+              authMessage: true,
+            });
           }
         }).catch((err) => {
           console.log(`User Update Profile: ${err}`);
+          this.setState({
+            authMessage: false,
+          });
         });
+      this.handleValidation();
     }
 
     updateUser = (e) => {
@@ -115,6 +129,7 @@ class userProfile extends Component {
       if (!cookie.load('cookie')) {
         redirectVar = <Redirect to="/login" />;
       }
+      const authMessageE = this.state.authMessageE;
       const { country } = this.state;
       return (
         <div>
@@ -228,6 +243,9 @@ class userProfile extends Component {
                     <br />
                     <input type="tel" name="contact" defaultValue={this.state.contact} placeholder=" Contact " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
                     <br />
+                    <span style={{ color: 'green' }}>
+                      {authMessageE}
+                    </span>
                   </OverallText>
                 </div>
               </div>

@@ -71,11 +71,19 @@ app.post('/userReg', (req, res)=> {
   console.log("Reg here");
   console.log(username)
   if(username != '' && usercontact != '' && useremail != '' && userpassword != ''){
-  connection.query("INSERT INTO uber_eats.test(name, contact, email, password) VALUES (?,?,?,?)", [username, usercontact, useremail, userpassword], 
+  connection.query("INSERT INTO uber_eats.user(name, contact, email, password) VALUES (?,?,?,?)", [username, usercontact, useremail, userpassword], 
   (err, results) => {
-    console.log(err);
-    console.log(results);
+    if(err){
+      console.log(err);
+      console.log("email")
+      res.json({
+        "status": 1062
+      });
+    }
+    else {
+      console.log(results);
     res.send(results);
+  }
   });
 }
 })
@@ -85,7 +93,7 @@ app.post('/login', (req, res)=> {
   const userpassword = req.body.password
   const dbUser = (useremail, userpassword)
   console.log("here");
-  connection.query("SELECT email,password FROM uber_eats.test WHERE email = ? AND password = ?", [useremail, userpassword], 
+  connection.query("SELECT email,password FROM uber_eats.user WHERE email = ? AND password = ?", [useremail, userpassword], 
   (err, results) => {
     if (err) {
       res.send({err: err});
@@ -127,11 +135,19 @@ app.post('/resReg', (req, res)=> {
   console.log("Reg here");
   console.log(username)
   if(username != '' && userlocation != '' && useremail != '' && userpassword != ''){
-  connection.query("INSERT INTO uber_eats.restest(name, email, password, location) VALUES (?,?,?,?)", [username, useremail, userpassword, userlocation], 
+  connection.query("INSERT INTO uber_eats.restaurant(name, email, password, location) VALUES (?,?,?,?)", [username, useremail, userpassword, userlocation], 
   (err, results) => {
-    console.log(err);
-    console.log(results);
+    if(err){
+      console.log(err);
+      console.log("email")
+      res.json({
+        "status": 1062
+      });
+    }
+    else {
+      console.log(results);
     res.send(results);
+  }
   });
 }
 })
@@ -141,7 +157,7 @@ app.post('/reslogin', (req, res)=> {
   const userpassword = req.body.password
   const dbUser = (useremail, userpassword)
   console.log("here");
-  connection.query("SELECT email,password FROM uber_eats.restest WHERE email = ? AND password = ?", [useremail, userpassword], 
+  connection.query("SELECT email,password FROM uber_eats.restaurant WHERE email = ? AND password = ?", [useremail, userpassword], 
   (err, results) => {
     if (err) {
       res.send({err: err});
@@ -184,7 +200,7 @@ app.get('/resProfile', (req, res) => {
       res.sendStatus(404);
       console.log("Not Logged In");
   } else {
-      let profileSQL = "SELECT * FROM uber_eats.restest WHERE email = ?";
+      let profileSQL = "SELECT * FROM uber_eats.restaurant WHERE email = ?";
       connection.query(profileSQL, [req.session.email], (err, results) => {
           if (err) {
               throw err;
@@ -205,12 +221,13 @@ app.post('/resupdateProfile', (req, res) => {
   if (!req.session.isLoggedIn) {
       console.log("User has to be logged in to update profile...");
   } else {
-      let updateProfile = "UPDATE uber_eats.restest " + "SET name = ?, location = ?, description = ?, contact = ?, timings = ? WHERE email = ?";
-      connection.query(updateProfile, [name, location, description, contact, timing, req.session.email], (err, res) => {
+      let updateProfile = "UPDATE uber_eats.restaurant " + "SET name = ?, location = ?, description = ?, contact = ?, timings = ? WHERE email = ?";
+      connection.query(updateProfile, [name, location, description, contact, timing, req.session.email], (err, results) => {
           if (err) {
               throw err;
           } else {
               console.log('Updated Profile Successfully!');
+              res.send(results);
           }
       });
   }
@@ -223,7 +240,7 @@ app.get('/userProfile', (req, res) => {
       res.sendStatus(404);
       console.log("Not Logged In");
   } else {
-      let profileSQL = "SELECT * FROM uber_eats.test WHERE email = ?";
+      let profileSQL = "SELECT * FROM uber_eats.user WHERE email = ?";
       connection.query(profileSQL, [req.session.email], (err, results) => {
           if (err) {
               throw err;
@@ -240,20 +257,67 @@ app.get('/userProfile', (req, res) => {
 app.post('/updateProfile', (req, res) => {
   console.log('Update profile')
   console.log(req.body);
-  const {name, location, description, contact, timing } = req.body;
+  const {name, location, state, country, nickname, dob, about, email, contact } = req.body;
   if (!req.session.isLoggedIn) {
       console.log("User has to be logged in to update profile...");
   } else {
-      let updateProfile = "UPDATE uber_eats.test " + "SET name = ?, location = ?, description = ?, contact = ?, timings = ? WHERE email = ?";
-      connection.query(updateProfile, [name, location, description, contact, timing, req.session.email], (err, res) => {
+      let updateProfile = "UPDATE uber_eats.user " + "SET name = ?, location = ?, state = ?, country = ?, nickname = ?, dob = ?, about = ?, email = ?, contact = ? WHERE email = ?";
+      connection.query(updateProfile, [name, location, state, country, nickname, dob, about, email, contact, req.session.email], (err, results) => {
           if (err) {
               throw err;
           } else {
               console.log('Updated Profile Successfully!');
+              res.send(results);
           }
       });
   }
 });
+
+app.get('/resAddItems', (req,res) => {
+  console.log("Res Menu")
+  if (req.session.isLoggedIn) {
+      let ownerMenu = "SELECT * FROM menu WHERE email = ?";
+      connection.query(ownerMenu, [req.session.email], (err, results) => {
+          if (err) {
+              throw err;
+          } else if (results.length > 0) {
+              res.send(results);
+          } else {
+              console.log("Can't find owner's lunch menu!");
+          }
+      });
+  } else {
+      console.log("Log in to add menu!");
+  }
+})
+
+app.post('/saveItem', (req, res) => {
+  console.log('Res Add Item')
+  const {p_id, p_name, p_ingredients, p_description, p_category, p_price} = req.body;
+  if (!req.session.isLoggedIn) {
+      console.log("Please log in first!");
+  } else {
+      let findItem = "SELECT p_id FROM menu WHERE email = ? AND p_id = ?";
+      connection.query(findItem, [req.session.email, p_id], (err, results) => {
+          if (err) {
+              throw err;
+          } else if (results.length > 0) {
+              let updateItem = "UPDATE menu " + "SET p_name = ?, p_ingredients = ?, p_description = ?, p_category = ?, p_price = ? WHERE p_id = ?";
+              connection.query(updateItem, [p_name, p_ingredients, p_description, p_category, p_price, p_id], (err, results) => {
+                  if(err) throw err;
+                  console.log(results);
+              });
+          } else {
+              let insertItem = "INSERT INTO menu " + "SET p_name = ?, p_ingredients = ?, p_description = ?, p_category = ?, p_price = ?, email = ?";
+              connection.query(insertItem, [p_name, p_ingredients, p_description, p_category, p_price, req.session.email], (err, results) => {
+                  if(err) throw err;
+                  console.log(results);
+              });
+          }
+      });
+      res.sendStatus(200);
+  }
+})
 
 // app.get('/', function (req, res) {
 //   res.send('Hello World!');

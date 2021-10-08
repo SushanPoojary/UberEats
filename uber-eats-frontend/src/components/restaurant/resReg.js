@@ -52,10 +52,12 @@ export class resReg extends React.Component {
       locationValid: '',
       emailValid: '',
       passwordValid: '',
+      emailDup: '',
       usernameError: '',
       locationError: '',
       emailError: '',
       passwordError: '',
+      emailDupError: '',
     };
     this.usernameInputHandler = this.usernameInputHandler.bind(this);
     this.locationInputHandler = this.locationInputHandler.bind(this);
@@ -78,16 +80,19 @@ export class resReg extends React.Component {
       locationValid,
       emailValid,
       passwordValid,
+      emailDup,
     } = this.state;
     const usernameError = usernameValid ? '' : 'Name cannot be empty.';
     const locationError = locationValid ? '' : 'Location cannot be empty.';
     const emailError = emailValid ? '' : 'Email is invalid';
     const passwordError = passwordValid ? '' : 'Password cannot be blank.';
+    const emailDupError = emailDup ? '' : 'Email already exists.';
     this.setState({
       usernameError,
       locationError,
       emailError,
       passwordError,
+      emailDupError,
     });
   }
 
@@ -185,9 +190,18 @@ export class resReg extends React.Component {
     }).then((response) => {
       console.log('Status Code : ', response.status);
       console.log(response);
-      this.setState({
-        redirect: true,
-      });
+      const status = response.data.status;
+      if (status === 1062) {
+        this.setState({
+          redirect: false,
+          emailDup: true,
+        });
+      } else {
+        this.setState({
+          redirect: true,
+          emailDup: false,
+        });
+      }
 
       // props.history.push('/login');
       // <Redirect to='/login'/>
@@ -203,6 +217,7 @@ export class resReg extends React.Component {
     const locationError = this.state.locationError;
     const emailError = this.state.emailError;
     const passwordError = this.state.passwordError;
+    const emailDupError = this.state.emailDupError;
     return (
       <div>
         {redirectVar}
@@ -247,6 +262,9 @@ export class resReg extends React.Component {
                   <input type="email" name="email" placeholder=" Email " style={{ width: '390px', height: '35px' }} onChange={this.emailInputHandler} required />
                   <span style={{ color: 'red' }}>
                     {emailError}
+                  </span>
+                  <span style={{ color: 'red' }}>
+                    {emailDupError}
                   </span>
                   <br />
                 </OverallText>

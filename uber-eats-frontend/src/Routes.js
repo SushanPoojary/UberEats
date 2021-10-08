@@ -10,6 +10,8 @@ import { resHome } from './components/restaurant/resHome';
 // import resProfile from './components/restaurant/resProfile';
 import resProfile from './components/restaurant/resProfile';
 import userProfile from './components/customer/userProfile';
+import temp from './components/restaurant/temp';
+import resAddItems from './components/restaurant/resAddItems';
 
 export default class Routes extends Component {
   render() {
@@ -24,6 +26,8 @@ export default class Routes extends Component {
           <Route path="/resHome" exact component={resHome} />
           <Route path="/resProfile" exact component={resProfile} />
           <Route path="/userprofile" exact component={userProfile} />
+          <Route path="/resadditems" exact component={resAddItems} />
+          <Route path="/temp" exact component={temp} />
         </Switch>
       </Router>
     );
