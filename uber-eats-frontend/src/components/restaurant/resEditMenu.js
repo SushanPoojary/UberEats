@@ -2,7 +2,6 @@
 /* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
 import { Redirect } from 'react-router';
-import cookie from 'react-cookies';
 import Axios from 'axios';
 import styled from 'styled-components';
 import NavBar from '../../NavBar';
@@ -28,42 +27,37 @@ const OverallText = styled.h2`
     //padding-left: 150px;
 `;
 
-class resProfile extends Component {
+class resEditMenu extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: '',
-      location: '',
-      description: '',
-      contact: '',
-      picture: '',
-      dishes: '',
-      timing: '',
-      delivery: '',
-      pickup: '',
+      p_name: '',
+      p_ingredients: '',
+      p_description: '',
+      p_category: '',
+      p_type: '',
+      p_price: '',
       authMessage: true,
       authMessageE: '',
+      redirect: false,
     };
     this.handleChange = this.handleChange.bind(this);
   }
 
   componentDidMount() {
     Axios.defaults.withCredentials = true;
-    Axios.get('http://localhost:3001/resProfile')
+    Axios.get('http://localhost:3001/resEditMenu')
       .then((res) => {
         if (res) {
-          this.setState({ name: res.data[0].name });
-          this.setState({ location: res.data[0].location });
-          this.setState({ description: res.data[0].description });
-          this.setState({ contact: res.data[0].contact });
-          this.setState({ picture: res.data[0].picture });
-          this.setState({ dishes: res.data[0].dishes });
-          this.setState({ timing: res.data[0].timings });
-          this.setState({ delivery: res.data[0].delivery });
-          this.setState({ pickup: res.data[0].pickup });
+          this.setState({ p_name: res.data[0].p_name });
+          this.setState({ p_ingredients: res.data[0].p_ingredients });
+          this.setState({ p_description: res.data[0].p_description });
+          this.setState({ p_category: res.data[0].p_category });
+          this.setState({ p_type: res.data[0].p_type });
+          this.setState({ p_price: res.data[0].p_price });
         }
       }).catch((err) => {
-        console.log(`Restaurant Profile: ${err}`);
+        console.log(`Restaurant Menu Edit: ${err}`);
       });
   }
 
@@ -76,19 +70,20 @@ class resProfile extends Component {
       const {
         authMessage,
       } = this.state;
-      const authMessageE = authMessage ? 'Profile Updated' : 'Error Updating Profile';
+      const authMessageE = authMessage ? 'Menu Updated' : 'Error Updating Menu';
       this.setState({
         authMessageE,
       });
     }
 
-    updateProfile = (data) => {
-      Axios.post('http://localhost:3001/resupdateProfile', data)
+    updateMenuItem = (data) => {
+      Axios.post('http://localhost:3001/resupdateMenu', data)
         .then((res) => {
           if (res) {
             console.log('Updated');
             this.setState({
               authMessage: true,
+              redirect: true,
             });
             // this.setState({ name: data.name });
             // this.setState({ location: data.location });
@@ -99,7 +94,7 @@ class resProfile extends Component {
             // this.setState({ timing: data.timing });
           }
         }).catch((err) => {
-          console.log(`Restaurant Update Profile: ${err}`);
+          console.log(`Restaurant Update Menu: ${err}`);
           this.setState({
             authMessage: false,
           });
@@ -107,26 +102,23 @@ class resProfile extends Component {
       this.handleValidation();
     }
 
-    updateRes = (e) => {
+    updateMenu = (e) => {
       e.preventDefault();
       const ownerData = {
-        name: this.state.name,
-        location: this.state.location,
-        description: this.state.description,
-        contact: this.state.contact,
-        picture: this.state.picture,
-        dishes: this.state.dishes,
-        timing: this.state.timing,
-        delivery: this.state.delivery,
-        pickup: this.state.pickup,
+        p_name: this.state.p_name,
+        p_ingredients: this.state.p_ingredients,
+        p_description: this.state.p_description,
+        p_category: this.state.p_category,
+        p_type: this.state.p_type,
+        p_price: this.state.p_price,
       };
-      this.updateProfile(ownerData);
+      this.updateMenuItem(ownerData);
     }
 
     render() {
       let redirectVar = null;
-      if (!cookie.load('cookie')) {
-        redirectVar = <Redirect to="/reslogin" />;
+      if (this.state.redirect) {
+        redirectVar = <Redirect to="/resadditems" />;
       }
       const authMessageE = this.state.authMessageE;
       return (
@@ -139,7 +131,7 @@ class resProfile extends Component {
                 <div className="col-xs" />
                 <div className="col-xs">
                   <HeadText>
-                    Restaurant&apos;s Profile
+                    Restaurant&apos;s Menu
                     <br />
                     <br />
                   </HeadText>
@@ -151,7 +143,7 @@ class resProfile extends Component {
                   <OverallText>
                     Name
                     <br />
-                    <input type="text" name="name" defaultValue={this.state.name} placeholder=" Restaurant Name " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
+                    <input type="text" name="p_name" defaultValue={this.state.p_name} placeholder=" Item Name " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
                     <br />
                   </OverallText>
                 </div>
@@ -160,9 +152,9 @@ class resProfile extends Component {
                 <div className="col-xs" />
                 <div className="col-xs">
                   <OverallText>
-                    Location
+                    Ingredients
                     <br />
-                    <input type="text" name="location" defaultValue={this.state.location} placeholder=" Restaurant Location " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
+                    <input type="text" name="p_ingredients" defaultValue={this.state.p_ingredients} placeholder=" Ingredients " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
                     <br />
                   </OverallText>
                 </div>
@@ -173,7 +165,7 @@ class resProfile extends Component {
                   <OverallText>
                     Description
                     <br />
-                    <input type="text" name="description" defaultValue={this.state.description} placeholder=" Restaurant Description " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
+                    <input type="text" name="p_description" defaultValue={this.state.p_description} placeholder=" Dish Description " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
                     <br />
                   </OverallText>
                 </div>
@@ -182,20 +174,9 @@ class resProfile extends Component {
                 <div className="col-xs" />
                 <div className="col-xs">
                   <OverallText>
-                    Contact
+                    Category
                     <br />
-                    <input type="tel" name="contact" defaultValue={this.state.contact} placeholder=" Restaurant Contact " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
-                    <br />
-                  </OverallText>
-                </div>
-              </div>
-              <div className="row">
-                <div className="col-xs" />
-                <div className="col-xs">
-                  <OverallText>
-                    Timings
-                    <br />
-                    <input type="text" name="timing" defaultValue={this.state.timing} placeholder=" Restaurant Timing " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
+                    <input type="tel" name="p_category" defaultValue={this.state.p_category} placeholder=" Category " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
                     <br />
                   </OverallText>
                 </div>
@@ -204,9 +185,9 @@ class resProfile extends Component {
                 <div className="col-xs" />
                 <div className="col-xs">
                   <OverallText>
-                    Delivery
+                    Type
                     <br />
-                    <input type="text" name="delivery" defaultValue={this.state.delivery} placeholder=" Delivery " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
+                    <input type="text" name="p_type" defaultValue={this.state.p_type} placeholder=" Veg/NonVeg " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
                     <br />
                   </OverallText>
                 </div>
@@ -215,9 +196,9 @@ class resProfile extends Component {
                 <div className="col-xs" />
                 <div className="col-xs">
                   <OverallText>
-                    Pickup
+                    Price
                     <br />
-                    <input type="text" name="pickup" defaultValue={this.state.pickup} placeholder=" Pickup " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
+                    <input type="text" name="p_price" defaultValue={this.state.p_price} placeholder=" Price " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
                     <br />
                     <span style={{ color: 'green' }}>
                       {authMessageE}
@@ -225,7 +206,7 @@ class resProfile extends Component {
                   </OverallText>
                 </div>
               </div>
-              <button type="submit" onClick={this.updateRes} style={{ width: '390px', height: '35px', backgroundColor: '#7bb420' }}>Update Profile</button>
+              <button type="submit" onClick={this.updateMenu} style={{ width: '390px', height: '35px', backgroundColor: '#7bb420' }}>Update Menu</button>
             </form>
           </div>
         </div>
@@ -233,4 +214,4 @@ class resProfile extends Component {
     }
 }
 
-export default resProfile;
+export default resEditMenu;

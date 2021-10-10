@@ -7,11 +7,17 @@ import { userReg } from './components/customer/userReg';
 import { resLogin } from './components/restaurant/index';
 import { resReg } from './components/restaurant/resReg';
 import { resHome } from './components/restaurant/resHome';
-// import resProfile from './components/restaurant/resProfile';
 import resProfile from './components/restaurant/resProfile';
 import userProfile from './components/customer/userProfile';
-import temp from './components/restaurant/temp';
 import resAddItems from './components/restaurant/resAddItems';
+import { addMenu } from './components/restaurant/addMenu';
+import homePage from './components/customer/homepage';
+import seeRestaurant from './components/customer/seeRestaurant';
+import addToCart from './components/customer/addToCart';
+import userorder from './components/customer/userorder';
+import resorder from './components/restaurant/resorder';
+import resEditMenu from './components/restaurant/resEditMenu';
+import userFavourites from './components/customer/userFavourites';
 
 export default class Routes extends Component {
   render() {
@@ -27,7 +33,14 @@ export default class Routes extends Component {
           <Route path="/resProfile" exact component={resProfile} />
           <Route path="/userprofile" exact component={userProfile} />
           <Route path="/resadditems" exact component={resAddItems} />
-          <Route path="/temp" exact component={temp} />
+          <Route path="/addmenu" exact component={addMenu} />
+          <Route path="/homepage" exact component={homePage} />
+          <Route path="/seerestaurant" exact component={seeRestaurant} />
+          <Route path="/cart" exact component={addToCart} />
+          <Route path="/order" exact component={userorder} />
+          <Route path="/resorders" exact component={resorder} />
+          <Route path="/editmenu" exact component={resEditMenu} />
+          <Route path="/favourites" exact component={userFavourites} />
         </Switch>
       </Router>
     );

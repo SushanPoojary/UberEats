@@ -1,28 +1,24 @@
+/* eslint-disable max-len */
 /* eslint-disable react/jsx-wrap-multilines */
 /* eslint-disable react/destructuring-assignment */
 import React from 'react';
 import Axios from 'axios';
-import {
-  Form,
-  Button,
-} from 'react-bootstrap';
-import { Redirect } from 'react-router';
 import NavBar from '../../NavBar';
 
-export default class resAddItems extends React.Component {
+export default class seeRestaurant extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       products: [],
-      p_id: 0,
-      redirect: false,
+      po_id: 0,
+      redirectVar: false,
     };
   }
 
   componentDidMount() {
     const menuList = [];
     Axios.defaults.withCredentials = true;
-    Axios.get('http://localhost:3001/resAddItems')
+    Axios.get('http://localhost:3001/sr')
       .then((res) => {
         if (res) {
           console.log(res.data);
@@ -39,7 +35,12 @@ export default class resAddItems extends React.Component {
       });
   }
 
-  handleEdit = (event) => {
+  handleSubmit = (e) => {
+    e.preventDefault();
+    this.sendRestAPI({ item: this.state.item });
+  }
+
+  handleVisit = (event) => {
     event.preventDefault();
     const orderNum = parseInt(event.target.id, 10);
     const visitdata = {
@@ -47,27 +48,22 @@ export default class resAddItems extends React.Component {
     };
     console.log(visitdata);
     this.setState({
-      p_id: visitdata,
+      po_id: visitdata,
+      redirectVar: true,
     });
-    console.log(this.state.p_id);
-    console.log(this.state.redirect);
+    console.log(this.state.po_id);
+    console.log(this.state.redirectVar);
     Axios.defaults.withCredentials = true;
-    Axios.post('http://localhost:3001/editmenu', visitdata)
+    Axios.post('http://localhost:3001/addtocart', visitdata)
       .then((res) => {
         console.log(res.status);
-        this.setState({ redirect: true });
       });
   }
 
   render() {
     console.log(this.state.products);
-    let redirectVar = null;
-    if (this.state.redirect) {
-      redirectVar = <Redirect to="/editmenu" />;
-    }
     return (
       <div>
-        {redirectVar}
         <NavBar />
         <div>
           <table>
@@ -78,10 +74,9 @@ export default class resAddItems extends React.Component {
                 <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Ingredients</td>
                 <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Description</td>
                 <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Category</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Type</td>
                 <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Price</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Edit</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Delete</td>
+                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Add to Cart</td>
+                {/* <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Delete</td> */}
               </tr>
             </thead>
             <tbody>
@@ -93,16 +88,12 @@ export default class resAddItems extends React.Component {
                   <td style={{ textAlign: 'left', padding: '1em' }}>{item.p_ingredients}</td>
                   <td style={{ textAlign: 'left', padding: '1em' }}>{item.p_description}</td>
                   <td style={{ textAlign: 'left', padding: '1em' }}>{item.p_category}</td>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.p_type}</td>
                   <td style={{ textAlign: 'left', padding: '1em' }}>{item.p_price}</td>
-                  <td><input type="button" id={item.p_id} value="Edit" style={{ width: '100px', height: '30px', backgroundColor: '#7bb420' }} onClick={this.handleEdit} /></td>
-                  <td><input type="button" value="Delete" style={{ width: '100px', height: '30px', backgroundColor: '#FF0000' }} /></td>
+                  <td><input type="button" id={item.p_id} value="Add To Cart" style={{ width: '100px', height: '30px', backgroundColor: '#7bb420' }} onClick={this.handleVisit} /></td>
+                  {/* <td><input type="button" value="Delete" style={{ width: '100px', height: '30px', backgroundColor: '#FF0000' }} /></td> */}
                 </tr>)}
             </tbody>
           </table>
-          <Form className="offset-sm-9" inline>
-            <Button variant="success" href="/addmenu">Add</Button>
-          </Form>
         </div>
       </div>
     );

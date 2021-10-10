@@ -128,7 +128,7 @@ export class UserLogin extends React.Component {
             this.setState({
               authFlag: true,
               authMessage: '',
-              redirectHome: <Redirect to="/" />,
+              redirectHome: <Redirect to="/homepage" />,
             });
           } else if (status === 403) {
             this.setState({
