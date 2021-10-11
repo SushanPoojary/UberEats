@@ -22,7 +22,7 @@ export default class resAddItems extends React.Component {
   componentDidMount() {
     const menuList = [];
     Axios.defaults.withCredentials = true;
-    Axios.get('http://localhost:3001/resAddItems')
+    Axios.get('http://54.215.127.115:3001/resAddItems')
       .then((res) => {
         if (res) {
           console.log(res.data);
@@ -52,7 +52,7 @@ export default class resAddItems extends React.Component {
     console.log(this.state.p_id);
     console.log(this.state.redirect);
     Axios.defaults.withCredentials = true;
-    Axios.post('http://localhost:3001/editmenu', visitdata)
+    Axios.post('http://54.215.127.115:3001/editmenu', visitdata)
       .then((res) => {
         console.log(res.status);
         this.setState({ redirect: true });

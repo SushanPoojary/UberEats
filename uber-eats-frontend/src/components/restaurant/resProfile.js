@@ -49,7 +49,7 @@ class resProfile extends Component {
 
   componentDidMount() {
     Axios.defaults.withCredentials = true;
-    Axios.get('http://localhost:3001/resProfile')
+    Axios.get('http://54.215.127.115:3001/resProfile')
       .then((res) => {
         if (res) {
           this.setState({ name: res.data[0].name });
@@ -83,7 +83,7 @@ class resProfile extends Component {
     }
 
     updateProfile = (data) => {
-      Axios.post('http://localhost:3001/resupdateProfile', data)
+      Axios.post('http://54.215.127.115:3001/resupdateProfile', data)
         .then((res) => {
           if (res) {
             console.log('Updated');

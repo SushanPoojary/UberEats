@@ -38,7 +38,7 @@ class homePage extends Component {
 
     sendRestAPI = (data) => {
       Axios.defaults.withCredentials = true;
-      Axios.post('http://localhost:3001/searchItem', data)
+      Axios.post('http://54.215.127.115:3001/searchItem', data)
         .then((res) => {
           if (res.status === 200) {
             this.setState({ resultTable: res.data });
@@ -67,7 +67,7 @@ class homePage extends Component {
         console.log(this.state.remail);
         console.log(this.state.redirectVar);
         Axios.defaults.withCredentials = true;
-        Axios.post('http://localhost:3001/sr', visitdata)
+        Axios.post('http://54.215.127.115:3001/sr', visitdata)
             .then((res) => {
                 console.log(res.status);
             });
@@ -84,7 +84,7 @@ class homePage extends Component {
       })
       console.log(this.state.remail);
       Axios.defaults.withCredentials = true;
-      Axios.post('http://localhost:3001/markfavourite', visitdata)
+      Axios.post('http://54.215.127.115:3001/markfavourite', visitdata)
           .then((res) => {
               console.log(res.status);
           });
@@ -93,7 +93,7 @@ class homePage extends Component {
     showFilterPage = (e) => {
       this.setState({ viewFilter: true });
       Axios.defaults.withCredentials = true;
-      Axios.post('http://localhost:3001/filter')
+      Axios.post('http://54.215.127.115:3001/filter')
         .then((res) => {
           if (res.status === 200) {
             this.setState({ filteredCuisines: res.data });

@@ -22,7 +22,7 @@ export default class userFavourites extends React.Component {
   componentDidMount() {
     const menuList = [];
     Axios.defaults.withCredentials = true;
-    Axios.get('http://localhost:3001/getFavourites')
+    Axios.get('http://54.215.127.115:3001/getFavourites')
       .then((res) => {
         if (res) {
           console.log(res.data);
@@ -52,7 +52,7 @@ export default class userFavourites extends React.Component {
     console.log(this.state.remail);
     console.log(this.state.redirect);
     Axios.defaults.withCredentials = true;
-    Axios.post('http://localhost:3001/sr', visitdata)
+    Axios.post('http://54.215.127.115:3001/sr', visitdata)
       .then((res) => {
         console.log(res.status);
       });

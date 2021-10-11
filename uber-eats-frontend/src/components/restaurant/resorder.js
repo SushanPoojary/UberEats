@@ -19,7 +19,7 @@ export default class resorder extends React.Component {
   componentDidMount() {
     const menuList = [];
     Axios.defaults.withCredentials = true;
-    Axios.get('http://localhost:3001/resorderstatus')
+    Axios.get('http://54.215.127.115:3001/resorderstatus')
       .then((res) => {
         if (res) {
           console.log(res.data);
@@ -53,7 +53,7 @@ export default class resorder extends React.Component {
     });
     console.log(this.state.order_id);
     Axios.defaults.withCredentials = true;
-    Axios.post('http://localhost:3001/preparing', visitdata)
+    Axios.post('http://54.215.127.115:3001/preparing', visitdata)
       .then((res) => {
         console.log(res.status);
       });
@@ -71,7 +71,7 @@ export default class resorder extends React.Component {
     });
     console.log(this.state.order_id);
     Axios.defaults.withCredentials = true;
-    Axios.post('http://localhost:3001/delivered', visitdata)
+    Axios.post('http://54.215.127.115:3001/delivered', visitdata)
       .then((res) => {
         console.log(res.status);
       });

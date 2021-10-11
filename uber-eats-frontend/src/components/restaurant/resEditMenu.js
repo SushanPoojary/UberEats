@@ -46,7 +46,7 @@ class resEditMenu extends Component {
 
   componentDidMount() {
     Axios.defaults.withCredentials = true;
-    Axios.get('http://localhost:3001/resEditMenu')
+    Axios.get('http://54.215.127.115:3001/resEditMenu')
       .then((res) => {
         if (res) {
           this.setState({ p_name: res.data[0].p_name });
@@ -77,7 +77,7 @@ class resEditMenu extends Component {
     }
 
     updateMenuItem = (data) => {
-      Axios.post('http://localhost:3001/resupdateMenu', data)
+      Axios.post('http://54.215.127.115:3001/resupdateMenu', data)
         .then((res) => {
           if (res) {
             console.log('Updated');

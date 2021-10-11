@@ -51,7 +51,7 @@ class userProfile extends Component {
 
   componentDidMount() {
     Axios.defaults.withCredentials = true;
-    Axios.get('http://localhost:3001/userProfile')
+    Axios.get('http://54.215.127.115:3001/userProfile')
       .then((res) => {
         if (res) {
           this.setState({ name: res.data[0].name });
@@ -86,7 +86,7 @@ class userProfile extends Component {
     }
 
     updateProfile = (data) => {
-      Axios.post('http://localhost:3001/updateProfile', data)
+      Axios.post('http://54.215.127.115:3001/updateProfile', data)
         .then((res) => {
           if (res) {
             console.log('Updated');

@@ -167,7 +167,7 @@ export class userReg extends React.Component {
       password,
     } = this.state;
     console.log(username, contact, email, password);
-    Axios.post('http://localhost:3001/userReg', {
+    Axios.post('http://54.215.127.115:3001/userReg', {
       username,
       contact,
       email,

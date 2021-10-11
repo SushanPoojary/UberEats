@@ -23,7 +23,7 @@ export default class addToCart extends React.Component {
   componentDidMount() {
     const menuList = [];
     Axios.defaults.withCredentials = true;
-    Axios.get('http://localhost:3001/getCart')
+    Axios.get('http://54.215.127.115:3001/getCart')
       .then((res) => {
         if (res) {
           console.log(res.data);
@@ -40,7 +40,7 @@ export default class addToCart extends React.Component {
       });
 
     Axios.defaults.withCredentials = true;
-    Axios.get('http://localhost:3001/getPrice')
+    Axios.get('http://54.215.127.115:3001/getPrice')
       .then((res) => {
         if (res) {
           console.log(res.data);
@@ -61,7 +61,7 @@ export default class addToCart extends React.Component {
     } = this.state;
     console.log(products);
     Axios.defaults.withCredentials = true;
-    Axios.post('http://localhost:3001/order', products)
+    Axios.post('http://54.215.127.115:3001/order', products)
       .then((response) => {
         console.log('Status Code : ', response.status);
         console.log(response);
@@ -77,7 +77,7 @@ export default class addToCart extends React.Component {
           });
         }
       });
-    Axios.post('http://localhost:3001/cartorder', products)
+    Axios.post('http://54.215.127.115:3001/cartorder', products)
       .then((response) => {
         console.log('Status Code : ', response.status);
         console.log(response);
@@ -108,7 +108,7 @@ export default class addToCart extends React.Component {
     console.log(this.state.po_id);
     console.log(this.state.redirectVar);
     Axios.defaults.withCredentials = true;
-    Axios.post('http://localhost:3001/deletefromcart', visitdata)
+    Axios.post('http://54.215.127.115:3001/deletefromcart', visitdata)
       .then((res) => {
         console.log(res.status);
       });

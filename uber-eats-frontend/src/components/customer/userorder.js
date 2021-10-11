@@ -18,7 +18,7 @@ export default class userorder extends React.Component {
   componentDidMount() {
     const menuList = [];
     Axios.defaults.withCredentials = true;
-    Axios.get('http://localhost:3001/orderstatus')
+    Axios.get('http://54.215.127.115:3001/orderstatus')
       .then((res) => {
         if (res) {
           console.log(res.data);

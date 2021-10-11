@@ -199,7 +199,7 @@ export class addMenu extends React.Component {
     } = this.state;
     console.log(p_name, p_ingredients, p_description, p_category, p_type, p_price);
     Axios.defaults.withCredentials = true;
-    Axios.post('http://localhost:3001/addMenu', {
+    Axios.post('http://54.215.127.115:3001/addMenu', {
       p_name,
       p_ingredients,
       p_description,

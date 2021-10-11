@@ -182,7 +182,7 @@ export class resReg extends React.Component {
       password,
     } = this.state;
     console.log(username, location, email, password);
-    Axios.post('http://localhost:3001/resReg', {
+    Axios.post('http://54.215.127.115:3001/resReg', {
       username,
       location,
       email,

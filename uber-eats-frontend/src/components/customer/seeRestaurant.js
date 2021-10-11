@@ -18,7 +18,7 @@ export default class seeRestaurant extends React.Component {
   componentDidMount() {
     const menuList = [];
     Axios.defaults.withCredentials = true;
-    Axios.get('http://localhost:3001/sr')
+    Axios.get('http://54.215.127.115:3001/sr')
       .then((res) => {
         if (res) {
           console.log(res.data);
@@ -54,7 +54,7 @@ export default class seeRestaurant extends React.Component {
     console.log(this.state.po_id);
     console.log(this.state.redirectVar);
     Axios.defaults.withCredentials = true;
-    Axios.post('http://localhost:3001/addtocart', visitdata)
+    Axios.post('http://54.215.127.115:3001/addtocart', visitdata)
       .then((res) => {
         console.log(res.status);
       });
