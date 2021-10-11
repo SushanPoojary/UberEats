@@ -7,7 +7,7 @@ var mysql = require('mysql');
 var constants = require('./config.json');
 var cors = require('cors');
 var jwt = require('jsonwebtoken');
-app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
+app.use(cors({credentials: true, origin: 'http://54.215.127.115:3000'}));
 
 const JWT_KEY = 'UberEatsSP#07'
 
@@ -32,7 +32,7 @@ var connection = mysql.createPool({
 
 
 app.use(function(req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.setHeader('Access-Control-Allow-Origin', 'http://54.215.127.115:3000');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT,DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers');
