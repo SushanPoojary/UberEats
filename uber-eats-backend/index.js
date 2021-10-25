@@ -1,13 +1,16 @@
 var express = require('express');
 var app = express();
-app.use(express.json());
+app.use(express.json(({ limit: '10MB' })));
 var session = require('express-session');
-
+const {cloudinary} = require('./cloudinary')
 var mysql = require('mysql');
 var constants = require('./config.json');
 var cors = require('cors');
 var jwt = require('jsonwebtoken');
 app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
+
+// var ipAdd='localhost';
+// `http://${ipAdd}:3000`
 
 const JWT_KEY = 'UberEatsSP#07'
 
@@ -214,15 +217,28 @@ app.get('/resProfile', (req, res) => {
   }
 });
 
-app.post('/resupdateProfile', (req, res) => {
+app.post('/resupdateProfile', async (req, res) => {
   console.log('Res Update profile')
   console.log(req.body);
+  try {
+    const fileStr = req.body.preview;
+    const uploadResponse = await cloudinary.uploader.upload(fileStr, { upload_preset: 'sushan_ubereats'});
+    console.log(uploadResponse);
+    req.session.uploadPublicID = uploadResponse.public_id;
+    req.session.uploadURL = uploadResponse.url;
+   } catch (err) {
+    console.log(err);
+   }
+
+   console.log(req.session.uploadPublicID);
+   console.log(req.session.uploadURL);
+
   const {name, location, description, contact, timing, delivery, pickup } = req.body;
   if (!req.session.isLoggedIn) {
       console.log("User has to be logged in to update profile...");
   } else {
-      let updateProfile = "UPDATE uber_eats.restaurant " + "SET name = ?, location = ?, description = ?, contact = ?, timings = ?, delivery = ?, pickup = ? WHERE email = ?";
-      connection.query(updateProfile, [name, location, description, contact, timing, delivery, pickup, req.session.remail], (err, results) => {
+      let updateProfile = "UPDATE uber_eats.restaurant " + "SET name = ?, location = ?, description = ?, contact = ?, timings = ?, delivery = ?, pickup = ?, uploadPublicID = ?, uploadURL = ? WHERE email = ?";
+      connection.query(updateProfile, [name, location, description, contact, timing, delivery, pickup, req.session.uploadPublicID, req.session.uploadURL, req.session.remail], (err, results) => {
           if (err) {
               throw err;
           } else {
@@ -254,15 +270,27 @@ app.get('/userProfile', (req, res) => {
   }
 });
 
-app.post('/updateProfile', (req, res) => {
+app.post('/updateProfile', async (req, res) => {
   console.log('Update profile')
-  console.log(req.body);
-  const {name, location, state, country, nickname, dob, about, email, contact } = req.body;
+  try {
+      const fileStr = req.body.preview;
+      const uploadResponse = await cloudinary.uploader.upload(fileStr, { upload_preset: 'sushan_ubereats'});
+      console.log(uploadResponse);
+      req.session.uploadPublicID = uploadResponse.public_id;
+      req.session.uploadURL = uploadResponse.url;
+  } catch (err) {
+      console.log(err);
+  }
+
+  console.log(req.session.uploadPublicID);
+  console.log(req.session.uploadURL);
+
+  const {name, add1, add2, location, state, country, nickname, dob, about, email, contact } = req.body;
   if (!req.session.isLoggedIn) {
       console.log("User has to be logged in to update profile...");
   } else {
-      let updateProfile = "UPDATE uber_eats.user " + "SET name = ?, location = ?, state = ?, country = ?, nickname = ?, dob = ?, about = ?, email = ?, contact = ? WHERE email = ?";
-      connection.query(updateProfile, [name, location, state, country, nickname, dob, about, email, contact, req.session.uemail], (err, results) => {
+      let updateProfile = "UPDATE uber_eats.user " + "SET name = ?, add1= ?, add2= ?, location = ?, state = ?, country = ?, nickname = ?, dob = ?, about = ?, email = ?, contact = ?, uploadPublicID = ?, uploadURL = ? WHERE email = ?";
+      connection.query(updateProfile, [name, add1, add2, location, state, country, nickname, dob, about, email, contact, req.session.uploadPublicID, req.session.uploadURL, req.session.uemail], (err, results) => {
           if (err) {
               throw err;
           } else {
@@ -272,6 +300,25 @@ app.post('/updateProfile', (req, res) => {
       });
   }
 });
+
+app.post('/updateordProfile', (req, res) => {
+    console.log('Update profile')
+    console.log(req.body);
+    const {name, add1, add2, location, state, country, nickname, dob, about, email, contact } = req.body;
+    if (!req.session.isLoggedIn) {
+        console.log("User has to be logged in to update profile...");
+    } else {
+        let updateProfile = "UPDATE uber_eats.user " + "SET name = ?, add1= ?, add2= ?, email = ?, contact = ? WHERE email = ?";
+        connection.query(updateProfile, [name, add1, add2, email, contact, req.session.uemail], (err, results) => {
+            if (err) {
+                throw err;
+            } else {
+                console.log('Updated Profile Successfully!');
+                res.send(results);
+            }
+        });
+    }
+  });
 
 app.get('/resAddItems', (req,res) => {
   console.log("Res Menu")
@@ -375,15 +422,53 @@ app.post('/resupdateMenu', (req, res) => {
   }
 });
 
+app.get('/allrest', (req, res) => {
+  console.log('user home')
+  let profileSQL = "SELECT * FROM uber_eats.restaurant";
+    connection.query(profileSQL, (err, results) => {
+      if (err) {
+          throw err;
+      } else if (results.length > 0) {
+          console.log(results);
+            res.send(results);
+      } else {
+          console.log("Can't find restaurants!");
+        }
+      });
+  })
+
 app.post('/searchItem', (req, res) => {
-  console.log(req.body.item);
+  console.log(req.body);
   console.log("INSIDE SEARCH ITEM")
   if (!req.session.isLoggedIn) {
       console.log("Please log in first!");
   } else {
       //find restaurants for the owner who has this item on the menu
-      let findRestaurant = "SELECT r.name, r.location, r.description, r.contact, r.timings, m.email FROM menu m RIGHT JOIN restaurant r ON m.email = r.email WHERE ((m.p_name = ?) OR (r.location = ?) OR (m.p_category = ?) OR (r.name = ?)) GROUP BY name, m.email";
-      connection.query(findRestaurant, [req.body.item, req.body.item, req.body.item, req.body.item], (err, results) => {
+      let findRestaurant = "SELECT r.name, r.location, r.description, r.contact, r.timings, m.email FROM menu m RIGHT JOIN restaurant r ON m.email = r.email WHERE ((m.p_name = ?) OR (r.location = ?) OR (m.p_category = ?) OR (r.name = ?)) AND (r.delivery = ? OR r.pickup = ?) AND (m.p_type = ?) GROUP BY name, m.email";
+      connection.query(findRestaurant, [req.body.inSearch, req.body.inSearch, req.body.inSearch, req.body.inSearch, req.body.inDelivery, req.body.inDelivery, req.body.inV], (err, results) => {
+          if (err) {
+              throw err;
+          } else if (results.length > 0) {
+              console.log(results);
+              // req.session.remail = results[0].email
+              res.send(results);
+          } else {
+              res.sendStatus(404);
+              console.log("Can't find any menus for this item!");
+          }
+      });
+  }
+})
+
+app.post('/searchOI', (req, res) => {
+  console.log(req.body);
+  console.log("INSIDE SEARCH ITEM OI")
+  if (!req.session.isLoggedIn) {
+      console.log("Please log in first!");
+  } else {
+      //find restaurants for the owner who has this item on the menu
+      let findRestaurant = "SELECT r.name, r.location, r.description, r.contact, r.timings, m.email FROM uber_eats.menu m RIGHT JOIN uber_eats.restaurant r ON m.email = r.email WHERE ((m.p_name = ?) OR (r.location = ?) OR (m.p_category = ?) OR (r.name = ?)) GROUP BY name, m.email";
+      connection.query(findRestaurant, [req.body.inSer, req.body.inSer, req.body.inSer, req.body.inSer], (err, results) => {
           if (err) {
               throw err;
           } else if (results.length > 0) {
@@ -469,6 +554,43 @@ app.get('/sr', (req,res) => {
   }
 })
 
+app.post('/deletefromfav', (req, res) => {
+  console.log("Delete from fav")
+  const {email} = req.body;
+  console.log(req.body);
+  if (!req.session.isLoggedIn) {
+      console.log("Please log in first!");
+  } else {
+      let ownerMenu = "DELETE FROM favourites WHERE owner_email = ? AND user_email = ?";
+      connection.query(ownerMenu, [email, req.session.uemail], (err, results) => {
+          if (err) {
+              throw err;
+          } else {
+              res.sendStatus(200);
+              console.log("Deleted from cart!");
+          }
+      });
+  }
+})
+
+app.get('/sr1', (req,res) => {
+  console.log("Res Menu")
+  if (req.session.isLoggedIn) {
+      let ownerMenu = "SELECT * FROM restaurant WHERE email = ?";
+      connection.query(ownerMenu, [req.session.remail], (err, results) => {
+          if (err) {
+              throw err;
+          } else if (results.length > 0) {
+              res.send(results);
+          } else {
+              console.log("Can't find Res menu!");
+          }
+      });
+  } else {
+      console.log("Log in to add menu!");
+  }
+})
+
 app.post('/filter', (req, res) => {
   console.log("Filter")
   if (req.session.isLoggedIn) {
@@ -490,13 +612,13 @@ app.post('/filter', (req, res) => {
 
 app.post('/addToCart', (req, res) => {
   console.log("Add Cart")
-  const {p_id} = req.body;
+  const {p_id, price} = req.body;
   console.log(req.body);
   if (!req.session.isLoggedIn) {
       console.log("Please log in first!");
   } else {
-      let ownerMenu = "INSERT INTO cart " + "SET po_id = ?, user_email = ?, owner_email = ?";
-      connection.query(ownerMenu, [p_id, req.session.uemail, req.session.remail], (err, results) => {
+      let ownerMenu = "INSERT INTO cart " + "SET po_id = ?, price = ?, user_email = ?, owner_email = ?";
+      connection.query(ownerMenu, [p_id, price, req.session.uemail, req.session.remail], (err, results) => {
           if (err) {
               throw err;
           } else {
@@ -507,12 +629,31 @@ app.post('/addToCart', (req, res) => {
   }
 })
 
+app.post('/updatequantity', (req, res) => {
+  console.log("Update Quantity")
+  const {po_id, quantity} = req.body;
+  console.log(req.body);
+  if (!req.session.isLoggedIn) {
+      console.log("Please log in first!");
+  } else {
+      let ownerMenu = "UPDATE cart " + "SET quantity = ? WHERE user_email = ? AND po_id = ?;";
+      connection.query(ownerMenu, [quantity, req.session.uemail, po_id], (err, results) => {
+          if (err) {
+              throw err;
+          } else {
+              res.sendStatus(200);
+              console.log("Updated Quantity!");
+          }
+      });
+  }
+})
+
 app.get('/getCart', (req, res) => {
   console.log('Get Cart')
   if (!req.session.isLoggedIn) {
       res.sendStatus(404);
   } else {
-      let profileSQL = "SELECT po_id, p_name, p_category, p_price FROM cart as c LEFT JOIN menu as m ON m.p_id=c.po_id WHERE user_email = ?";
+      let profileSQL = "SELECT po_id, r.name, c.quantity, p_name, p_category, p_price FROM cart as c LEFT JOIN menu as m ON m.p_id=c.po_id INNER JOIN restaurant as r ON r.email = c.owner_email WHERE user_email = ?";
       connection.query(profileSQL, [req.session.uemail], (err, results) => {
           if (err) {
               throw err;
@@ -521,6 +662,7 @@ app.get('/getCart', (req, res) => {
               res.status(200).send(results);
           } else {
               console.log("No Cart Items");
+              res.send(results);
           }
       });
   }
@@ -531,7 +673,7 @@ app.get('/getPrice', (req, res) => {
   if (!req.session.isLoggedIn) {
       res.sendStatus(404);
   } else {
-      let profileSQL = "SELECT SUM(p_price) AS total_price FROM cart as c LEFT JOIN menu as m ON m.p_id=c.po_id WHERE user_email = ?";
+      let profileSQL = "SELECT SUM(overallprice) AS total_price FROM cart WHERE user_email = ?";
       connection.query(profileSQL, [req.session.uemail], (err, results) => {
           if (err) {
               throw err;
@@ -540,6 +682,25 @@ app.get('/getPrice', (req, res) => {
               res.status(200).send(results);
           } else {
               console.log("Nothing's added to cart!");
+          }
+      });
+  }
+});
+
+app.get('/getUserDeets', (req, res) => {
+  console.log('Get User Details')
+  if (!req.session.isLoggedIn) {
+      res.sendStatus(404);
+  } else {
+      let profileSQL = "SELECT id, name, contact, email, add1, add2 FROM user WHERE email = ?";
+      connection.query(profileSQL, [req.session.uemail], (err, results) => {
+          if (err) {
+              throw err;
+          } else if (results.length > 0) {
+              console.log(results);
+              res.status(200).send(results);
+          } else {
+              console.log("No Cart Items");
           }
       });
   }
@@ -567,13 +728,21 @@ app.post('/deletefromcart', (req, res) => {
 app.post('/order', (req, res) => {
   console.log("Order Page")
   console.log(req.body);
+  let date_ob = new Date();
+  let date = ("0" + date_ob.getDate()).slice(-2);
+  let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
+  let year = date_ob.getFullYear();
+  let hours = ("0" + date_ob.getHours()).slice(-2);
+  let minutes = ("0" + date_ob.getMinutes()).slice(-2);
+  let ordertime = year + "-" + month + "-" + date + " " + hours + ":" + minutes;
+  console.log(ordertime);
   if (!req.session.isLoggedIn) {
     console.log("Please log in first!");
   } else {
   req.body.forEach(element => {
     console.log(element.po_id);
-    let ownerMenu = "INSERT INTO uber_eats.order " + "SET po_id = ?, user_email = ?, order_status = ?";
-    connection.query(ownerMenu, [element.po_id, req.session.uemail, 'ordered'], (err, results) => {
+    let ownerMenu = "INSERT INTO uber_eats.order " + "SET po_id = ?, user_email = ?, quantity = ?,  ordertime = ?, order_status = ?";
+    connection.query(ownerMenu, [element.po_id, req.session.uemail, element.quantity, ordertime, 'ordered'], (err, results) => {
         if (err) {
             throw err;
         } else {
@@ -584,6 +753,26 @@ app.post('/order', (req, res) => {
   res.sendStatus(200);
   }
     
+  })
+
+  app.post('/orderIns', (req, res) => {
+    console.log("Sp Ins")
+    const {sp_id, SpIns} = req.body[0];
+    console.log(req.body.sp_id);
+    console.log(sp_id);
+    if (!req.session.isLoggedIn) {
+        console.log("Please log in first!");
+    } else {
+        let ownerMenu = "UPDATE uber_eats.order " + "SET sp_inst = ? WHERE user_email = ? AND po_id = ?;";
+        connection.query(ownerMenu, [SpIns, req.session.uemail, sp_id], (err, results) => {
+            if (err) {
+                throw err;
+            } else {
+                res.sendStatus(200);
+                console.log("Updated Quantity!");
+            }
+        });
+    }
   })
 
   app.post('/cartorder', (req, res) => {
@@ -629,7 +818,7 @@ app.post('/order', (req, res) => {
     if (!req.session.isLoggedIn) {
         res.sendStatus(404);
     } else {
-        let profileSQL = "SELECT o.po_id, o.order_id, m.p_name, u.name, u.location, u.contact, o.order_status FROM uber_eats.order as o INNER JOIN uber_eats.menu as m ON o.po_id = m.p_id INNER JOIN uber_eats.user as u ON o.user_email = u.email WHERE m.email = ? GROUP BY 1,2,3,4,5,6,7;";
+        let profileSQL = "SELECT u.email, u.name, u.location, u.contact, o.order_status, o.ordertime FROM uber_eats.order as o INNER JOIN uber_eats.menu as m ON o.po_id = m.p_id INNER JOIN uber_eats.user as u ON o.user_email = u.email WHERE m.email = ? GROUP BY 1,2,3,4,5,6;";
         connection.query(profileSQL, [req.session.remail], (err, results) => {
             if (err) {
                 throw err;
@@ -643,36 +832,75 @@ app.post('/order', (req, res) => {
     }
   });
 
-  app.post('/preparing', (req, res) => {
-    console.log('Preparing')
-    console.log(req.body.order_id);
-    var order_id_p = req.body.order_id;
-    console.log(order_id_p);
+  app.post('/filteresorders', (req, res) => {
+    console.log('Filter Res order status')
+    console.log(req.body);
     if (!req.session.isLoggedIn) {
-        console.log("Log In");
+        res.sendStatus(404);
     } else {
-        let updateProfile = "UPDATE uber_eats.order " + "SET order_status = ? WHERE order_id = ?";
-        connection.query(updateProfile, ['Preparing', order_id_p], (err, results) => {
+        let profileSQL = "SELECT u.email, u.name, u.location, u.contact, o.order_status, o.ordertime FROM uber_eats.order as o INNER JOIN uber_eats.menu as m ON o.po_id = m.p_id INNER JOIN uber_eats.user as u ON o.user_email = u.email WHERE m.email = ? AND order_status = ? GROUP BY 1,2,3,4,5,6;";
+        connection.query(profileSQL, [req.session.remail, req.body.inOS], (err, results) => {
             if (err) {
                 throw err;
+            } else if (results.length > 0) {
+                console.log(results);
+                res.status(200).send(results);
             } else {
-                console.log('Updated Order Stat Successfully!');
-                res.send(results);
+                console.log("Nothing's ordered from this restaurant!");
             }
         });
     }
   });
 
-  app.post('/delivered', (req, res) => {
-    console.log('Delivered')
-    console.log(req.body.order_id);
-    var order_id_p = req.body.order_id;
-    console.log(order_id_p);
+  app.post('/rorderdeets', (req, res) => {
+    console.log('Res order status')
+    console.log(req.body);
+    req.session.ordertime = req.body.order_id;
+    if (!req.session.isLoggedIn) {
+        res.sendStatus(404);
+    } else {
+        let profileSQL = "SELECT u.email, u.name, u.location, u.contact, o.order_status, o.quantity, m.p_name, u.add1, u.add2, o.sp_inst, m.p_price FROM uber_eats.order as o INNER JOIN uber_eats.menu as m ON o.po_id = m.p_id INNER JOIN uber_eats.user as u ON o.user_email = u.email WHERE m.email = ? AND ordertime= ? GROUP BY 1,2,3,4,5,6,7,8,9,10;";
+        connection.query(profileSQL, [req.session.remail, req.body.order_id], (err, results) => {
+            if (err) {
+                throw err;
+            } else if (results.length > 0) {
+                console.log(results);
+                res.status(200).send(results);
+            } else {
+                console.log("Nothing's ordered from this restaurant!");
+            }
+        });
+    }
+  });
+
+  app.get('/rorderdeets', (req, res) => {
+    console.log('Res order status')
+    console.log(req.body);
+    if (!req.session.isLoggedIn) {
+        res.sendStatus(404);
+    } else {
+        let profileSQL = "SELECT u.email, u.name, u.location, u.contact, o.order_status, o.quantity, m.p_name, u.add1, u.add2, o.sp_inst, m.p_price FROM uber_eats.order as o INNER JOIN uber_eats.menu as m ON o.po_id = m.p_id INNER JOIN uber_eats.user as u ON o.user_email = u.email WHERE m.email = ? AND ordertime = ? GROUP BY 1,2,3,4,5,6,7,8,9,10;";
+        connection.query(profileSQL, [req.session.remail, req.session.ordertime], (err, results) => {
+            if (err) {
+                throw err;
+            } else if (results.length > 0) {
+                console.log(results);
+                res.status(200).send(results);
+            } else {
+                console.log("Nothing's ordered from this restaurant!");
+            }
+        });
+    }
+  });
+
+  app.post('/resorderactions', (req, res) => {
+    console.log('resorderactions')
+    console.log(req.body);
     if (!req.session.isLoggedIn) {
         console.log("Log In");
     } else {
-        let updateProfile = "UPDATE uber_eats.order " + "SET order_status = ? WHERE order_id = ?";
-        connection.query(updateProfile, ['Delivered', order_id_p], (err, results) => {
+        let updateProfile = "UPDATE uber_eats.order " + "SET order_status = ? WHERE ordertime = ?";
+        connection.query(updateProfile, [req.body.actions, req.body.order_id], (err, results) => {
             if (err) {
                 throw err;
             } else {

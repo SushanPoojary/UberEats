@@ -18,6 +18,9 @@ import userorder from './components/customer/userorder';
 import resorder from './components/restaurant/resorder';
 import resEditMenu from './components/restaurant/resEditMenu';
 import userFavourites from './components/customer/userFavourites';
+import checkout from './components/customer/checkout';
+import temp from './components/customer/temp';
+import rorderdeets from './components/restaurant/rorderdeets';
 
 export default class Routes extends Component {
   render() {
@@ -41,6 +44,9 @@ export default class Routes extends Component {
           <Route path="/resorders" exact component={resorder} />
           <Route path="/editmenu" exact component={resEditMenu} />
           <Route path="/favourites" exact component={userFavourites} />
+          <Route path="/checkout" exact component={checkout} />
+          <Route path="/temp" exact component={temp} />
+          <Route path="/rorderdeets" exact component={rorderdeets} />
         </Switch>
       </Router>
     );

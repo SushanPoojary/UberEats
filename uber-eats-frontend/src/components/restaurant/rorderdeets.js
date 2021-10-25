@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unused-state */
 /* eslint-disable no-restricted-globals */
 /* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable camelcase */
@@ -12,22 +11,25 @@ import { Redirect } from 'react-router';
 import { Modal, Button, Form } from 'react-bootstrap';
 import NavBar from '../../NavBar';
 
-export default class addToCart extends React.Component {
+export default class rorderdeets extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       products: [],
       po_id: 0,
       redirect: false,
-      isOpen: true,
+      // totalprice: 0,
+      openModal: true,
       quantity: 0,
+    //   finalp_price: 0,
+    //   finalorder: 0,
     };
   }
 
   componentDidMount() {
     const menuList = [];
     Axios.defaults.withCredentials = true;
-    Axios.get('http://localhost:3001/getCart')
+    Axios.get('http://localhost:3001/rorderdeets')
       .then((res) => {
         if (res) {
           console.log(res.data);
@@ -44,22 +46,45 @@ export default class addToCart extends React.Component {
       });
   }
 
-  // componentDidUpdate(props, state) {
-  //   if (state.quantity !== this.state.quantity) {
-  //     console.log('input changed');
-  //   }
-  // }
+  componentDidUpdate(props, state) {
+    if (state.quantity !== this.state.quantity) {
+      console.log('input changed');
+    }
+  }
 
-  openModal = () => this.setState({ isOpen: true });
+  openModal = () => this.setState({ openModal: true });
 
-  closeModal = () => this.setState({ isOpen: false, redirect: true });
+  closeModal = () => this.setState({
+    openModal: false,
+    redirect: true,
+  });
 
   handleSubmit = (event) => {
     event.preventDefault();
+    // const finalorderint = parseFloat(event.target.id, 10);
+    // console.log(finalorderint);
+    // this.setState({ finalorder: finalorderint });
     const {
       products,
     } = this.state;
     console.log(products);
+    // Axios.defaults.withCredentials = true;
+    // Axios.post('http://localhost:3001/checkout', products)
+    //   .then((response) => {
+    //     console.log('Status Code : ', response.status);
+    //     console.log(response);
+    //     const status = response.status;
+    //     if (status !== 200) {
+    //       this.setState({
+    //         redirect: false,
+    //       });
+    //     } else {
+    //       console.log('Andar');
+    //       this.setState({
+    //         redirect: true,
+    //       });
+    //     }
+    //   });
     this.setState({ redirect: true });
   }
 
@@ -101,37 +126,52 @@ export default class addToCart extends React.Component {
     console.log(this.state.products);
     let redirectVar = null;
     if (this.state.redirect) {
-      redirectVar = <Redirect to="/checkout" />;
+      redirectVar = <Redirect to="/resorders" />;
     }
     return (
       <div>
         {redirectVar}
         <NavBar />
         <div>
-          <div><h3 style={{ paddingLeft: '0.5em' }}>Cart</h3></div>
-          <Modal show={this.state.isOpen} onHide={this.closeModal}>
+          <div><h3 style={{ paddingLeft: '0.5em' }}>Order Details</h3></div>
+          <Modal show={this.state.openModal} onHide={this.closeModal}>
             <Modal.Header>
-              <Modal.Title>Cart Details</Modal.Title>
+              <Modal.Title>Customer Details</Modal.Title>
             </Modal.Header>
-            {this.state.products.map((item) => <div>
+            {this.state.products.slice(0, 1).map((item) => <div>
               <Form.Group>
                 <Modal.Body>
                   {item.name}
                   <br />
-                  {item.p_name}
-                  <Form.Control type="number" style={{ width: '4rem' }} id={item.po_id} onChange={this.handleChange} placeholder="1" />
-                  $
-                  {item.p_price}
+                  Address: &nbsp;
+                  {item.add1}
+                  <br />
+                  Contact: &nbsp;
+                  {item.contact}
+                  <br />
+                  Order Status: &nbsp;
+                  {item.order_status}
                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  <Button variant="outline-danger" id={item.po_id} onClick={this.handleDelete}>
-                    Delete
-                  </Button>
+                </Modal.Body>
+              </Form.Group>
+            </div>)}
+            {this.state.products.map((item) => <div>
+              <Form.Group>
+                <Modal.Body>
+                  Dish: &nbsp;
+                  {item.p_name}
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  Quantity: &nbsp;
+                  {item.quantity}
+                  <br />
+                  Special Instruction: &nbsp;
+                  {item.sp_inst}
                 </Modal.Body>
               </Form.Group>
             </div>)}
             <Modal.Footer>
-              <Button variant="secondary" onClick={() => { this.closeModal(event); this.handleSubmit(event); }}>
-                Proceed to Checkout
+              <Button variant="secondary" onClick={this.closeModal}>
+                Close
               </Button>
             </Modal.Footer>
           </Modal>

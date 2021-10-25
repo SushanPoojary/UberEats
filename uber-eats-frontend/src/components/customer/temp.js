@@ -1,141 +1,192 @@
-/* eslint-disable */
-import React, { Component } from 'react';
-import { Grid, GridColumn as Column, GridToolbar } from '@progress/kendo-react-grid';
-import '@progress/kendo-theme-default/dist/all.css';
-// import DialogContainer from './DialogContainer.jsx';
-// import cellWithEditing from './cellWithEditing.jsx';
-import axios from 'axios';
+/* eslint-disable camelcase */
+/* eslint-disable prefer-destructuring */
+/* eslint-disable max-len */
+/* eslint-disable react/jsx-wrap-multilines */
+/* eslint-disable react/destructuring-assignment */
+import React from 'react';
+import Axios from 'axios';
+import { Redirect } from 'react-router';
+import NavBar from '../../NavBar';
 
-export const appetizerItems = [];
-class LunchMenu extends Component {
-    state = {
-        products: appetizerItems.slice(0, 7),
-        productInEdit: undefined,
-        ownerID: null,
-        itemID: null
+export default class temp extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      products: [],
+      po_id: 0,
+      redirect: false,
+      totalprice: 0,
+    //   finalorder: 0,
     };
+  }
 
-    componentDidMount() {
-        axios.get('/getOwnerMenu/appetizer')
-            .then(res => {
-                if (res) {
-                    console.log(res.data);
-                    if (res.data.length >= 0) {
-                        for (var i = 0; i < res.data.length; i++) {
-                            this.state.products.push(res.data[i]);
-                        }
-                    }
-                    this.setState({ ownerID: res.data[0].menu_owner });
-                    this.setState({ itemID: res.data[0].p_id })
-                }
-            }).catch((err) => {
-                throw err;
-            })
-    }
-
-    saveItem = (data) => {
-        axios.post('http://localhost:3001/saveItem', data)
-            .then(res => {
-                if (res)
-                    console.log("Add/Updated!");
-            });
-    }
-
-    removeItem = (data) => {
-        axios.post('http://localhost:3001/removeItem', data)
-            .then(res => {
-                console.log("Removed!!");
-            });
-    }
-
-    edit = (dataItem) => {
-        this.setState({ productInEdit: this.cloneProduct(dataItem) });
-        console.log("EDITING" + dataItem);
-    }
-
-    remove = (dataItem) => {
-        this.setState({
-            products: this.state.products.filter(p => p.ProductID !== dataItem.ProductID)
-        });
-        this.removeItem(dataItem);
-    }
-
-    save = () => {
-        const dataItem = this.state.productInEdit;
-        const products = this.state.products.slice();
-        const isNewProduct = dataItem.ProductID === undefined;
-
-        if (isNewProduct) {
-            products.unshift(this.newProduct(dataItem));
-        } else {
-            const index = products.findIndex(p => p.ProductID === dataItem.ProductID);
-            products.splice(index, 1, dataItem);
+  componentDidMount() {
+    const menuList = [];
+    const restlist = [];
+    Axios.defaults.withCredentials = true;
+    Axios.get('http://localhost:3001/getCart')
+      .then((res) => {
+        if (res) {
+          console.log(res.data);
+          if (res.data.length >= 0) {
+            // eslint-disable-next-line no-plusplus
+            for (let i = 0; i < res.data.length; i++) {
+              if (res.data[i].name !== restlist[0]) {
+                menuList.push(res.data[i]);
+                restlist.push(res.data[i].name);
+                console.log(res.data[i].name);
+              }
+            }
+          }
+          this.setState({ products: menuList });
         }
+      }).catch((err) => {
+        throw err;
+      });
+    console.log(restlist);
+    Axios.defaults.withCredentials = true;
+    Axios.get('http://localhost:3001/getPrice')
+      .then((res) => {
+        if (res) {
+          console.log(res.data);
+          this.setState({ totalprice: res.data[0].total_price });
+        }
+      }).catch((err) => {
+        throw err;
+      });
+  }
 
-        this.setState({
-            products: products,
-            productInEdit: undefined
-        });
-        this.saveItem(dataItem);
-        console.log(dataItem);
+  handleSubmit = (event) => {
+    event.preventDefault();
+    // const finalorderint = parseFloat(event.target.id, 10);
+    // console.log(finalorderint);
+    // this.setState({ finalorder: finalorderint });
+    const {
+      products,
+    } = this.state;
+    console.log(products);
+    Axios.defaults.withCredentials = true;
+    Axios.post('http://localhost:3001/order', products)
+      .then((response) => {
+        console.log('Status Code : ', response.status);
+        console.log(response);
+        const status = response.status;
+        if (status !== 200) {
+          this.setState({
+            redirect: false,
+          });
+        } else {
+          console.log('Andar');
+          this.setState({
+            redirect: true,
+          });
+        }
+      });
+    Axios.post('http://localhost:3001/cartorder', products)
+      .then((response) => {
+        console.log('Status Code : ', response.status);
+        console.log(response);
+        const status = response.status;
+        if (status !== 200) {
+          this.setState({
+            redirect: false,
+          });
+        } else {
+          console.log('Andar');
+          this.setState({
+            redirect: true,
+          });
+        }
+      });
+  }
+
+  handleDelete = (event) => {
+    event.preventDefault();
+    const orderNum = parseInt(event.target.id, 10);
+    const visitdata = {
+      po_id: orderNum,
+    };
+    console.log(visitdata);
+    this.setState({
+      po_id: visitdata,
+    });
+    console.log(this.state.po_id);
+    console.log(this.state.redirectVar);
+    Axios.defaults.withCredentials = true;
+    Axios.post('http://localhost:3001/deletefromcart', visitdata)
+      .then((res) => {
+        console.log(res.status);
+      });
+  }
+
+  render() {
+    console.log(this.state.products);
+    const orderValue = Math.round(((this.state.totalprice) + Number.EPSILON) * 100) / 100;
+    const taxes = Math.round(((orderValue / 10) + Number.EPSILON) * 100) / 100;
+    const serviceFee = Math.round(((orderValue / 7.5) + Number.EPSILON) * 100) / 100;
+    const totalvalue = orderValue + taxes + serviceFee;
+    const totalordervalue = Math.round(((totalvalue) + Number.EPSILON) * 100) / 100;
+    console.log(orderValue);
+    let redirectVar = null;
+    if (this.state.redirect) {
+      redirectVar = <Redirect to="/order" />;
     }
-
-    cancel = () => {
-        this.setState({ productInEdit: undefined });
-    }
-
-    insert = () => {
-        this.setState({ productInEdit: {} });
-    }
-
-    render() {
-        return (
-            <div >
-                <Grid
-                    data={this.state.products}
-                    style={{ height: '420px' }}
-                >
-                    <GridToolbar>
-                        <button
-                            onClick={this.insert}
-                            className="k-button"
-                        >
-                            Add New
-                        </button>
-                    </GridToolbar>
-                    <Column field="ProductID" title="AutoIncrement" width="50px" />
-                    <Column field="p_id" title="Item ID" />
-                    <Column field="p_name" title="Name" />
-                    <Column field="p_description" title="Description" />
-                    <Column field="p_image" title="Image" />
-                    <Column field="p_quantity" title="Quantity" width="150px" editor="numeric" />
-                    <Column field="p_price" title="Price" />
-                    <Column
-                        title="Edit"
-                        // cell={cellWithEditing(this.edit, this.remove)}
-                    />
-                </Grid>
-                {/* {this.state.productInEdit && <DialogContainer dataItem={this.state.productInEdit} save={this.save} cancel={this.cancel} />} */}
-            </div>
-        );
-    }
-
-    dialogTitle() {
-        return `${this.state.productInEdit.ProductID === undefined ? 'Add' : 'Edit'} product`;
-    }
-    cloneProduct(product) {
-        return Object.assign({}, product);
-    }
-
-    newProduct(source) {
-
-        const id = this.state.itemID + 1;
-        const newProduct = {
-            ProductID: id,
-        };
-
-        return Object.assign(newProduct, source);
-    }
+    return (
+      <div>
+        {redirectVar}
+        <NavBar />
+        <div>
+          <div><h3 style={{ paddingLeft: '0.5em' }}>Checkout</h3></div>
+          <div><h3 style={{ paddingLeft: '0.5em' }}>{this.state.products.name}</h3></div>
+          <table>
+            <thead>
+              <tr>
+                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>CID</td>
+                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Name</td>
+                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Quantity</td>
+                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Price</td>
+                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Total Price</td>
+                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Delete from Checkout</td>
+                {/* <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Delete</td> */}
+              </tr>
+            </thead>
+            <tbody>
+              {this.state.products.map((item, i) =>
+              // eslint-disable-next-line implicit-arrow-linebreak
+                <tr>
+                  <td style={{ textAlign: 'left', padding: '1em' }}>{i + 1}</td>
+                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.p_name}</td>
+                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.quantity}</td>
+                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.p_price}</td>
+                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.p_price * item.quantity}</td>
+                  <td><input type="button" id={item.po_id} value="Delete" style={{ width: '100px', height: '30px', backgroundColor: '#fc465a' }} onClick={this.handleDelete} /></td>
+                  {/* <td><input type="button" value="Delete" style={{ width: '100px', height: '30px', backgroundColor: '#FF0000' }} /></td> */}
+                </tr>)}
+            </tbody>
+          </table>
+          <div>
+            Order Value:
+            $
+            {orderValue}
+          </div>
+          <div>
+            Taxes:
+            $
+            {taxes}
+          </div>
+          <div>
+            Service Fee:
+            $
+            { serviceFee }
+          </div>
+          <div>
+            Total Price:
+            $
+            { totalordervalue }
+          </div>
+          <input type="button" id={totalordervalue} value="Order" style={{ width: '100px', height: '35px', backgroundColor: '#7bb420' }} onClick={this.handleSubmit} />
+        </div>
+      </div>
+    );
+  }
 }
-
-export default LunchMenu;

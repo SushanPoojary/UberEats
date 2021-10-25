@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { Redirect } from 'react-router';
 import cookie from 'react-cookies';
 import Axios from 'axios';
+import { Image } from 'cloudinary-react';
 import styled from 'styled-components';
 import NavBar from '../../NavBar';
 
@@ -36,11 +37,13 @@ class resProfile extends Component {
       location: '',
       description: '',
       contact: '',
-      picture: '',
       dishes: '',
       timing: '',
       delivery: '',
       pickup: '',
+      picture: '',
+      preview: '',
+      uploadPublicID: '',
       authMessage: true,
       authMessageE: '',
     };
@@ -61,6 +64,9 @@ class resProfile extends Component {
           this.setState({ timing: res.data[0].timings });
           this.setState({ delivery: res.data[0].delivery });
           this.setState({ pickup: res.data[0].pickup });
+          this.setState({ picture: res.data[0].picture });
+          this.setState({ preview: res.data[0].preview });
+          this.setState({ uploadPublicID: res.data[0].uploadPublicID });
         }
       }).catch((err) => {
         console.log(`Restaurant Profile: ${err}`);
@@ -69,6 +75,14 @@ class resProfile extends Component {
 
     handleChange = (e) => {
       this.setState({ [e.target.name]: e.target.value });
+    }
+
+    handleFileChange = (e) => {
+      this.setState({ [e.target.name]: e.target.value });
+      const file = e.target.files[0];
+      console.log(file);
+      console.log(e.target.value);
+      this.previewFile(file);
     }
 
     handleValidation() {
@@ -80,6 +94,14 @@ class resProfile extends Component {
       this.setState({
         authMessageE,
       });
+    }
+
+    previewFile = (file) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onloadend = () => {
+        this.setState({ preview: reader.result });
+      };
     }
 
     updateProfile = (data) => {
@@ -114,11 +136,12 @@ class resProfile extends Component {
         location: this.state.location,
         description: this.state.description,
         contact: this.state.contact,
-        picture: this.state.picture,
         dishes: this.state.dishes,
         timing: this.state.timing,
         delivery: this.state.delivery,
         pickup: this.state.pickup,
+        picture: this.state.picture,
+        preview: this.state.preview,
       };
       this.updateProfile(ownerData);
     }
@@ -222,6 +245,25 @@ class resProfile extends Component {
                     <span style={{ color: 'green' }}>
                       {authMessageE}
                     </span>
+                  </OverallText>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-xs" />
+                <div className="col-xs">
+                  <OverallText>
+                    Profile Image
+                    <br />
+                    <input type="file" name="picture" defaultValue={this.state.picture} onChange={this.handleFileChange} required />
+                    <br />
+                    {this.state.preview && (<img src={this.state.preview} alt="chosen" style={{ height: '200px' }} />)}
+                    <Image
+                      cloudName="sushanubereats"
+                      publicID={this.state.uploadPublicID}
+                      width="150"
+                      crop="scale"
+                    />
+                    <br />
                   </OverallText>
                 </div>
               </div>

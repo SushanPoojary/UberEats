@@ -1,8 +1,19 @@
+/* eslint-disable no-else-return */
+/* eslint-disable brace-style */
+/* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable max-len */
 /* eslint-disable react/jsx-wrap-multilines */
 /* eslint-disable react/destructuring-assignment */
 import React from 'react';
 import Axios from 'axios';
+import { Redirect } from 'react-router';
+import {
+  Form,
+  Button,
+  Container,
+  Row,
+  Col,
+} from 'react-bootstrap';
 import NavBar from '../../NavBar';
 
 export default class resorder extends React.Component {
@@ -10,9 +21,11 @@ export default class resorder extends React.Component {
     super(props);
     this.state = {
       products: [],
-      order_id: 0,
-      // po_id: 0,
-      // redirectVar: false,
+      order_id: '',
+      actions: '',
+      redirect: false,
+      inOS: '',
+      filter: false,
     };
   }
 
@@ -36,93 +49,239 @@ export default class resorder extends React.Component {
       });
   }
 
-  //   handleSubmit = (e) => {
-  //     e.preventDefault();
-  //     this.sendRestAPI({ item: this.state.item });
-  //   }
-
-  handlePreparing = (event) => {
-    event.preventDefault();
-    const orderNum = parseInt(event.target.id, 10);
-    const visitdata = {
-      order_id: orderNum,
-    };
-    console.log(visitdata);
-    this.setState({
-      order_id: visitdata,
-    });
-    console.log(this.state.order_id);
+  finalFilter = (filData) => {
+    console.log(filData);
     Axios.defaults.withCredentials = true;
-    Axios.post('http://localhost:3001/preparing', visitdata)
+    Axios.post('http://localhost:3001/filteresorders', filData)
       .then((res) => {
-        console.log(res.status);
+        if (res.status === 200) {
+          this.setState({ products: res.data });
+          this.setState({ filter: true });
+        } else {
+          // this.setState({ search: false });
+        }
       });
   }
 
-  handleDelivered = (event) => {
+  finalActions = (actionData) => {
+    console.log(actionData);
+    Axios.defaults.withCredentials = true;
+    Axios.post('http://localhost:3001/resorderactions', actionData)
+      .then((res) => {
+        if (res.status === 200) {
+          // this.forceUpdate();
+        } else {
+          // this.setState({ search: false });
+        }
+      });
+  }
+
+  handleChangeOS = (e) => {
+    this.setState({ inOS: e.target.value });
+    console.log(e.target.value);
+  }
+
+  handleChangeActions = (e) => {
+    this.setState({
+      order_id: e.target.id,
+      actions: e.target.value,
+    });
+  }
+
+  handleActions = (e) => {
+    e.preventDefault();
+    this.setState({
+      order_id: e.target.id,
+    });
+    const actionData = {
+      order_id: this.state.order_id,
+      actions: this.state.actions,
+    };
+    this.finalActions(actionData);
+  }
+
+  handleFilter = (e) => {
+    e.preventDefault();
+    const filData = {
+      inOS: this.state.inOS,
+    };
+    this.finalFilter(filData);
+  }
+
+  onClickButton = (event) => {
     event.preventDefault();
-    const orderNum = parseInt(event.target.id, 10);
+    const orderNum = event.target.id;
     const visitdata = {
       order_id: orderNum,
     };
     console.log(visitdata);
     this.setState({
-      order_id: visitdata,
+      order_id: event.target.id,
     });
     console.log(this.state.order_id);
     Axios.defaults.withCredentials = true;
-    Axios.post('http://localhost:3001/delivered', visitdata)
+    Axios.post('http://localhost:3001/rorderdeets', visitdata)
       .then((res) => {
         console.log(res.status);
+        this.setState({ redirect: true });
       });
   }
 
   render() {
     console.log(this.state.products);
-    return (
-      <div>
-        <NavBar />
+    let redirectVar = null;
+    if (this.state.redirect) {
+      redirectVar = <Redirect to="/rorderdeets" />;
+    }
+    if (!this.state.filter) {
+      return (
         <div>
-          <table>
-            <thead>
-              <tr>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>OID</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Customer Name</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Location</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Contact</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Dish Name</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Order Status</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Order Details</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Preparing</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>On The Way</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Delivered</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Pick Up Ready</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Picked Up</td>
-                {/* <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Delete</td> */}
-              </tr>
-            </thead>
-            <tbody>
-              {this.state.products.map((item, i) =>
-              // eslint-disable-next-line implicit-arrow-linebreak
+          <NavBar />
+          {redirectVar}
+          <div>
+            <Form inline>
+              <Container>
+                <Row>
+                  <Col>
+                    <label>
+                      Order Status: &nbsp;
+                      <select onChange={this.handleChangeOS}>
+                        <option>Select</option>
+                        <option value="Ordered">Order Received</option>
+                        <option value="Cancelled">Cancelled</option>
+                        <option value="Preparing">Preparing</option>
+                        <option value="On The Way">On The Way</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Pick Up Ready">Pick Up Ready</option>
+                        <option value="Picked Up">Picked Up</option>
+                      </select>
+                    </label>
+                        &nbsp; &nbsp; &nbsp;
+                    <Button type="submit" onClick={this.handleFilter}>Filter Order</Button>
+                  </Col>
+                </Row>
+              </Container>
+            </Form>
+            <div><h3>&nbsp;&nbsp;Order Management</h3></div>
+            <table>
+              <thead>
                 <tr>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{i + 1}</td>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.name}</td>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.location}</td>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.contact}</td>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.p_name}</td>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.order_status}</td>
-                  <td><input type="button" id={item.order_id} value="Order Details" style={{ width: '110px', height: '29px', backgroundColor: '#ffeded' }} /></td>
-                  <td><input type="button" id={item.order_id} value="Preparing" style={{ width: '110px', height: '29px', backgroundColor: '#ffe46d' }} onClick={this.handlePreparing} /></td>
-                  <td><input type="button" id={item.order_id} value="On the Way" style={{ width: '110px', height: '29px', backgroundColor: '#6dfff0' }} /></td>
-                  <td><input type="button" id={item.order_id} value="Delivered" style={{ width: '110px', height: '29px', backgroundColor: '#8fff6d' }} onClick={this.handleDelivered} /></td>
-                  <td><input type="button" id={item.order_id} value="Pickup Ready" style={{ width: '110px', height: '29px', backgroundColor: '#6dfff0' }} /></td>
-                  <td><input type="button" id={item.order_id} value="Picked Up" style={{ width: '110px', height: '29px', backgroundColor: '#8fff6d' }} /></td>
-                  {/* <td><input type="button" value="Delete" style={{ width: '100px', height: '30px', backgroundColor: '#FF0000' }} /></td> */}
-                </tr>)}
-            </tbody>
-          </table>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>OID</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Customer Name</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Location</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Contact</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Order Time</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Order Status</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Order Details</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Change Order Status</td>
+                </tr>
+              </thead>
+              <tbody>
+                {this.state.products.map((item, i) =>
+                // eslint-disable-next-line implicit-arrow-linebreak
+                  <tr>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{i + 1}</td>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.name}</td>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.location}</td>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.contact}</td>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.ordertime}</td>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.order_status}</td>
+                    <td><input type="button" id={item.ordertime} value="Order Details" style={{ backgroundColor: '#ffeded' }} onClick={this.onClickButton} /></td>
+                    <label>
+                      <select onChange={this.handleChangeActions}>
+                        <option>Select</option>
+                        <option value="Ordered">Order Received</option>
+                        <option value="Cancelled">Cancelled</option>
+                        <option value="Preparing">Preparing</option>
+                        <option value="On The Way">On The Way</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Pick Up Ready">Pick Up Ready</option>
+                        <option value="Picked Up">Picked Up</option>
+                      </select>
+                    </label>
+                        &nbsp; &nbsp; &nbsp;
+                    <Button type="submit" id={item.ordertime} onClick={this.handleActions}>Confirm Action</Button>
+                  </tr>)}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
-    );
+      );
+    }
+    else {
+      return (
+        <div>
+          <NavBar />
+          {redirectVar}
+          <div>
+            <Form inline>
+              <Container>
+                <Row>
+                  <Col>
+                    <label>
+                      Order Status: &nbsp;
+                      <select onChange={this.handleChangeOS}>
+                        <option>Select</option>
+                        <option value="Ordered">Order Received</option>
+                        <option value="Cancelled">Cancelled</option>
+                        <option value="Preparing">Preparing</option>
+                        <option value="On The Way">On The Way</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Pick Up Ready">Pick Up Ready</option>
+                        <option value="Picked Up">Picked Up</option>
+                      </select>
+                    </label>
+                        &nbsp; &nbsp; &nbsp;
+                    <Button type="submit" onClick={this.handleFilter}>Filter Order</Button>
+                  </Col>
+                </Row>
+              </Container>
+            </Form>
+            <div><h3>&nbsp;&nbsp;Order Management</h3></div>
+            <table>
+              <thead>
+                <tr>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>OID</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Customer Name</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Location</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Contact</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Order Time</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Order Status</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Order Details</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Change Order Status</td>
+                </tr>
+              </thead>
+              <tbody>
+                {this.state.products.map((item, i) =>
+                // eslint-disable-next-line implicit-arrow-linebreak
+                  <tr>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{i + 1}</td>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.name}</td>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.location}</td>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.contact}</td>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.ordertime}</td>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.order_status}</td>
+                    <td><input type="button" id={item.ordertime} value="Order Details" style={{ width: '110px', height: '29px', backgroundColor: '#ffeded' }} onClick={this.onClickButton} /></td>
+                    <label>
+                      <select onChange={this.handleChangeActions}>
+                        <option>Select</option>
+                        <option value="Ordered">Order Received</option>
+                        <option value="Cancelled">Cancelled</option>
+                        <option value="Preparing">Preparing</option>
+                        <option value="On The Way">On The Way</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Pick Up Ready">Pick Up Ready</option>
+                        <option value="Picked Up">Picked Up</option>
+                      </select>
+                    </label>
+                        &nbsp; &nbsp; &nbsp;
+                    <Button type="submit" id={item.ordertime} onClick={this.handleActions}>Confirm Action</Button>
+                  </tr>)}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
   }
 }

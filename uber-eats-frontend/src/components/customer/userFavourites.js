@@ -3,9 +3,18 @@
 /* eslint-disable max-len */
 /* eslint-disable react/jsx-wrap-multilines */
 /* eslint-disable react/destructuring-assignment */
+/* eslint-disable */
 import React from 'react';
 import Axios from 'axios';
 import { Redirect } from 'react-router';
+import {
+  Form,
+  Button,
+  Card,
+  Container,
+  Row,
+  Col,
+} from 'react-bootstrap';
 import NavBar from '../../NavBar';
 
 export default class userFavourites extends React.Component {
@@ -58,6 +67,24 @@ export default class userFavourites extends React.Component {
       });
   }
 
+  handleRemove = (event) => {
+    event.preventDefault();
+    const orderNum = parseInt(event.target.id, 10);
+    const visitdata = {
+      email: event.target.id,
+    };
+    console.log(visitdata);
+    this.setState({
+      remail: visitdata
+    });
+    console.log(this.state.remail);
+    Axios.defaults.withCredentials = true;
+    Axios.post('http://localhost:3001/deletefromfav', visitdata)
+      .then((res) => {
+        console.log(res.status);
+      });
+  }
+
   render() {
     console.log(this.state.products);
     let redirectVar = null;
@@ -69,32 +96,31 @@ export default class userFavourites extends React.Component {
         {redirectVar}
         <NavBar />
         <div>
-          <div><h3 style={{ paddingLeft: '0.5em' }}>Favourites</h3></div>
-          <table>
-            <thead>
-              <tr>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>FID</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Name</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Location</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Timings</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Visit</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Remove Favourite</td>
-              </tr>
-            </thead>
-            <tbody>
-              {this.state.products.map((item, i) =>
-              // eslint-disable-next-line implicit-arrow-linebreak
-                <tr>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{i + 1}</td>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.name}</td>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.location}</td>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.timings}</td>
-                  <td><input type="button" id={item.email} value="Visit" style={{ width: '100px', height: '30px', backgroundColor: '#7bb420' }} onClick={this.handleVisit} /></td>
-                  <td><input type="button" id={item.po_id} value="Remove" style={{ width: '100px', height: '30px', backgroundColor: '#fc465a' }} /></td>
-                  {/* <td><input type="button" value="Delete" style={{ width: '100px', height: '30px', backgroundColor: '#FF0000' }} /></td> */}
-                </tr>)}
-            </tbody>
-          </table>
+        <div><h4>Favourite</h4></div>
+        <Form inline>
+            <Container>
+              <Row>
+              {this.state.products.map((item) => <Col>
+               <Card style={{ width: '20rem', margin: '2rem' }}>
+                <Card.Img variant="right" />
+                <Card.Body>
+                  <Card.Title>{item.name}</Card.Title>
+                  <Card.Text>
+                    {item.description}
+                  </Card.Text>
+                  <Card.Text>
+                    {item.location}
+                    &nbsp; &nbsp; &nbsp;
+                    {item.timings}
+                  </Card.Text>
+                  <Button variant="success" id={item.email} value={item.email} onClick={this.handleVisit}>Visit</Button>
+                  <Button variant="outline-danger" size="sm" id={item.email} value={item.email} onClick={this.handleRemove}>Remove</Button>
+                </Card.Body>
+              </Card>
+              </Col>)}
+              </Row>
+            </Container>
+          </Form>
         </div>
       </div>
     );

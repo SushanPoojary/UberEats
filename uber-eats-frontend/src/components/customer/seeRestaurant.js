@@ -1,8 +1,21 @@
+/* eslint-disable no-shadow */
+/* eslint-disable react/no-unused-state */
+/* eslint-disable react/jsx-indent */
+/* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable max-len */
 /* eslint-disable react/jsx-wrap-multilines */
 /* eslint-disable react/destructuring-assignment */
 import React from 'react';
 import Axios from 'axios';
+import {
+  Form,
+  Button,
+  Card,
+  Container,
+  Row,
+  Col,
+  Modal,
+} from 'react-bootstrap';
 import NavBar from '../../NavBar';
 
 export default class seeRestaurant extends React.Component {
@@ -11,7 +24,16 @@ export default class seeRestaurant extends React.Component {
     this.state = {
       products: [],
       po_id: 0,
+      price: 0,
       redirectVar: false,
+      name: '',
+      location: '',
+      description: '',
+      // contact: '',
+      timings: '',
+      isOpen: false,
+      // delivery: '',
+      // pickup: '',
     };
   }
 
@@ -33,30 +55,110 @@ export default class seeRestaurant extends React.Component {
       }).catch((err) => {
         throw err;
       });
+    Axios.defaults.withCredentials = true;
+    Axios.get('http://localhost:3001/sr1')
+      .then((res) => {
+        if (res.status === 200) {
+          this.setState({ name: res.data[0].name });
+          this.setState({ location: res.data[0].location });
+          this.setState({ description: res.data[0].description });
+          // this.setState({ contact: res.data[0].contact });
+          this.setState({ timings: res.data[0].timings });
+          // this.setState({ delivery: res.data[0].delivery });
+          // this.setState({ pickup: res.data[0].pickup });
+        } else {
+          console.log('Unable to fetch restaurant data');
+        }
+      });
   }
 
-  handleSubmit = (e) => {
-    e.preventDefault();
-    this.sendRestAPI({ item: this.state.item });
-  }
+  // handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   this.sendRestAPI({ item: this.state.item });
+  // }
 
-  handleVisit = (event) => {
+  // handleVisit = (event) => {
+  //   event.preventDefault();
+  //   const orderNum = parseInt(event.target.id, 10);
+  //   const visitdata = {
+  //     p_id: orderNum,
+  //     price: event.target.value,
+  //   };
+  //   console.log(visitdata);
+  //   this.setState({
+  //     po_id: visitdata,
+  //     redirectVar: true,
+  //     price: event.target.value,
+  //   });
+  //   console.log(this.state.po_id);
+  //   console.log(this.state.redirectVar);
+  //   Axios.defaults.withCredentials = true;
+  //   Axios.post('http://localhost:3001/addtocart', visitdata)
+  //     .then((res) => {
+  //       console.log(res.status);
+  //     });
+  // }
+
+  closeModal = () => this.setState({ isOpen: false });
+
+  handleCart = (event) => {
     event.preventDefault();
     const orderNum = parseInt(event.target.id, 10);
     const visitdata = {
       p_id: orderNum,
+      price: event.target.value,
     };
     console.log(visitdata);
     this.setState({
       po_id: visitdata,
-      redirectVar: true,
+      price: event.target.value,
     });
     console.log(this.state.po_id);
     console.log(this.state.redirectVar);
     Axios.defaults.withCredentials = true;
-    Axios.post('http://localhost:3001/addtocart', visitdata)
+    Axios.get('http://localhost:3001/getCart')
       .then((res) => {
-        console.log(res.status);
+        if (res.data.length > 0) {
+          if (res.data[0].name !== this.state.name) {
+            console.log('Item present');
+            this.setState({ isOpen: true });
+            console.log(this.state.isOpen);
+          } else {
+            Axios.defaults.withCredentials = true;
+            Axios.post('http://localhost:3001/addtocart', visitdata)
+              .then((res) => {
+                console.log(res.status);
+                this.setState({ redirectVar: true });
+              });
+          }
+        } else {
+          Axios.defaults.withCredentials = true;
+          Axios.post('http://localhost:3001/addtocart', visitdata)
+            .then((res) => {
+              console.log(res.status);
+              this.setState({ redirectVar: true });
+            });
+        }
+      });
+  }
+
+  handleNew = (e) => {
+    console.log(e.target.value);
+    Axios.defaults.withCredentials = true;
+    Axios.post('http://localhost:3001/cartorder')
+      .then((response) => {
+        console.log('Status Code : ', response.status);
+        console.log(response);
+        const { status } = response.status;
+        if (status !== 200) {
+          this.setState({
+            isOpen: false,
+          });
+        } else {
+          this.setState({
+            isOpen: true,
+          });
+        }
       });
   }
 
@@ -66,34 +168,61 @@ export default class seeRestaurant extends React.Component {
       <div>
         <NavBar />
         <div>
-          <table>
-            <thead>
-              <tr>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>PID</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Name</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Ingredients</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Description</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Category</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Price</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Add to Cart</td>
-                {/* <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Delete</td> */}
-              </tr>
-            </thead>
-            <tbody>
-              {this.state.products.map((item, i) =>
-              // eslint-disable-next-line implicit-arrow-linebreak
-                <tr>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{i + 1}</td>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.p_name}</td>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.p_ingredients}</td>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.p_description}</td>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.p_category}</td>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.p_price}</td>
-                  <td><input type="button" id={item.p_id} value="Add To Cart" style={{ width: '100px', height: '30px', backgroundColor: '#7bb420' }} onClick={this.handleVisit} /></td>
-                  {/* <td><input type="button" value="Delete" style={{ width: '100px', height: '30px', backgroundColor: '#FF0000' }} /></td> */}
-                </tr>)}
-            </tbody>
-          </table>
+          <Card style={{ paddingLeft: '6rem' }}>
+            <Card.Header as="h4">{this.state.name}</Card.Header>
+            <Card.Text className="mb-2 text-muted">{this.state.description}</Card.Text>
+            <Card.Text className="mb-2 text-muted">
+              {this.state.location}
+              &nbsp; &nbsp; &nbsp;
+              {this.state.timings}
+              </Card.Text>
+          </Card>
+        </div>
+        <div>
+          <Form inline>
+            <Container>
+              <Row>
+              {this.state.products.map((item) => <Col>
+               <Card style={{ width: '20rem', margin: '2rem' }}>
+                <Card.Img variant="right" />
+                <Card.Body>
+                  <Card.Title>{item.p_name}</Card.Title>
+                  <Card.Text>
+                    {item.p_description}
+                  </Card.Text>
+                  <Card.Text>
+                    $
+                    {item.p_price}
+                  </Card.Text>
+                  <Button variant="success" id={item.p_id} value={item.p_price} name={this.state.name} onClick={this.handleCart}>Add To Cart</Button>
+                </Card.Body>
+              </Card>
+              </Col>)}
+              </Row>
+            </Container>
+          </Form>
+          <Modal show={this.state.isOpen} onHide={this.closeModal}>
+            <Modal.Header>
+              <Modal.Title>Create New Order?</Modal.Title>
+            </Modal.Header>
+            <div>
+              <Form.Group>
+                <Modal.Body>
+                  Your order contains items from a different Restaurant.
+                  Create a new order to add items from &nbsp;
+                  {this.state.name}
+                </Modal.Body>
+              </Form.Group>
+            </div>
+            <Modal.Footer>
+              <Button variant="success" onClick={this.handleNew}>
+                Confirm
+              </Button>
+              <Button variant="secondary" onClick={this.closeModal}>
+                Cancel
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </div>
       </div>
     );

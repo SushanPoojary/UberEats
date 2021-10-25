@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { Redirect } from 'react-router';
 import cookie from 'react-cookies';
 import Axios from 'axios';
+import { Image } from 'cloudinary-react';
 import styled from 'styled-components';
 import { CountryDropdown } from 'react-country-region-selector';
 import NavBar from '../../NavBar';
@@ -34,6 +35,8 @@ class userProfile extends Component {
     super(props);
     this.state = {
       name: '',
+      add1: '',
+      add2: '',
       location: '',
       state: '',
       country: '',
@@ -43,6 +46,8 @@ class userProfile extends Component {
       email: '',
       contact: '',
       picture: '',
+      preview: '',
+      uploadPublicID: '',
       authMessage: true,
       authMessageE: '',
     };
@@ -55,6 +60,8 @@ class userProfile extends Component {
       .then((res) => {
         if (res) {
           this.setState({ name: res.data[0].name });
+          this.setState({ add1: res.data[0].add1 });
+          this.setState({ add2: res.data[0].add2 });
           this.setState({ location: res.data[0].location });
           this.setState({ state: res.data[0].state });
           this.setState({ country: res.data[0].country });
@@ -64,6 +71,8 @@ class userProfile extends Component {
           this.setState({ email: res.data[0].email });
           this.setState({ contact: res.data[0].contact });
           this.setState({ picture: res.data[0].picture });
+          this.setState({ preview: res.data[0].preview });
+          this.setState({ uploadPublicID: res.data[0].uploadPublicID });
         }
       }).catch((err) => {
         console.log(`User Profile: ${err}`);
@@ -72,6 +81,14 @@ class userProfile extends Component {
 
     handleChange = (e) => {
       this.setState({ [e.target.name]: e.target.value });
+    }
+
+    handleFileChange = (e) => {
+      this.setState({ [e.target.name]: e.target.value });
+      const file = e.target.files[0];
+      console.log(file);
+      console.log(e.target.value);
+      this.previewFile(file);
     }
 
     handleValidation() {
@@ -83,6 +100,14 @@ class userProfile extends Component {
       this.setState({
         authMessageE,
       });
+    }
+
+    previewFile = (file) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onloadend = () => {
+        this.setState({ preview: reader.result });
+      };
     }
 
     updateProfile = (data) => {
@@ -107,6 +132,8 @@ class userProfile extends Component {
       e.preventDefault();
       const userData = {
         name: this.state.name,
+        add1: this.state.add1,
+        add2: this.state.add2,
         location: this.state.location,
         state: this.state.state,
         country: this.state.country,
@@ -116,6 +143,7 @@ class userProfile extends Component {
         email: this.state.email,
         contact: this.state.contact,
         picture: this.state.picture,
+        preview: this.state.preview,
       };
       this.updateProfile(userData);
     }
@@ -154,6 +182,28 @@ class userProfile extends Component {
                     Name
                     <br />
                     <input type="text" name="name" defaultValue={this.state.name} placeholder=" Name " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
+                    <br />
+                  </OverallText>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-xs" />
+                <div className="col-xs">
+                  <OverallText>
+                    Address
+                    <br />
+                    <input type="text" name="add1" defaultValue={this.state.add1} placeholder=" Address " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
+                    <br />
+                  </OverallText>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-xs" />
+                <div className="col-xs">
+                  <OverallText>
+                    Alternate Address
+                    <br />
+                    <input type="text" name="add2" defaultValue={this.state.add2} placeholder=" Address " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
                     <br />
                   </OverallText>
                 </div>
@@ -246,6 +296,25 @@ class userProfile extends Component {
                     <span style={{ color: 'green' }}>
                       {authMessageE}
                     </span>
+                  </OverallText>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-xs" />
+                <div className="col-xs">
+                  <OverallText>
+                    Profile Image
+                    <br />
+                    <input type="file" name="picture" defaultValue={this.state.picture} onChange={this.handleFileChange} required />
+                    <br />
+                    {this.state.preview && (<img src={this.state.preview} alt="chosen" style={{ height: '200px' }} />)}
+                    <Image
+                      cloudName="sushanubereats"
+                      publicID={this.state.uploadPublicID}
+                      width="150"
+                      crop="scale"
+                    />
+                    <br />
                   </OverallText>
                 </div>
               </div>

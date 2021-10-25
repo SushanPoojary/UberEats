@@ -40,26 +40,6 @@ export default class userorder extends React.Component {
     this.sendRestAPI({ item: this.state.item });
   }
 
-  // handleVisit = (event) => {
-  //   event.preventDefault();
-  //   const orderNum = parseInt(event.target.id, 10);
-  //   const visitdata = {
-  //     p_id: orderNum,
-  //   };
-  //   console.log(visitdata);
-  //   this.setState({
-  //     po_id: visitdata,
-  //     redirectVar: true,
-  //   });
-  //   console.log(this.state.po_id);
-  //   console.log(this.state.redirectVar);
-  //   Axios.defaults.withCredentials = true;
-  //   Axios.post('http://localhost:3001/addtocart', visitdata)
-  //     .then((res) => {
-  //       console.log(res.status);
-  //     });
-  // }
-
   render() {
     console.log(this.state.products);
     return (
