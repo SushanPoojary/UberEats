@@ -3,6 +3,7 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router';
 import Axios from 'axios';
+import { Image } from 'cloudinary-react';
 import styled from 'styled-components';
 import NavBar from '../../NavBar';
 
@@ -37,6 +38,9 @@ class resEditMenu extends Component {
       p_category: '',
       p_type: '',
       p_price: '',
+      picture: '',
+      preview: '',
+      uploadPublicID: '',
       authMessage: true,
       authMessageE: '',
       redirect: false,
@@ -55,6 +59,9 @@ class resEditMenu extends Component {
           this.setState({ p_category: res.data[0].p_category });
           this.setState({ p_type: res.data[0].p_type });
           this.setState({ p_price: res.data[0].p_price });
+          this.setState({ picture: res.data[0].picture });
+          this.setState({ preview: res.data[0].preview });
+          this.setState({ uploadPublicID: res.data[0].uploadPublicID });
         }
       }).catch((err) => {
         console.log(`Restaurant Menu Edit: ${err}`);
@@ -63,6 +70,14 @@ class resEditMenu extends Component {
 
     handleChange = (e) => {
       this.setState({ [e.target.name]: e.target.value });
+    }
+
+    handleFileChange = (e) => {
+      this.setState({ [e.target.name]: e.target.value });
+      const file = e.target.files[0];
+      console.log(file);
+      console.log(e.target.value);
+      this.previewFile(file);
     }
 
     handleValidation() {
@@ -74,6 +89,14 @@ class resEditMenu extends Component {
       this.setState({
         authMessageE,
       });
+    }
+
+    previewFile = (file) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onloadend = () => {
+        this.setState({ preview: reader.result });
+      };
     }
 
     updateMenuItem = (data) => {
@@ -111,6 +134,8 @@ class resEditMenu extends Component {
         p_category: this.state.p_category,
         p_type: this.state.p_type,
         p_price: this.state.p_price,
+        picture: this.state.picture,
+        preview: this.state.preview,
       };
       this.updateMenuItem(ownerData);
     }
@@ -203,6 +228,25 @@ class resEditMenu extends Component {
                     <span style={{ color: 'green' }}>
                       {authMessageE}
                     </span>
+                  </OverallText>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-xs" />
+                <div className="col-xs">
+                  <OverallText>
+                    Dish Image
+                    <br />
+                    <input type="file" name="picture" defaultValue={this.state.picture} onChange={this.handleFileChange} required />
+                    <br />
+                    {this.state.preview && (<img src={this.state.preview} alt="chosen" style={{ height: '200px' }} />)}
+                    <Image
+                      cloudName="sushanubereats"
+                      publicID={this.state.uploadPublicID}
+                      width="150"
+                      crop="scale"
+                    />
+                    <br />
                   </OverallText>
                 </div>
               </div>

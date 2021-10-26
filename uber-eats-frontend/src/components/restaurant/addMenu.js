@@ -5,6 +5,7 @@ import React from 'react';
 // import ReactDOM from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.css';
 import Axios from 'axios';
+import { Image } from 'cloudinary-react';
 import { Redirect } from 'react-router';
 import styled from 'styled-components';
 // eslint-disable-next-line import/no-cycle
@@ -41,6 +42,9 @@ export class addMenu extends React.Component {
       p_category: '',
       p_type: '',
       p_price: 0,
+      picture: '',
+      preview: '',
+      uploadPublicID: '',
       redirect: '',
       nameValid: '',
       ingredientsValid: '',
@@ -187,6 +191,22 @@ export class addMenu extends React.Component {
     }
   }
 
+  handleFileChange = (e) => {
+    this.setState({ [e.target.name]: e.target.value });
+    const file = e.target.files[0];
+    console.log(file);
+    console.log(e.target.value);
+    this.previewFile(file);
+  }
+
+  previewFile = (file) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      this.setState({ preview: reader.result });
+    };
+  }
+
   handleSubmit = (event) => {
     event.preventDefault();
     const {
@@ -196,6 +216,7 @@ export class addMenu extends React.Component {
       p_category,
       p_type,
       p_price,
+      preview,
     } = this.state;
     console.log(p_name, p_ingredients, p_description, p_category, p_type, p_price);
     Axios.defaults.withCredentials = true;
@@ -206,6 +227,7 @@ export class addMenu extends React.Component {
       p_category,
       p_type,
       p_price,
+      preview,
     }).then((response) => {
       console.log('Status Code : ', response.status);
       console.log(response);
@@ -341,6 +363,25 @@ export class addMenu extends React.Component {
                   <span style={{ color: 'red' }}>
                     {priceError}
                   </span>
+                  <br />
+                </OverallText>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-xs" />
+              <div className="col-xs">
+                <OverallText>
+                  Dish Image
+                  <br />
+                  <input type="file" name="picture" defaultValue={this.state.picture} onChange={this.handleFileChange} required />
+                  <br />
+                  {this.state.preview && (<img src={this.state.preview} alt="chosen" style={{ height: '200px' }} />)}
+                  <Image
+                    cloudName="sushanubereats"
+                    publicID={this.state.uploadPublicID}
+                    width="150"
+                    crop="scale"
+                  />
                   <br />
                 </OverallText>
               </div>

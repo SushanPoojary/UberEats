@@ -169,7 +169,7 @@ export default class homepage extends React.Component {
                         <label>
                         Type of Delivery:
                         <select onChange={this.handleChangeD}>
-                          <option value="Select">Select</option>
+                          <option value="All">Select</option>
                           <option value="Delivery">Delivery</option>
                           <option value="Pickup">Pickup</option>
                           </select>
@@ -178,7 +178,7 @@ export default class homepage extends React.Component {
                         <label>
                         Type of Food:
                         <select onChange={this.handleChangeV}>
-                        <option value="Select">Select</option>
+                        <option value="All">Select</option>
                           <option value="NonVeg">NonVeg</option>
                           <option value="Veg">Veg</option>
                           <option value="Vegan">Vegan</option>
@@ -231,12 +231,12 @@ export default class homepage extends React.Component {
                 <Container>
                     <Row>
                         <Col>
-                        <input type="text" name="inSearch" placeholder=" Search Dish Name, Restaurants, Cuisine, Locations " style={{ width: '500px', height: '35px' }} onChange={this.handleChange} required />
+                        <input type="text" name="inSearch" placeholder=" Search Dish Name, Restaurants, Cuisine, Locations " style={{ width: '500px', height: '35px' }} onChange={this.handleChange} onKeyPress={this.enterPressed.bind(this)} required />
                         &nbsp; &nbsp; &nbsp;
                         <label>
                         Type of Delivery:
                         <select onChange={this.handleChangeD}>
-                          <option value="Select">Select</option>
+                          <option value="All">Select</option>
                           <option value="Delivery">Delivery</option>
                           <option value="Pickup">Pickup</option>
                           </select>
@@ -245,7 +245,7 @@ export default class homepage extends React.Component {
                         <label>
                         Type of Food:
                         <select onChange={this.handleChangeV}>
-                        <option value="Select">Select</option>
+                        <option value="All">Select</option>
                           <option value="NonVeg">NonVeg</option>
                           <option value="Veg">Veg</option>
                           <option value="Vegan">Vegan</option>
@@ -262,7 +262,11 @@ export default class homepage extends React.Component {
               <Row>
               {this.state.resultTable.map((item) => <Col>
                <Card style={{ width: '20rem', margin: '2rem' }}>
-                <Card.Img variant="right" />
+                <Card.Img
+                  variant="top"
+                  src={item.uploadURL}
+                  style={{ height: '250px' }}
+                />
                 <Card.Body>
                   <Card.Title>{item.name}</Card.Title>
                   <Card.Text>

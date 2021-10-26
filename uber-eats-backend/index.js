@@ -338,9 +338,19 @@ app.get('/resAddItems', (req,res) => {
   }
 })
 
-app.post('/addMenu', (req, res) => {
+app.post('/addMenu', async (req, res) => {
   console.log('Res Add Item')
-  const {p_id, p_name, p_ingredients, p_description, p_category, p_type, p_price} = req.body;
+  try {
+    const fileStr = req.body.preview;
+    const uploadResponse = await cloudinary.uploader.upload(fileStr, { upload_preset: 'sushan_ubereats'});
+    console.log(uploadResponse);
+    req.session.uploadPublicID = uploadResponse.public_id;
+    req.session.uploadURL = uploadResponse.url;
+  } catch (err) {
+    console.log(err);
+  }
+
+  const {p_id, p_name, p_ingredients, p_description, p_category, p_type, p_price, preview} = req.body;
   if (!req.session.isLoggedIn) {
       console.log("Please log in first!");
   } else {
@@ -348,15 +358,9 @@ app.post('/addMenu', (req, res) => {
       connection.query(findItem, [req.session.remail, p_id], (err, results) => {
           if (err) {
               throw err;
-          } else if (results.length > 0) {
-              let updateItem = "UPDATE menu " + "SET p_name = ?, p_ingredients = ?, p_description = ?, p_category = ?, p_type = ?, p_price = ? WHERE p_id = ?";
-              connection.query(updateItem, [p_name, p_ingredients, p_description, p_category, p_type, p_price, p_id], (err, results) => {
-                  if(err) throw err;
-                  console.log(results);
-              });
           } else {
-              let insertItem = "INSERT INTO menu " + "SET p_name = ?, p_ingredients = ?, p_description = ?, p_category = ?, p_type = ?, p_price = ?, email = ?";
-              connection.query(insertItem, [p_name, p_ingredients, p_description, p_category, p_type, p_price, req.session.remail], (err, results) => {
+              let insertItem = "INSERT INTO menu " + "SET p_name = ?, p_ingredients = ?, p_description = ?, p_category = ?, p_type = ?, p_price = ?, uploadPublicID = ?, uploadURL = ?, email = ?";
+              connection.query(insertItem, [p_name, p_ingredients, p_description, p_category, p_type, p_price, req.session.uploadPublicID, req.session.uploadURL, req.session.remail], (err, results) => {
                   if(err) throw err;
                   console.log(results);
               });
@@ -403,15 +407,24 @@ app.get('/resEditMenu', (req, res) => {
   }
 })
 
-app.post('/resupdateMenu', (req, res) => {
+app.post('/resupdateMenu', async (req, res) => {
   console.log('Update Menu')
+  try {
+    const fileStr = req.body.preview;
+    const uploadResponse = await cloudinary.uploader.upload(fileStr, { upload_preset: 'sushan_ubereats'});
+    console.log(uploadResponse);
+    req.session.uploadPublicID = uploadResponse.public_id;
+    req.session.uploadURL = uploadResponse.url;
+  } catch (err) {
+    console.log(err);
+  }
   console.log(req.body);
   const {p_name, p_ingredients, p_description, p_category, p_type, p_price} = req.body;
   if (!req.session.isLoggedIn) {
       console.log("User has to be logged in to update profile...");
   } else {
-      let updateProfile = "UPDATE uber_eats.menu " + "SET p_name = ?, p_ingredients = ?, p_description = ?, p_category = ?, p_type = ?, p_price = ? WHERE email = ? AND p_id = ?";
-      connection.query(updateProfile, [p_name, p_ingredients, p_description, p_category, p_type, p_price, req.session.remail, req.session.p_id], (err, results) => {
+      let updateProfile = "UPDATE uber_eats.menu " + "SET p_name = ?, p_ingredients = ?, p_description = ?, p_category = ?, p_type = ?, p_price = ?, uploadPublicID = ?, uploadURL = ? WHERE email = ? AND p_id = ?";
+      connection.query(updateProfile, [p_name, p_ingredients, p_description, p_category, p_type, p_price, req.session.uploadPublicID, req.session.uploadURL, req.session.remail, req.session.p_id], (err, results) => {
           if (err) {
               throw err;
           } else {
@@ -437,14 +450,14 @@ app.get('/allrest', (req, res) => {
       });
   })
 
-app.post('/searchItem', (req, res) => {
-  console.log(req.body);
+app.post('/searchItem', async (req, res) => {
+//   console.log(req.body);
   console.log("INSIDE SEARCH ITEM")
   if (!req.session.isLoggedIn) {
       console.log("Please log in first!");
   } else {
       //find restaurants for the owner who has this item on the menu
-      let findRestaurant = "SELECT r.name, r.location, r.description, r.contact, r.timings, m.email FROM menu m RIGHT JOIN restaurant r ON m.email = r.email WHERE ((m.p_name = ?) OR (r.location = ?) OR (m.p_category = ?) OR (r.name = ?)) AND (r.delivery = ? OR r.pickup = ?) AND (m.p_type = ?) GROUP BY name, m.email";
+      let findRestaurant = "SELECT r.name, r.location, r.description, r.contact, r.timings, r.uploadURL, m.email FROM menu m RIGHT JOIN restaurant r ON m.email = r.email WHERE ((m.p_name = ?) OR (r.location = ?) OR (m.p_category = ?) OR (r.name = ?)) AND (r.delivery = ? OR r.pickup = ?) AND (m.p_type = ?) GROUP BY name, m.email";
       connection.query(findRestaurant, [req.body.inSearch, req.body.inSearch, req.body.inSearch, req.body.inSearch, req.body.inDelivery, req.body.inDelivery, req.body.inV], (err, results) => {
           if (err) {
               throw err;
@@ -460,14 +473,13 @@ app.post('/searchItem', (req, res) => {
   }
 })
 
-app.post('/searchOI', (req, res) => {
-  console.log(req.body);
+app.post('/searchOI', async (req, res) => {
   console.log("INSIDE SEARCH ITEM OI")
   if (!req.session.isLoggedIn) {
       console.log("Please log in first!");
   } else {
       //find restaurants for the owner who has this item on the menu
-      let findRestaurant = "SELECT r.name, r.location, r.description, r.contact, r.timings, m.email FROM uber_eats.menu m RIGHT JOIN uber_eats.restaurant r ON m.email = r.email WHERE ((m.p_name = ?) OR (r.location = ?) OR (m.p_category = ?) OR (r.name = ?)) GROUP BY name, m.email";
+      let findRestaurant = "SELECT r.name, r.location, r.description, r.contact, r.timings, r.uploadURL, m.email FROM uber_eats.menu m RIGHT JOIN uber_eats.restaurant r ON m.email = r.email WHERE ((m.p_name = ?) OR (r.location = ?) OR (m.p_category = ?) OR (r.name = ?)) GROUP BY name, m.email";
       connection.query(findRestaurant, [req.body.inSer, req.body.inSer, req.body.inSer, req.body.inSer], (err, results) => {
           if (err) {
               throw err;

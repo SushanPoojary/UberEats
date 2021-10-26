@@ -72,33 +72,6 @@ export default class seeRestaurant extends React.Component {
       });
   }
 
-  // handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   this.sendRestAPI({ item: this.state.item });
-  // }
-
-  // handleVisit = (event) => {
-  //   event.preventDefault();
-  //   const orderNum = parseInt(event.target.id, 10);
-  //   const visitdata = {
-  //     p_id: orderNum,
-  //     price: event.target.value,
-  //   };
-  //   console.log(visitdata);
-  //   this.setState({
-  //     po_id: visitdata,
-  //     redirectVar: true,
-  //     price: event.target.value,
-  //   });
-  //   console.log(this.state.po_id);
-  //   console.log(this.state.redirectVar);
-  //   Axios.defaults.withCredentials = true;
-  //   Axios.post('http://localhost:3001/addtocart', visitdata)
-  //     .then((res) => {
-  //       console.log(res.status);
-  //     });
-  // }
-
   closeModal = () => this.setState({ isOpen: false });
 
   handleCart = (event) => {
@@ -184,7 +157,7 @@ export default class seeRestaurant extends React.Component {
               <Row>
               {this.state.products.map((item) => <Col>
                <Card style={{ width: '20rem', margin: '2rem' }}>
-                <Card.Img variant="right" />
+                <Card.Img variant="right" src={item.uploadURL} style={{ height: '250px' }} />
                 <Card.Body>
                   <Card.Title>{item.p_name}</Card.Title>
                   <Card.Text>
