@@ -1,9 +1,9 @@
+/* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable camelcase */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable max-len */
 /* eslint-disable react/jsx-wrap-multilines */
 /* eslint-disable react/destructuring-assignment */
-/* eslint-disable */
 import React from 'react';
 import Axios from 'axios';
 import { Redirect } from 'react-router';
@@ -69,13 +69,12 @@ export default class userFavourites extends React.Component {
 
   handleRemove = (event) => {
     event.preventDefault();
-    const orderNum = parseInt(event.target.id, 10);
     const visitdata = {
       email: event.target.id,
     };
     console.log(visitdata);
     this.setState({
-      remail: visitdata
+      remail: visitdata,
     });
     console.log(this.state.remail);
     Axios.defaults.withCredentials = true;
@@ -96,28 +95,28 @@ export default class userFavourites extends React.Component {
         {redirectVar}
         <NavBar />
         <div>
-        <div><h4>Favourite</h4></div>
-        <Form inline>
+          <div><h4>Favourite</h4></div>
+          <Form inline>
             <Container>
               <Row>
-              {this.state.products.map((item) => <Col>
-               <Card style={{ width: '20rem', margin: '2rem' }}>
-                <Card.Img variant="right" />
-                <Card.Body>
-                  <Card.Title>{item.name}</Card.Title>
-                  <Card.Text>
-                    {item.description}
-                  </Card.Text>
-                  <Card.Text>
-                    {item.location}
+                {this.state.products.map((item) => <Col>
+                  <Card style={{ width: '20rem', margin: '2rem' }}>
+                    <Card.Img variant="top" src={item.uploadURL} style={{ height: '250px' }} />
+                    <Card.Body>
+                      <Card.Title>{item.name}</Card.Title>
+                      <Card.Text>
+                        {item.description}
+                      </Card.Text>
+                      <Card.Text>
+                        {item.location}
                     &nbsp; &nbsp; &nbsp;
-                    {item.timings}
-                  </Card.Text>
-                  <Button variant="success" id={item.email} value={item.email} onClick={this.handleVisit}>Visit</Button>
-                  <Button variant="outline-danger" size="sm" id={item.email} value={item.email} onClick={this.handleRemove}>Remove</Button>
-                </Card.Body>
-              </Card>
-              </Col>)}
+                        {item.timings}
+                      </Card.Text>
+                      <Button variant="success" id={item.email} value={item.email} onClick={this.handleVisit}>Visit</Button>
+                      <Button variant="outline-danger" size="sm" id={item.email} value={item.email} onClick={this.handleRemove}>Remove</Button>
+                    </Card.Body>
+                  </Card>
+                </Col>)}
               </Row>
             </Container>
           </Form>

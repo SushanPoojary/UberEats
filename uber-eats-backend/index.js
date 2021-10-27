@@ -530,7 +530,7 @@ app.get('/getFavourites', (req, res) => {
   if (!req.session.isLoggedIn) {
       res.sendStatus(404);
   } else {
-      let profileSQL = "SELECT r.id, r.name, r.email, r.location, r.timings FROM restaurant as r INNER JOIN favourites as f ON r.email=f.owner_email WHERE user_email = ?";
+      let profileSQL = "SELECT r.id, r.name, r.email, r.location, r.timings, r.uploadURL FROM restaurant as r INNER JOIN favourites as f ON r.email=f.owner_email WHERE user_email = ?";
       connection.query(profileSQL, [req.session.uemail], (err, results) => {
           if (err) {
               throw err;
@@ -754,7 +754,7 @@ app.post('/order', (req, res) => {
   req.body.forEach(element => {
     console.log(element.po_id);
     let ownerMenu = "INSERT INTO uber_eats.order " + "SET po_id = ?, user_email = ?, quantity = ?,  ordertime = ?, order_status = ?";
-    connection.query(ownerMenu, [element.po_id, req.session.uemail, element.quantity, ordertime, 'ordered'], (err, results) => {
+    connection.query(ownerMenu, [element.po_id, req.session.uemail, element.quantity, ordertime, 'Ordered'], (err, results) => {
         if (err) {
             throw err;
         } else {
@@ -811,7 +811,7 @@ app.post('/order', (req, res) => {
     if (!req.session.isLoggedIn) {
         res.sendStatus(404);
     } else {
-        let profileSQL = "SELECT r.name, r.location, o.order_status FROM uber_eats.order as o INNER JOIN uber_eats.menu as m ON o.po_id = m.p_id INNER JOIN uber_eats.restaurant as r ON m.email = r.email WHERE o.user_email = ? GROUP BY 1,2,3;";
+        let profileSQL = "SELECT r.name, r.location, r.contact, o.order_status, o.ordertime FROM uber_eats.order as o INNER JOIN uber_eats.menu as m ON o.po_id = m.p_id INNER JOIN uber_eats.restaurant as r ON m.email = r.email WHERE o.user_email = ? GROUP BY 1,2,3,4,5;";
         connection.query(profileSQL, [req.session.uemail], (err, results) => {
             if (err) {
                 throw err;
@@ -864,6 +864,26 @@ app.post('/order', (req, res) => {
     }
   });
 
+  app.post('/filteruorders', (req, res) => {
+    console.log('Filter Res order status')
+    console.log(req.body);
+    if (!req.session.isLoggedIn) {
+        res.sendStatus(404);
+    } else {
+        let profileSQL = "SELECT r.name, r.location, r.contact, o.order_status, o.ordertime FROM uber_eats.order as o INNER JOIN uber_eats.menu as m ON o.po_id = m.p_id INNER JOIN uber_eats.restaurant as r ON m.email = r.email WHERE o.user_email = ? AND order_status = ? GROUP BY 1,2,3,4,5;";
+        connection.query(profileSQL, [req.session.uemail, req.body.inOS], (err, results) => {
+            if (err) {
+                throw err;
+            } else if (results.length > 0) {
+                console.log(results);
+                res.status(200).send(results);
+            } else {
+                console.log("Nothing's ordered from this restaurant!");
+            }
+        });
+    }
+  });
+
   app.post('/rorderdeets', (req, res) => {
     console.log('Res order status')
     console.log(req.body);
@@ -900,6 +920,65 @@ app.post('/order', (req, res) => {
                 res.status(200).send(results);
             } else {
                 console.log("Nothing's ordered from this restaurant!");
+            }
+        });
+    }
+  });
+
+  app.post('/uorderdeets', (req, res) => {
+    console.log('Cust order status')
+    console.log(req.body);
+    req.session.ordertime = req.body.order_id;
+    if (!req.session.isLoggedIn) {
+        res.sendStatus(404);
+    } else {
+        let profileSQL = "SELECT u.name, u.location, u.contact, o.order_status, o.quantity, m.p_name, u.add1, u.add2, o.sp_inst, m.p_price FROM uber_eats.order as o INNER JOIN uber_eats.menu as m ON o.po_id = m.p_id INNER JOIN uber_eats.user as u ON o.user_email = u.email WHERE ordertime = ? GROUP BY 1,2,3,4,5,6,7,8,9,10;";
+        connection.query(profileSQL, [req.session.ordertime], (err, results) => {
+            if (err) {
+                throw err;
+            } else if (results.length > 0) {
+                console.log(results);
+                res.status(200).send(results);
+            } else {
+                console.log("Nothing's ordered from this restaurant!");
+            }
+        });
+    }
+  });
+
+  app.get('/uorderdeets', (req, res) => {
+    console.log('Cust order status')
+    console.log(req.body);
+    if (!req.session.isLoggedIn) {
+        res.sendStatus(404);
+    } else {
+        let profileSQL = "SELECT u.email, u.name, u.location, u.contact, o.order_status, o.quantity, m.p_name, u.add1, u.add2, o.sp_inst, m.p_price FROM uber_eats.order as o INNER JOIN uber_eats.menu as m ON o.po_id = m.p_id INNER JOIN uber_eats.user as u ON o.user_email = u.email WHERE ordertime = ? GROUP BY 1,2,3,4,5,6,7,8,9,10;";
+        connection.query(profileSQL, [req.session.ordertime], (err, results) => {
+            if (err) {
+                throw err;
+            } else if (results.length > 0) {
+                console.log(results);
+                res.status(200).send(results);
+            } else {
+                console.log("Nothing's ordered from this restaurant!");
+            }
+        });
+    }
+  });
+
+  app.post('/updateordercan', (req, res) => {
+    console.log('updateordercan')
+    console.log(req.body);
+    if (!req.session.isLoggedIn) {
+        console.log("Log In");
+    } else {
+        let updateProfile = "UPDATE uber_eats.order " + "SET order_status = ? WHERE ordertime = ?";
+        connection.query(updateProfile, ['Cancelled', req.body.order_id], (err, results) => {
+            if (err) {
+                throw err;
+            } else {
+                console.log('Updated Order Stat Successfully!');
+                res.send(results);
             }
         });
     }

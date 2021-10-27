@@ -21,6 +21,7 @@ import userFavourites from './components/customer/userFavourites';
 import checkout from './components/customer/checkout';
 import temp from './components/customer/temp';
 import rorderdeets from './components/restaurant/rorderdeets';
+import uorderdeets from './components/customer/uorderdeets';
 
 export default class Routes extends Component {
   render() {
@@ -47,6 +48,7 @@ export default class Routes extends Component {
           <Route path="/checkout" exact component={checkout} />
           <Route path="/temp" exact component={temp} />
           <Route path="/rorderdeets" exact component={rorderdeets} />
+          <Route path="/uorderdeets" exact component={uorderdeets} />
         </Switch>
       </Router>
     );

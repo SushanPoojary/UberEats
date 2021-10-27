@@ -49,6 +49,12 @@ export default class resorder extends React.Component {
       });
   }
 
+  // componentDidUpdate(props, state) {
+  //   if (state.inOS !== this.state.inOS) {
+  //     console.log('input changed');
+  //   }
+  // }
+
   finalFilter = (filData) => {
     console.log(filData);
     Axios.defaults.withCredentials = true;
@@ -69,7 +75,7 @@ export default class resorder extends React.Component {
     Axios.post('http://localhost:3001/resorderactions', actionData)
       .then((res) => {
         if (res.status === 200) {
-          // this.forceUpdate();
+          // console.log('A');
         } else {
           // this.setState({ search: false });
         }
@@ -186,7 +192,7 @@ export default class resorder extends React.Component {
                     <td style={{ textAlign: 'left', padding: '1em' }}>{item.contact}</td>
                     <td style={{ textAlign: 'left', padding: '1em' }}>{item.ordertime}</td>
                     <td style={{ textAlign: 'left', padding: '1em' }}>{item.order_status}</td>
-                    <td><input type="button" id={item.ordertime} value="Order Details" style={{ backgroundColor: '#ffeded' }} onClick={this.onClickButton} /></td>
+                    <td><Button variant="dark" id={item.ordertime} onClick={this.onClickButton}>Order Details</Button></td>
                     <label>
                       <select onChange={this.handleChangeActions}>
                         <option>Select</option>
@@ -261,7 +267,7 @@ export default class resorder extends React.Component {
                     <td style={{ textAlign: 'left', padding: '1em' }}>{item.contact}</td>
                     <td style={{ textAlign: 'left', padding: '1em' }}>{item.ordertime}</td>
                     <td style={{ textAlign: 'left', padding: '1em' }}>{item.order_status}</td>
-                    <td><input type="button" id={item.ordertime} value="Order Details" style={{ width: '110px', height: '29px', backgroundColor: '#ffeded' }} onClick={this.onClickButton} /></td>
+                    <td><Button variant="dark" id={item.ordertime} onClick={this.onClickButton}>Order Details</Button></td>
                     <label>
                       <select onChange={this.handleChangeActions}>
                         <option>Select</option>

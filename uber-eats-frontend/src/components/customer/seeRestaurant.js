@@ -157,7 +157,7 @@ export default class seeRestaurant extends React.Component {
               <Row>
               {this.state.products.map((item) => <Col>
                <Card style={{ width: '20rem', margin: '2rem' }}>
-                <Card.Img variant="right" src={item.uploadURL} style={{ height: '250px' }} />
+                <Card.Img variant="top" src={item.uploadURL} style={{ height: '250px' }} />
                 <Card.Body>
                   <Card.Title>{item.p_name}</Card.Title>
                   <Card.Text>

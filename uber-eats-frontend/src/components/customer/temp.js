@@ -1,192 +1,322 @@
-/* eslint-disable camelcase */
 /* eslint-disable prefer-destructuring */
+/* eslint-disable react/no-access-state-in-setstate */
+/* eslint-disable react/no-unused-state */
+/* eslint-disable object-shorthand */
+/* eslint-disable brace-style */
+/* eslint-disable jsx-a11y/label-has-associated-control */
+/* eslint-disable no-else-return */
 /* eslint-disable max-len */
 /* eslint-disable react/jsx-wrap-multilines */
 /* eslint-disable react/destructuring-assignment */
 import React from 'react';
 import Axios from 'axios';
+import ReactPaginate from 'react-paginate';
 import { Redirect } from 'react-router';
+import {
+  Form,
+  Button,
+  Container,
+  Row,
+  Col,
+} from 'react-bootstrap';
+import './paginate.css';
 import NavBar from '../../NavBar';
 
-export default class temp extends React.Component {
+export default class userorder extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       products: [],
-      po_id: 0,
-      redirect: false,
-      totalprice: 0,
-    //   finalorder: 0,
+      filter: false,
+      inOS: '',
+      order_id: '',
+      offset: 0,
+      perPage: 5,
+      currentPage: 0,
+      tabledata: [],
+      // pageNumber: '',
+      // po_id: 0,
+      // redirectVar: false,
     };
+    this.handlePageClick = this.handlePageClick.bind(this);
   }
 
   componentDidMount() {
-    const menuList = [];
-    const restlist = [];
+    this.getData();
+  }
+
+  handlePageClick = (e) => {
+    const selectedPage = e.selected;
+    const offset = selectedPage * this.state.perPage;
+
+    this.setState({
+      currentPage: selectedPage,
+      offset: offset,
+    }, () => {
+      this.loadMoreData();
+    });
+  }
+
+  getData() {
+    // const menuList = [];
     Axios.defaults.withCredentials = true;
-    Axios.get('http://localhost:3001/getCart')
+    Axios.get('http://localhost:3001/orderstatus')
       .then((res) => {
-        if (res) {
-          console.log(res.data);
-          if (res.data.length >= 0) {
-            // eslint-disable-next-line no-plusplus
-            for (let i = 0; i < res.data.length; i++) {
-              if (res.data[i].name !== restlist[0]) {
-                menuList.push(res.data[i]);
-                restlist.push(res.data[i].name);
-                console.log(res.data[i].name);
-              }
-            }
-          }
-          this.setState({ products: menuList });
-        }
-      }).catch((err) => {
-        throw err;
-      });
-    console.log(restlist);
-    Axios.defaults.withCredentials = true;
-    Axios.get('http://localhost:3001/getPrice')
-      .then((res) => {
-        if (res) {
-          console.log(res.data);
-          this.setState({ totalprice: res.data[0].total_price });
-        }
-      }).catch((err) => {
-        throw err;
+        const data = res.data;
+        const slice = data.slice(this.state.offset, this.state.offset + this.state.perPage);
+        this.setState({
+          pageCount: Math.ceil(data.length / this.state.perPage),
+          products: res.data,
+          tabledata: slice,
+        });
       });
   }
 
-  handleSubmit = (event) => {
-    event.preventDefault();
-    // const finalorderint = parseFloat(event.target.id, 10);
-    // console.log(finalorderint);
-    // this.setState({ finalorder: finalorderint });
-    const {
-      products,
-    } = this.state;
-    console.log(products);
-    Axios.defaults.withCredentials = true;
-    Axios.post('http://localhost:3001/order', products)
-      .then((response) => {
-        console.log('Status Code : ', response.status);
-        console.log(response);
-        const status = response.status;
-        if (status !== 200) {
-          this.setState({
-            redirect: false,
-          });
-        } else {
-          console.log('Andar');
-          this.setState({
-            redirect: true,
-          });
-        }
-      });
-    Axios.post('http://localhost:3001/cartorder', products)
-      .then((response) => {
-        console.log('Status Code : ', response.status);
-        console.log(response);
-        const status = response.status;
-        if (status !== 200) {
-          this.setState({
-            redirect: false,
-          });
-        } else {
-          console.log('Andar');
-          this.setState({
-            redirect: true,
-          });
-        }
-      });
+  handleSubmit = (e) => {
+    e.preventDefault();
+    this.sendRestAPI({ item: this.state.item });
   }
 
   handleDelete = (event) => {
     event.preventDefault();
-    const orderNum = parseInt(event.target.id, 10);
+    const orderNum = event.target.id;
     const visitdata = {
-      po_id: orderNum,
+      order_id: orderNum,
     };
     console.log(visitdata);
     this.setState({
-      po_id: visitdata,
+      order_id: visitdata,
     });
-    console.log(this.state.po_id);
+    console.log(this.state.order_id);
     console.log(this.state.redirectVar);
+    console.log(event.target.value);
+    if (event.target.value === 'Ordered') {
+      Axios.defaults.withCredentials = true;
+      Axios.post('http://localhost:3001/updateordercan', visitdata)
+        .then((res) => {
+          console.log(res.status);
+        });
+      this.forceUpdate();
+    }
+    else {
+      alert('Restaurant has already processed your order');
+    }
+  }
+
+  onClickButton = (event) => {
+    event.preventDefault();
+    const orderNum = event.target.id;
+    const visitdata = {
+      order_id: orderNum,
+    };
+    console.log(visitdata);
+    this.setState({
+      order_id: event.target.id,
+    });
+    console.log(this.state.order_id);
     Axios.defaults.withCredentials = true;
-    Axios.post('http://localhost:3001/deletefromcart', visitdata)
+    Axios.post('http://localhost:3001/uorderdeets', visitdata)
       .then((res) => {
         console.log(res.status);
+        this.setState({ redirect: true });
       });
   }
 
+  handleChangeOS = (e) => {
+    this.setState({ inOS: e.target.value });
+    console.log(e.target.value);
+  }
+
+  finalFilter = (filData) => {
+    console.log(filData);
+    Axios.defaults.withCredentials = true;
+    Axios.post('http://localhost:3001/filteruorders', filData)
+      .then((res) => {
+        if (res.status === 200) {
+          this.setState({ products: res.data });
+          this.setState({ filter: true });
+        } else {
+          // this.setState({ search: false });
+        }
+      });
+  }
+
+  handleFilter = (e) => {
+    e.preventDefault();
+    const filData = {
+      inOS: this.state.inOS,
+    };
+    this.finalFilter(filData);
+  }
+
+  loadMoreData() {
+    const data = this.state.products;
+    const slice = data.slice(this.state.offset, this.state.offset + this.state.perPage);
+    this.setState({
+      pageCount: Math.ceil(data.length / this.state.perPage),
+      tabledata: slice,
+    });
+  }
+
+  // paginate = (number) => {
+  //   this.setState({ pageNumber: number });
+  //   console.log(number);
+  // }
+
   render() {
     console.log(this.state.products);
-    const orderValue = Math.round(((this.state.totalprice) + Number.EPSILON) * 100) / 100;
-    const taxes = Math.round(((orderValue / 10) + Number.EPSILON) * 100) / 100;
-    const serviceFee = Math.round(((orderValue / 7.5) + Number.EPSILON) * 100) / 100;
-    const totalvalue = orderValue + taxes + serviceFee;
-    const totalordervalue = Math.round(((totalvalue) + Number.EPSILON) * 100) / 100;
-    console.log(orderValue);
+    // const indexOfLastOrder = this.state.currentPage * this.state.ordersPerPage;
+    // const indexOfFirstOrder = indexOfLastOrder - this.state.ordersPerPage;
+    // const currentOrder = this.state.products.slice(indexOfFirstOrder, indexOfLastOrder);
     let redirectVar = null;
     if (this.state.redirect) {
-      redirectVar = <Redirect to="/order" />;
+      redirectVar = <Redirect to="/uorderdeets" />;
     }
-    return (
-      <div>
-        {redirectVar}
-        <NavBar />
+    if (!this.state.filter) {
+      return (
         <div>
-          <div><h3 style={{ paddingLeft: '0.5em' }}>Checkout</h3></div>
-          <div><h3 style={{ paddingLeft: '0.5em' }}>{this.state.products.name}</h3></div>
-          <table>
-            <thead>
-              <tr>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>CID</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Name</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Quantity</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Price</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Total Price</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Delete from Checkout</td>
-                {/* <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Delete</td> */}
-              </tr>
-            </thead>
-            <tbody>
-              {this.state.products.map((item, i) =>
-              // eslint-disable-next-line implicit-arrow-linebreak
+          <NavBar />
+          {redirectVar}
+          <div>
+            <Form inline>
+              <Container>
+                <Row>
+                  <Col>
+                    <label>
+                      Order Status: &nbsp;
+                      <select onChange={this.handleChangeOS}>
+                        <option>Select</option>
+                        <option value="Ordered">Order Received</option>
+                        <option value="Cancelled">Cancelled</option>
+                        <option value="Preparing">Preparing</option>
+                        <option value="On The Way">On The Way</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Pick Up Ready">Pick Up Ready</option>
+                        <option value="Picked Up">Picked Up</option>
+                      </select>
+                    </label>
+                        &nbsp; &nbsp; &nbsp;
+                    <Button type="submit" onClick={this.handleFilter}>Filter Order</Button>
+                  </Col>
+                </Row>
+              </Container>
+            </Form>
+            <div><h3>&nbsp;&nbsp;Orders</h3></div>
+            <table>
+              <thead>
                 <tr>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{i + 1}</td>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.p_name}</td>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.quantity}</td>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.p_price}</td>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.p_price * item.quantity}</td>
-                  <td><input type="button" id={item.po_id} value="Delete" style={{ width: '100px', height: '30px', backgroundColor: '#fc465a' }} onClick={this.handleDelete} /></td>
-                  {/* <td><input type="button" value="Delete" style={{ width: '100px', height: '30px', backgroundColor: '#FF0000' }} /></td> */}
-                </tr>)}
-            </tbody>
-          </table>
-          <div>
-            Order Value:
-            $
-            {orderValue}
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Restaurant Name</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Location</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Contact</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Order Time</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Order Status</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Order Details</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Cancel Order</td>
+                </tr>
+              </thead>
+              <tbody>
+                {this.state.tabledata.map((item) =>
+                // eslint-disable-next-line implicit-arrow-linebreak
+                  <tr>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.name}</td>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.location}</td>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.contact}</td>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.ordertime}</td>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.order_status}</td>
+                    <td><Button variant="dark" id={item.ordertime} onClick={this.onClickButton}>Order Details</Button></td>
+                    <td><Button variant="danger" id={item.ordertime} value={item.order_status} onClick={this.handleDelete}>Cancel Order</Button></td>
+                  </tr>)}
+              </tbody>
+            </table>
+            <ReactPaginate
+              previousLabel="prev"
+              nextLabel="next"
+              breakLabel="..."
+              breakClassName="break-me"
+              pageCount={this.state.pageCount}
+              marginPagesDisplayed={2}
+              pageRangeDisplayed={5}
+              onPageChange={this.handlePageClick}
+              containerClassName="pagination"
+              subContainerClassName="pages pagination"
+              activeClassName="active"
+            />
           </div>
-          <div>
-            Taxes:
-            $
-            {taxes}
-          </div>
-          <div>
-            Service Fee:
-            $
-            { serviceFee }
-          </div>
-          <div>
-            Total Price:
-            $
-            { totalordervalue }
-          </div>
-          <input type="button" id={totalordervalue} value="Order" style={{ width: '100px', height: '35px', backgroundColor: '#7bb420' }} onClick={this.handleSubmit} />
         </div>
-      </div>
-    );
+      );
+    }
+    else {
+      return (
+        <div>
+          <NavBar />
+          {redirectVar}
+          <div>
+            <Form inline>
+              <Container>
+                <Row>
+                  <Col>
+                    <label>
+                      Order Status: &nbsp;
+                      <select onChange={this.handleChangeOS}>
+                        <option>Select</option>
+                        <option value="Ordered">Order Received</option>
+                        <option value="Cancelled">Cancelled</option>
+                        <option value="Preparing">Preparing</option>
+                        <option value="On The Way">On The Way</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Pick Up Ready">Pick Up Ready</option>
+                        <option value="Picked Up">Picked Up</option>
+                      </select>
+                    </label>
+                        &nbsp; &nbsp; &nbsp;
+                    <Button type="submit" onClick={this.handleFilter}>Filter Order</Button>
+                  </Col>
+                </Row>
+              </Container>
+            </Form>
+            <div><h3>&nbsp;&nbsp;Orders</h3></div>
+            <table>
+              <thead>
+                <tr>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Restaurant Name</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Location</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Contact</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Order Time</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Order Status</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Order Details</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Cancel Order</td>
+                </tr>
+              </thead>
+              <tbody>
+                {this.state.products.map((item) =>
+                // eslint-disable-next-line implicit-arrow-linebreak
+                  <tr>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.name}</td>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.location}</td>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.contact}</td>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.ordertime}</td>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.order_status}</td>
+                    <td><Button variant="dark" id={item.ordertime} onClick={this.onClickButton}>Order Details</Button></td>
+                    <td><Button variant="danger" id={item.ordertime} value={item.order_status} onClick={this.handleDelete}>Cancel Order</Button></td>
+                  </tr>)}
+              </tbody>
+            </table>
+            <ReactPaginate
+              previousLabel="prev"
+              nextLabel="next"
+              breakLabel="..."
+              breakClassName="break-me"
+              pageCount={this.state.pageCount}
+              marginPagesDisplayed={2}
+              pageRangeDisplayed={5}
+              onPageChange={this.handlePageClick}
+              containerClassName="pagination"
+              subContainerClassName="pages pagination"
+              activeClassName="active"
+            />
+          </div>
+        </div>
+      );
+    }
   }
 }

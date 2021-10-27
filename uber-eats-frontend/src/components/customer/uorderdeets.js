@@ -11,7 +11,7 @@ import { Redirect } from 'react-router';
 import { Modal, Button, Form } from 'react-bootstrap';
 import NavBar from '../../NavBar';
 
-export default class rorderdeets extends React.Component {
+export default class uorderdeets extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -24,7 +24,7 @@ export default class rorderdeets extends React.Component {
   componentDidMount() {
     const menuList = [];
     Axios.defaults.withCredentials = true;
-    Axios.get('http://localhost:3001/rorderdeets')
+    Axios.get('http://localhost:3001/uorderdeets')
       .then((res) => {
         if (res) {
           console.log(res.data);
@@ -58,7 +58,7 @@ export default class rorderdeets extends React.Component {
     console.log(this.state.products);
     let redirectVar = null;
     if (this.state.redirect) {
-      redirectVar = <Redirect to="/resorders" />;
+      redirectVar = <Redirect to="/order" />;
     }
     return (
       <div>
@@ -68,7 +68,7 @@ export default class rorderdeets extends React.Component {
           <div><h3 style={{ paddingLeft: '0.5em' }}>Order Details</h3></div>
           <Modal show={this.state.openModal} onHide={this.closeModal}>
             <Modal.Header>
-              <Modal.Title>Customer Details</Modal.Title>
+              <Modal.Title>Order Details</Modal.Title>
             </Modal.Header>
             {this.state.products.slice(0, 1).map((item) => <div>
               <Form.Group>
