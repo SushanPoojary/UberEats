@@ -173,7 +173,7 @@ export class userReg extends React.Component {
       email,
       password,
     }).then((response) => {
-      console.log('Status Code : ', response.status);
+      console.log('Status Code : ', response.data.status);
       console.log(response);
       const status = response.data.status;
       if (status === 1062) {

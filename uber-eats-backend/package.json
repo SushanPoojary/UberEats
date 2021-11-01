@@ -20,11 +20,13 @@
     "express-promise-router": "^4.1.0",
     "express-session": "^1.17.2",
     "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.0.12",
     "mount-routes": "^1.0.8",
     "multer": "^1.4.3",
     "multer-storage-cloudinary": "^4.0.0",
     "mysql": "^2.18.1",
     "passport": "^0.5.0",
+    "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "promise-mysql": "^5.0.4",
     "routes": "^2.1.0",
@@ -36,6 +38,7 @@
     "babel-preset-es2015-node6": "^0.4.0",
     "chai": "^4.3.4",
     "mocha": "^9.1.2",
+    "nodemon": "^2.0.14",
     "superagent": "^6.1.0",
     "supertest": "^6.1.6"
   }

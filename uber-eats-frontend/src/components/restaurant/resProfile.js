@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
@@ -52,21 +53,22 @@ class resProfile extends Component {
 
   componentDidMount() {
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.get('http://localhost:3001/resProfile')
       .then((res) => {
         if (res) {
-          this.setState({ name: res.data[0].name });
-          this.setState({ location: res.data[0].location });
-          this.setState({ description: res.data[0].description });
-          this.setState({ contact: res.data[0].contact });
-          this.setState({ picture: res.data[0].picture });
-          this.setState({ dishes: res.data[0].dishes });
-          this.setState({ timing: res.data[0].timings });
-          this.setState({ delivery: res.data[0].delivery });
-          this.setState({ pickup: res.data[0].pickup });
-          this.setState({ picture: res.data[0].picture });
-          this.setState({ preview: res.data[0].preview });
-          this.setState({ uploadPublicID: res.data[0].uploadPublicID });
+          this.setState({ name: res.data.name });
+          this.setState({ location: res.data.location });
+          this.setState({ description: res.data.description });
+          this.setState({ contact: res.data.contact });
+          this.setState({ picture: res.data.picture });
+          this.setState({ dishes: res.data.dishes });
+          this.setState({ timing: res.data.timings });
+          this.setState({ delivery: res.data.delivery });
+          this.setState({ pickup: res.data.pickup });
+          this.setState({ picture: res.data.picture });
+          this.setState({ preview: res.data.preview });
+          this.setState({ uploadPublicID: res.data.uploadPublicID });
         }
       }).catch((err) => {
         console.log(`Restaurant Profile: ${err}`);
@@ -105,6 +107,8 @@ class resProfile extends Component {
     }
 
     updateProfile = (data) => {
+      Axios.defaults.withCredentials = true;
+      Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
       Axios.post('http://localhost:3001/resupdateProfile', data)
         .then((res) => {
           if (res) {
@@ -112,13 +116,6 @@ class resProfile extends Component {
             this.setState({
               authMessage: true,
             });
-            // this.setState({ name: data.name });
-            // this.setState({ location: data.location });
-            // this.setState({ description: data.description });
-            // this.setState({ contact: data.contact });
-            // this.setState({ picture: data.picture });
-            // this.setState({ dishes: data.dishes });
-            // this.setState({ timing: data.timing });
           }
         }).catch((err) => {
           console.log(`Restaurant Update Profile: ${err}`);
@@ -242,9 +239,6 @@ class resProfile extends Component {
                     <br />
                     <input type="text" name="pickup" defaultValue={this.state.pickup} placeholder=" Pickup " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
                     <br />
-                    <span style={{ color: 'green' }}>
-                      {authMessageE}
-                    </span>
                   </OverallText>
                 </div>
               </div>
@@ -264,6 +258,9 @@ class resProfile extends Component {
                       crop="scale"
                     />
                     <br />
+                    <span style={{ color: 'green' }}>
+                      {authMessageE}
+                    </span>
                   </OverallText>
                 </div>
               </div>

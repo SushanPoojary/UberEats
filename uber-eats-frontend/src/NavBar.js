@@ -25,11 +25,13 @@ class NavBar extends Component {
 
     handleLogout = () => {
       localStorage.removeItem('ubereatsResToken');
+      localStorage.removeItem('token');
       cookie.remove('cookie', { path: '/' });
     }
 
     handleUserLogout = () => {
       localStorage.removeItem('ubereatsUserToken');
+      localStorage.removeItem('token');
       cookie.remove('cookie', { path: '/' });
     }
 

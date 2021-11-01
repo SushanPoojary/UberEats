@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
@@ -56,23 +57,24 @@ class userProfile extends Component {
 
   componentDidMount() {
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.get('http://localhost:3001/userProfile')
       .then((res) => {
         if (res) {
-          this.setState({ name: res.data[0].name });
-          this.setState({ add1: res.data[0].add1 });
-          this.setState({ add2: res.data[0].add2 });
-          this.setState({ location: res.data[0].location });
-          this.setState({ state: res.data[0].state });
-          this.setState({ country: res.data[0].country });
-          this.setState({ nickname: res.data[0].nickname });
-          this.setState({ dob: res.data[0].dob });
-          this.setState({ about: res.data[0].about });
-          this.setState({ email: res.data[0].email });
-          this.setState({ contact: res.data[0].contact });
-          this.setState({ picture: res.data[0].picture });
-          this.setState({ preview: res.data[0].preview });
-          this.setState({ uploadPublicID: res.data[0].uploadPublicID });
+          this.setState({ name: res.data.name });
+          this.setState({ add1: res.data.add1 });
+          this.setState({ add2: res.data.add2 });
+          this.setState({ location: res.data.location });
+          this.setState({ state: res.data.state });
+          this.setState({ country: res.data.country });
+          this.setState({ nickname: res.data.nickname });
+          this.setState({ dob: res.data.dob });
+          this.setState({ about: res.data.about });
+          this.setState({ email: res.data.email });
+          this.setState({ contact: res.data.contact });
+          this.setState({ picture: res.data.picture });
+          this.setState({ preview: res.data.preview });
+          this.setState({ uploadPublicID: res.data.uploadPublicID });
         }
       }).catch((err) => {
         console.log(`User Profile: ${err}`);
@@ -111,6 +113,8 @@ class userProfile extends Component {
     }
 
     updateProfile = (data) => {
+      Axios.defaults.withCredentials = true;
+      Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
       Axios.post('http://localhost:3001/updateProfile', data)
         .then((res) => {
           if (res) {

@@ -125,6 +125,7 @@ export class resLogin extends React.Component {
           if (status === 200) {
             const { token } = response.data;
             localStorage.setItem('ubereatsResToken', token);
+            localStorage.setItem('token', response.data.JWT);
             this.setState({
               authFlag: true,
               authMessage: '',

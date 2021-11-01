@@ -119,12 +119,14 @@ export class UserLogin extends React.Component {
     Axios.defaults.withCredentials = true;
     Axios.post('http://localhost:3001/login', logdata)
       .then((response) => {
-        console.log('Status Code : ', response.status);
+        console.log('Status Code : ', response.data.status);
         if (response.status === 200) {
           const status = response.data.status;
           if (status === 200) {
-            const token = response.data.token;
+            // console.log(response);
+            const { token } = response.data;
             localStorage.setItem('ubereatsUserToken', token);
+            localStorage.setItem('token', response.data.JWT);
             this.setState({
               authFlag: true,
               authMessage: '',

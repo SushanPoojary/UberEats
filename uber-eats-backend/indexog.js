@@ -1,13 +1,8 @@
 var express = require('express');
 var app = express();
 app.use(express.json(({ limit: '10MB' })));
-const passport = require("passport");
-app.use(passport.initialize());
 var session = require('express-session');
-const {cloudinary} = require('./cloudinary');
-const mongoDB = require('./mongoconfig.json');
-var mongo = mongoDB.mongoURI;
-const mongoose = require('mongoose');
+const {cloudinary} = require('./cloudinary')
 var mysql = require('mysql');
 var constants = require('./config.json');
 var cors = require('cors');
@@ -26,33 +21,6 @@ app.use(session({
   duration            : 60 * 60 * 1000,    // Overall duration of Session : 30 minutes : 1800 seconds
   activeDuration      :  5 * 60 * 1000,
 }));
-
-
-
-const users = require('./models/user');
-const test = require('./models/test');
-const restaurants = require('./models/restaurant');
-const { auth } = require('./passport');
-auth();
-const { checkAuth } = require('./passport');
-const { checkAuthR } = require('./passport');
-
-
-var options = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    maxPoolSize: 500,
-    // bufferMaxEntries: 0
-}
-
-mongoose.connect(mongo, options, (err, res) => {
-    if (err) {
-        console.log(err);
-        console.log("MongoDB connection failed.");
-    } else {
-        console.log("MongoDB Connected");
-    }
-})
 
 
 // var connection = mysql.createConnection({})
@@ -83,8 +51,7 @@ connection.getConnection((err) => {
 });
 
 app.get('/test_api', async function (req, res){
-    test.find({}, {username:1, password: 1, _id:0},async function (error, results){
-      console.log("Andr");
+  await connection.query(`SELECT * FROM test`, async function (error, results){
     if (error){
       res.writeHead(200, {
         'Content-Type': 'text/plain'
@@ -99,251 +66,209 @@ app.get('/test_api', async function (req, res){
   })
 })
 
-app.post('/userReg', async function (req, res) {
-    
-    var newUser = new users({
-        name: req.body.username,
-        contact: req.body.contact,
-        email: req.body.email,
-        password: req.body.password
-    })
-    console.log("User Reg here");
-    users.findOne({ email: req.body.email }).then((user) => {
-        if(user) {
-            res.json({
-                "status": 1062
-              });
-            console.log("Email Exists.");
-        }
-        else {
-            newUser.save(function (err, results){
-                if (err) {
-                    console.log(err);
-                    console.log("error");
-                }
-                else {
-                    res.send(results);
-                    console.log(results);
-                }
-            })
-            }
-        });
-  });
-
-  app.post('/login', (req, res) => {
-    const useremail = req.body.email;
-    const userpassword = req.body.password;
-    console.log(useremail);
-    console.log(userpassword);
-    const dbUser = (useremail, userpassword)
-    console.log("User Login here");
-    users.findOne({ email: useremail, password: userpassword }, function(err, results) {
-        if(err) {
-            res.send({err: err});
-            console.log(err);
-            // console.log("Error");
-        }
-        if (results) {
-            res.cookie('cookie',useremail,{maxAge: 900000, httpOnly: false, path : '/'});
-            // console.log(results.email);
-            req.session.uemail = results.email;
-            req.session.isLoggedIn = true;
-            console.log(req.session.uemail);
-            console.log(req.session.isLoggedIn);
-            // console.log(results);
-            req.session.save();   
-            const payload = { _id: results._id, username: results.email};
-            // console.log(payload);
-            const tokenus = jwt.sign(payload, JWT_KEY, {
-                expiresIn: 1008000
-            })
-            let token = jwt.sign({useremail: useremail}, JWT_KEY);
-            res.json({
-                "status": 200,
-                "token": token,
-                "JWT": "JWT" + " " + tokenus
-            });
-            res.end("Successful Login!");
-            return;
-            }
-        else {
-            res.json({
-                "status": 403
-            })
-            console.log(results);
-        }
-    });
-});
-
-
-app.post('/resReg', async function (req, res) {
-    
-    var newUser = new restaurants({
-        name: req.body.username,
-        location: req.body.location,
-        email: req.body.email,
-        password: req.body.password
-    })
-    console.log("Rest Reg here");
-    restaurants.findOne({ email: req.body.email }).then((user) => {
-        if(user) {
-            res.json({
-                "status": 1062
-              });
-            console.log("Email Exists.");
-        }
-        else {
-            newUser.save(function (err, results){
-                if (err) {
-                    console.log(err);
-                    console.log("error");
-                }
-                else {
-                    res.send(results);
-                    console.log(results);
-                }
-            })
-            }
-        });
-  });
-
-  app.post('/reslogin', (req, res) => {
-    const useremail = req.body.email;
-    const userpassword = req.body.password;
-    console.log(useremail);
-    console.log(userpassword);
-    const dbUser = (useremail, userpassword)
-    console.log("User Login here");
-    restaurants.findOne({ email: useremail, password: userpassword }, function(err, results) {
-        if(err) {
-            res.send({err: err});
-            console.log(err);
-            // console.log("Error");
-        }
-        if (results) {
-            res.cookie('cookie',useremail,{maxAge: 900000, httpOnly: false, path : '/'});
-            // console.log(results.email);
-            req.session.remail = results.email;
-            req.session.isLoggedIn = true;
-            console.log(req.session.remail);
-            console.log(req.session.isLoggedIn);
-            req.session.save();   
-            const payload = { _id: results._id, username: results.email};
-            // console.log(payload);
-            const tokenr = jwt.sign(payload, JWT_KEY, {
-                expiresIn: 1008000
-            })
-            let token = jwt.sign({useremail: useremail}, JWT_KEY);
-            res.json({
-                "status": 200,
-                "token": token,
-                "JWT": "JWT" + " " + tokenr
-            });
-            res.end("Successful Login!");
-            return;
-            }
-        else {
-            res.json({
-                "status": 403
-            })
-            console.log(results);
-        }
-    });
-});
-
-
-app.get('/resProfile', checkAuthR, (req, res) => {
-    console.log('Res Profile')
-    console.log(req.session);
-    if (!req.session.isLoggedIn) {
-        res.sendStatus(404);
-        console.log("Not Logged In");
-    } else {
-    restaurants.findOne({ email: req.session.remail}, function(err, results) {
-        if(err) {
-            res.send({err: err});
-            console.log(err);
-            // console.log("Error");
-        }
-        if (results) {
-            res.status(200).send(results);
-            }
-        else {
-            console.log("Can't find user for profile page!");
-        }
-    });
+app.post('/userReg', (req, res)=> {
+  const username = req.body.username
+  const usercontact = req.body.contact
+  const useremail = req.body.email
+  const userpassword = req.body.password
+  console.log("Reg here");
+  console.log(username)
+  if(username != '' && usercontact != '' && useremail != '' && userpassword != ''){
+  connection.query("INSERT INTO uber_eats.user(name, contact, email, password) VALUES (?,?,?,?)", [username, usercontact, useremail, userpassword], 
+  (err, results) => {
+    if(err){
+      console.log(err);
+      console.log("email")
+      res.json({
+        "status": 1062
+      });
     }
-});
-
-
-app.post('/resupdateProfile', checkAuthR, async function (req, res) {
-    console.log("Rest Update Prof");
-    // console.log(req.body.preview);
-    try {
-        const fileStr = req.body.preview;
-        const uploadResponse = await cloudinary.uploader.upload(fileStr, { upload_preset: 'sushan_ubereats'});
-        // console.log(uploadResponse);
-        req.session.uploadPublicID = uploadResponse.public_id;
-        req.session.uploadURL = uploadResponse.url;
-       } catch (err) {
-        console.log(err);
-       }
-
-    if (!req.session.isLoggedIn) {
-        console.log("User has to be logged in to update profile...");
-    } else {
-    restaurants.findOneAndUpdate({ email: req.session.remail }, 
-        { $set : 
-            {   name: req.body.username,
-                location: req.body.location,
-                description: req.body.description,
-                contact: req.body.contact,
-                timings: req.body.timing,
-                delivery: req.body.delivery,
-                pickup: req.body.pickup,
-                uploadPublicID: req.session.uploadPublicID,
-                uploadURL: req.session.uploadURL }
-        }, function(err, results) {
-        if(err) {
-            res.send({err: err});
-            console.log(err);
-            // console.log("Error");
-        }
-        if (results) {
-            console.log('Updated Profile Successfully!');
-            res.send(results);
-        }
-        else {
-            console.log("No results found");
-            }
-        });
-    }
+    else {
+      console.log(results);
+    res.send(results);
+  }
   });
+}
+})
 
-
-  app.get('/userProfile', checkAuth, (req, res) => {
-    console.log('User Profile')
-    console.log(req.session);
-    if (!req.session.isLoggedIn) {
-        res.sendStatus(404);
-        console.log("Not Logged In");
+app.post('/login', (req, res)=> {
+  const useremail = req.body.email
+  const userpassword = req.body.password
+  const dbUser = (useremail, userpassword)
+  console.log("here");
+  connection.query("SELECT email,password FROM uber_eats.user WHERE email = ? AND password = ?", [useremail, userpassword], 
+  (err, results) => {
+    if (err) {
+      res.send({err: err});
+      console.log(err);
+    } 
+    if (results.length > 0) {
+      res.cookie('cookie',constants.DB.username,{maxAge: 900000, httpOnly: false, path : '/'});
+      req.session.uemail = results[0].email;
+      req.session.isLoggedIn = true;
+      console.log(req.session.uemail);
+      console.log(req.session.isLoggedIn);
+      req.session.save();   
+      let token = jwt.sign({useremail: useremail}, JWT_KEY);
+      res.json({
+        "status": 200,
+        "token": token
+      });
+      res.end("Successful Login!");
+      // res.send(results);
+      // console.log("Idhar?")
+      // req.session.dbUser = dbUser;
+      // console.log(req.session.dbUser);
+      // console.log(results);
+      return;
     } else {
-    users.findOne({ email: req.session.uemail}, function(err, results) {
-        if(err) {
-            res.send({err: err});
-            console.log(err);
-            // console.log("Error");
-        }
-        if (results) {
-            res.status(200).send(results);
-            }
-        else {
-            console.log("Can't find user for profile page!");
-        }
-    });
+      res.json({
+        "status": 403
+      })
+      console.log(results);
     }
+  })
+})
+
+app.post('/resReg', (req, res)=> {
+  const username = req.body.username
+  const userlocation = req.body.location
+  const useremail = req.body.email
+  const userpassword = req.body.password
+  console.log("Reg here");
+  console.log(username)
+  if(username != '' && userlocation != '' && useremail != '' && userpassword != ''){
+  connection.query("INSERT INTO uber_eats.restaurant(name, email, password, location) VALUES (?,?,?,?)", [username, useremail, userpassword, userlocation], 
+  (err, results) => {
+    if(err){
+      console.log(err);
+      console.log("email")
+      res.json({
+        "status": 1062
+      });
+    }
+    else {
+      console.log(results);
+    res.send(results);
+  }
+  });
+}
+})
+
+app.post('/reslogin', (req, res)=> {
+  const useremail = req.body.email
+  const userpassword = req.body.password
+  const dbUser = (useremail, userpassword)
+  console.log("here");
+  connection.query("SELECT email,password FROM uber_eats.restaurant WHERE email = ? AND password = ?", [useremail, userpassword], 
+  (err, results) => {
+    if (err) {
+      res.send({err: err});
+      console.log("Error");
+    } 
+    if (results.length > 0) {
+      res.cookie('cookie',constants.DB.username,{maxAge: 900000, httpOnly: false, path : '/'});
+      req.session.remail = results[0].email;
+      req.session.isLoggedIn = true;
+      console.log(req.session.remail);
+      console.log(req.session.isLoggedIn);
+      req.session.save();   
+      let token = jwt.sign({useremail: useremail}, JWT_KEY);
+      res.json({
+        "status": 200,
+        "token": token
+      });
+      res.end("Successful Login!");
+      // res.send(results);
+      // console.log("Idhar?")
+      // req.session.dbUser = dbUser;
+      // console.log(req.session.dbUser);
+      // console.log(results);
+      return;
+    } else {
+      res.json({
+        "status": 403
+      })
+      console.log("Error1");
+    }
+  })
+})
+
+
+
+app.get('/resProfile', (req, res) => {
+  console.log('Res Profile')
+  console.log(req.session);
+  if (!req.session.isLoggedIn) {
+      res.sendStatus(404);
+      console.log("Not Logged In");
+  } else {
+      let profileSQL = "SELECT * FROM uber_eats.restaurant WHERE email = ?";
+      connection.query(profileSQL, [req.session.remail], (err, results) => {
+          if (err) {
+              throw err;
+          } else if (results.length > 0) {
+              console.log(results);
+              res.status(200).send(results);
+          } else {
+              console.log("Can't find user for profile page!");
+          }
+      });
+  }
 });
 
+app.post('/resupdateProfile', async (req, res) => {
+  console.log('Res Update profile')
+  console.log(req.body);
+  try {
+    const fileStr = req.body.preview;
+    const uploadResponse = await cloudinary.uploader.upload(fileStr, { upload_preset: 'sushan_ubereats'});
+    console.log(uploadResponse);
+    req.session.uploadPublicID = uploadResponse.public_id;
+    req.session.uploadURL = uploadResponse.url;
+   } catch (err) {
+    console.log(err);
+   }
+
+   console.log(req.session.uploadPublicID);
+   console.log(req.session.uploadURL);
+
+  const {name, location, description, contact, timing, delivery, pickup } = req.body;
+  if (!req.session.isLoggedIn) {
+      console.log("User has to be logged in to update profile...");
+  } else {
+      let updateProfile = "UPDATE uber_eats.restaurant " + "SET name = ?, location = ?, description = ?, contact = ?, timings = ?, delivery = ?, pickup = ?, uploadPublicID = ?, uploadURL = ? WHERE email = ?";
+      connection.query(updateProfile, [name, location, description, contact, timing, delivery, pickup, req.session.uploadPublicID, req.session.uploadURL, req.session.remail], (err, results) => {
+          if (err) {
+              throw err;
+          } else {
+              console.log('Updated Profile Successfully!');
+              res.send(results);
+          }
+      });
+  }
+});
+
+app.get('/userProfile', (req, res) => {
+  console.log('user Profile')
+  console.log(req.session);
+  if (!req.session.isLoggedIn) {
+      res.sendStatus(404);
+      console.log("Not Logged In");
+  } else {
+      let profileSQL = "SELECT * FROM uber_eats.user WHERE email = ?";
+      connection.query(profileSQL, [req.session.uemail], (err, results) => {
+          if (err) {
+              throw err;
+          } else if (results.length > 0) {
+              console.log(results);
+              res.status(200).send(results);
+          } else {
+              console.log("Can't find user for profile page!");
+          }
+      });
+  }
+});
 
 app.post('/updateProfile', async (req, res) => {
   console.log('Update profile')
@@ -517,7 +442,7 @@ app.get('/allrest', (req, res) => {
       if (err) {
           throw err;
       } else if (results.length > 0) {
-        //   console.log(results);
+          console.log(results);
             res.send(results);
       } else {
           console.log("Can't find restaurants!");
