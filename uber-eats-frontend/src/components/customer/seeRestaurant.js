@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable no-shadow */
 /* eslint-disable react/no-unused-state */
 /* eslint-disable react/jsx-indent */
@@ -62,10 +63,7 @@ export default class seeRestaurant extends React.Component {
           this.setState({ name: res.data[0].name });
           this.setState({ location: res.data[0].location });
           this.setState({ description: res.data[0].description });
-          // this.setState({ contact: res.data[0].contact });
           this.setState({ timings: res.data[0].timings });
-          // this.setState({ delivery: res.data[0].delivery });
-          // this.setState({ pickup: res.data[0].pickup });
         } else {
           console.log('Unable to fetch restaurant data');
         }
@@ -89,6 +87,7 @@ export default class seeRestaurant extends React.Component {
     console.log(this.state.po_id);
     console.log(this.state.redirectVar);
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.get('http://localhost:3001/getCart')
       .then((res) => {
         if (res.data.length > 0) {
@@ -98,6 +97,7 @@ export default class seeRestaurant extends React.Component {
             console.log(this.state.isOpen);
           } else {
             Axios.defaults.withCredentials = true;
+            Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
             Axios.post('http://localhost:3001/addtocart', visitdata)
               .then((res) => {
                 console.log(res.status);
@@ -106,6 +106,7 @@ export default class seeRestaurant extends React.Component {
           }
         } else {
           Axios.defaults.withCredentials = true;
+          Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
           Axios.post('http://localhost:3001/addtocart', visitdata)
             .then((res) => {
               console.log(res.status);

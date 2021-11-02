@@ -15,6 +15,7 @@ var userSchema = new Schema({
     add1: {type: String, required: false},
     add2: {type: String, required: false},
     uploadPublicID: {type: String, required: false},
+    uploadURL: {type: String, required: false},
 
 },
 {

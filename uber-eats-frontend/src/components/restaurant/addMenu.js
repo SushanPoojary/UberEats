@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable camelcase */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable react/destructuring-assignment */
@@ -220,6 +221,7 @@ export class addMenu extends React.Component {
     } = this.state;
     console.log(p_name, p_ingredients, p_description, p_category, p_type, p_price);
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.post('http://localhost:3001/addMenu', {
       p_name,
       p_ingredients,

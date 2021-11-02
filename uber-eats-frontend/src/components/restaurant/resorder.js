@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable no-else-return */
 /* eslint-disable brace-style */
 /* eslint-disable jsx-a11y/label-has-associated-control */
@@ -32,6 +33,7 @@ export default class resorder extends React.Component {
   componentDidMount() {
     const menuList = [];
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.get('http://localhost:3001/resorderstatus')
       .then((res) => {
         if (res) {
@@ -58,6 +60,7 @@ export default class resorder extends React.Component {
   finalFilter = (filData) => {
     console.log(filData);
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.post('http://localhost:3001/filteresorders', filData)
       .then((res) => {
         if (res.status === 200) {
@@ -72,6 +75,7 @@ export default class resorder extends React.Component {
   finalActions = (actionData) => {
     console.log(actionData);
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.post('http://localhost:3001/resorderactions', actionData)
       .then((res) => {
         if (res.status === 200) {
@@ -126,6 +130,7 @@ export default class resorder extends React.Component {
     });
     console.log(this.state.order_id);
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.post('http://localhost:3001/rorderdeets', visitdata)
       .then((res) => {
         console.log(res.status);

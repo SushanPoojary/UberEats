@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable camelcase */
 /* eslint-disable prefer-destructuring */
@@ -31,6 +32,7 @@ export default class userFavourites extends React.Component {
   componentDidMount() {
     const menuList = [];
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.get('http://localhost:3001/getFavourites')
       .then((res) => {
         if (res) {
@@ -61,6 +63,7 @@ export default class userFavourites extends React.Component {
     console.log(this.state.remail);
     console.log(this.state.redirect);
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.post('http://localhost:3001/sr', visitdata)
       .then((res) => {
         console.log(res.status);
@@ -78,6 +81,7 @@ export default class userFavourites extends React.Component {
     });
     console.log(this.state.remail);
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.post('http://localhost:3001/deletefromfav', visitdata)
       .then((res) => {
         console.log(res.status);

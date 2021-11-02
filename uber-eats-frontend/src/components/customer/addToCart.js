@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable react/no-unused-state */
 /* eslint-disable no-restricted-globals */
 /* eslint-disable react/jsx-closing-tag-location */
@@ -27,6 +28,7 @@ export default class addToCart extends React.Component {
   componentDidMount() {
     const menuList = [];
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.get('http://localhost:3001/getCart')
       .then((res) => {
         if (res) {
@@ -64,6 +66,7 @@ export default class addToCart extends React.Component {
   }
 
   handleChange = (e) => {
+    console.log(e.target.name);
     this.setState({ quantity: e.target.value });
     const upquantity = {
       po_id: e.target.id,
@@ -71,6 +74,7 @@ export default class addToCart extends React.Component {
     };
     console.log(upquantity);
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.post('http://localhost:3001/updatequantity', upquantity)
       .then((res) => {
         console.log(res.status);
@@ -90,6 +94,7 @@ export default class addToCart extends React.Component {
     console.log(this.state.po_id);
     console.log(this.state.redirectVar);
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.post('http://localhost:3001/deletefromcart', visitdata)
       .then((res) => {
         console.log(res.status);
@@ -119,7 +124,7 @@ export default class addToCart extends React.Component {
                   {item.name}
                   <br />
                   {item.p_name}
-                  <Form.Control type="number" style={{ width: '4rem' }} id={item.po_id} onChange={this.handleChange} placeholder="1" />
+                  <Form.Control type="number" style={{ width: '4rem' }} id={item.po_id} name={item.p_price} onChange={this.handleChange} placeholder="1" />
                   $
                   {item.p_price}
                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

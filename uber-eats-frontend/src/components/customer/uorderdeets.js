@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable no-restricted-globals */
 /* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable camelcase */
@@ -24,6 +25,7 @@ export default class uorderdeets extends React.Component {
   componentDidMount() {
     const menuList = [];
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.get('http://localhost:3001/uorderdeets')
       .then((res) => {
         if (res) {

@@ -54,6 +54,7 @@ export default class checkout extends React.Component {
   componentDidMount() {
     const menuList = [];
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.get('http://localhost:3001/getCart')
       .then((res) => {
         if (res) {
@@ -71,25 +72,27 @@ export default class checkout extends React.Component {
       });
 
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.get('http://localhost:3001/getPrice')
       .then((res) => {
         if (res) {
           console.log(res.data);
-          this.setState({ totalprice: res.data[0].total_price });
+          this.setState({ totalprice: res.data.total_price });
         }
       }).catch((err) => {
         throw err;
       });
 
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.get('http://localhost:3001/getUserDeets')
       .then((res) => {
         if (res) {
-          this.setState({ name: res.data[0].name });
-          this.setState({ add1: res.data[0].add1 });
-          this.setState({ add2: res.data[0].add2 });
-          this.setState({ contact: res.data[0].contact });
-          this.setState({ email: res.data[0].email });
+          this.setState({ name: res.data.name });
+          this.setState({ add1: res.data.add1 });
+          this.setState({ add2: res.data.add2 });
+          this.setState({ contact: res.data.contact });
+          this.setState({ email: res.data.email });
         }
       }).catch((err) => {
         console.log(`User Profile: ${err}`);
@@ -101,6 +104,8 @@ export default class checkout extends React.Component {
   }
 
   updateProfile = (data) => {
+    Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.post('http://localhost:3001/updateordProfile', data)
       .then((res) => {
         if (res) {
@@ -134,6 +139,7 @@ export default class checkout extends React.Component {
     // eslint-disable-next-line no-plusplus
     console.log(products);
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.post('http://localhost:3001/order', products)
       .then((response) => {
         console.log('Status Code : ', response.status);
@@ -147,28 +153,12 @@ export default class checkout extends React.Component {
           this.setState({
             redirect: true,
           });
+          this.updateIns();
         }
       });
+    Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.post('http://localhost:3001/cartorder', products)
-      .then((response) => {
-        console.log('Status Code : ', response.status);
-        console.log(response);
-        const status = response.status;
-        if (status !== 200) {
-          this.setState({
-            redirect: false,
-          });
-        } else {
-          this.setState({
-            redirect: true,
-          });
-        }
-      });
-    const {
-      SplInv,
-    } = this.state;
-    console.log(products);
-    Axios.post('http://localhost:3001/orderIns', SplInv)
       .then((response) => {
         console.log('Status Code : ', response.status);
         console.log(response);
@@ -212,9 +202,34 @@ export default class checkout extends React.Component {
     console.log(this.state.po_id);
     console.log(this.state.redirectVar);
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.post('http://localhost:3001/deletefromcart', visitdata)
       .then((res) => {
         console.log(res.status);
+      });
+  }
+
+  updateIns() {
+    console.log('Here');
+    const {
+      SplInv,
+    } = this.state;
+    Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
+    Axios.post('http://localhost:3001/orderIns', SplInv)
+      .then((response) => {
+        console.log('Status Code : ', response.status);
+        console.log(response);
+        const status = response.status;
+        if (status !== 200) {
+          this.setState({
+            redirect: false,
+          });
+        } else {
+          this.setState({
+            redirect: true,
+          });
+        }
       });
   }
 

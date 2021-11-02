@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable react/jsx-wrap-multilines */
 /* eslint-disable react/destructuring-assignment */
@@ -27,6 +28,7 @@ export default class resAddItems extends React.Component {
   componentDidMount() {
     const menuList = [];
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.get('http://localhost:3001/resAddItems')
       .then((res) => {
         if (res) {
@@ -57,6 +59,7 @@ export default class resAddItems extends React.Component {
     console.log(this.state.p_id);
     console.log(this.state.redirect);
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.post('http://localhost:3001/editmenu', visitdata)
       .then((res) => {
         console.log(res.status);

@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable react/no-access-state-in-setstate */
 /* eslint-disable react/no-unused-state */
@@ -67,6 +68,7 @@ export default class userorder extends React.Component {
   getData() {
     // const menuList = [];
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.get('http://localhost:3001/orderstatus')
       .then((res) => {
         const data = res.data;
@@ -94,6 +96,7 @@ export default class userorder extends React.Component {
     console.log(event.target.value);
     if (event.target.value === 'Ordered') {
       Axios.defaults.withCredentials = true;
+      Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
       Axios.post('http://localhost:3001/updateordercan', visitdata)
         .then((res) => {
           console.log(res.status);
@@ -117,6 +120,7 @@ export default class userorder extends React.Component {
     });
     console.log(this.state.order_id);
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.post('http://localhost:3001/uorderdeets', visitdata)
       .then((res) => {
         console.log(res.status);
@@ -139,6 +143,7 @@ export default class userorder extends React.Component {
   finalFilter = (filData) => {
     console.log(filData);
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.post('http://localhost:3001/filteruorders', filData)
       .then((res) => {
         if (res.status === 200) {

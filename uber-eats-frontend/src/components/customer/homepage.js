@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable no-else-return */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable react/jsx-indent */
@@ -62,6 +63,7 @@ export default class homepage extends React.Component {
     Axios.post('http://localhost:3001/searchItem', userData)
       .then((res) => {
         if (res.status === 200) {
+          console.log(res.data);
           this.setState({ resultTable: res.data });
           this.setState({ search: true });
         } else {
@@ -124,6 +126,7 @@ export default class homepage extends React.Component {
     });
     console.log(this.state.remail);
     Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
     Axios.post('http://localhost:3001/markfavourite', visitdata)
       .then((res) => {
         console.log(res.status);
@@ -139,6 +142,7 @@ export default class homepage extends React.Component {
       Axios.post('http://localhost:3001/searchOI', ser)
         .then((res) => {
           if (res.status === 200) {
+            console.log(res.data);
             this.setState({ resultTable: res.data });
             this.setState({ search: true });
           } else {
@@ -150,6 +154,7 @@ export default class homepage extends React.Component {
 
   render() {
     console.log(this.state.products);
+    console.log(this.state.resultTable);
     let redirectVar = null;
     if (this.state.redirectVar) {
       redirectVar = <Redirect to="/seerestaurant" />;
