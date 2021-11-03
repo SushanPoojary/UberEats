@@ -12,6 +12,7 @@ var mysql = require('mysql');
 var constants = require('./config.json');
 var cors = require('cors');
 var jwt = require('jsonwebtoken');
+var kafka = require('./kafka/client');
 app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
 
 // var ipAdd='localhost';
@@ -86,22 +87,49 @@ connection.getConnection((err) => {
   console.log("Pool Created.")
 });
 
-app.get('/test_api', async function (req, res){
-    test.find({}, {username:1, password: 1, _id:0},async function (error, results){
-      console.log("Andr");
-    if (error){
-      res.writeHead(200, {
-        'Content-Type': 'text/plain'
-      });
-      res.end(error.code);
-    } else {
-      res.writeHead(200, {
-        'Content-Type': 'text/plain'
-      });
-      res.end(JSON.stringify(results));
-    }
-  })
-})
+
+app.get('/test_api', function(req, res){
+
+    kafka.make_request('test',{}, function(err,results){
+        console.log('in result');
+        console.log(results);
+        if (err){
+            console.log("Inside err");
+            // res.json({
+            //     status:"error",
+            //     msg:"System Error, Try Again."
+            // })
+        }else{
+            console.log("Inside else");
+            console.log(results);
+            res.writeHead(200, {
+                        'Content-Type': 'text/plain'
+                      });
+                      res.end(JSON.stringify(results));
+            }
+        
+    });
+});
+
+
+// app.get('/test_api', async function (req, res){
+//     console.log("Test Api");
+//     console.log(req.body);
+//     test.find({}, {username:1, password: 1, _id:0},async function (error, results){
+//       console.log("Andr");
+//     if (error){
+//       res.writeHead(200, {
+//         'Content-Type': 'text/plain'
+//       });
+//       res.end(error.code);
+//     } else {
+//       res.writeHead(200, {
+//         'Content-Type': 'text/plain'
+//       });
+//       res.end(JSON.stringify(results));
+//     }
+//   })
+// })
 
 app.post('/userReg', async function (req, res) {
     
