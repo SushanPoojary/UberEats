@@ -87,162 +87,183 @@ app.use(function(req, res, next) {
 //   console.log("Pool Created.")
 // });
 
-// Kafka Test Api
-app.get('/test_api', function(req, res){
-
-    kafka.make_request('test',{}, function(err,results){
-        console.log('in result');
-        console.log(results);
-        if (err){
-            console.log("Inside err");
-            // res.json({
-            //     status:"error",
-            //     msg:"System Error, Try Again."
-            // })
-        }else{
-            console.log("Inside else");
-            console.log(results);
-            res.writeHead(200, {
-                        'Content-Type': 'text/plain'
-                      });
-                      res.end(JSON.stringify(results));
-            }
-        
-    });
-});
 
 
-app.post('/userReg', function(req, res){
+// Mongo Test Api
+app.get('/test_api', async function (req, res){
+    console.log("Test Api");
+    console.log(req.body);
+    test.find({}, {username:1, password: 1, _id:0},async function (error, results){
+      console.log("Andr");
+    if (error){
+      res.writeHead(200, {
+        'Content-Type': 'text/plain'
+      });
+      res.end(error.code);
+    } else {
+      res.writeHead(200, {
+        'Content-Type': 'text/plain'
+      });
+      res.end(JSON.stringify(results));
+    }
+  })
+})
 
-    kafka.make_request('userReg',req.body, function(err,results){
-        console.log('in result');
-        console.log(results);
-        if (err){
-            console.log("Inside err");
-        }else{
-            console.log("Inside results");
-            console.log(results);
-            res.send(results);
+
+
+
+app.post('/userReg', async function (req, res) {
+    
+    var newUser = new users({
+        name: req.body.username,
+        contact: req.body.contact,
+        email: req.body.email,
+        password: req.body.password
+    })
+    console.log("User Reg here");
+    users.findOne({ email: req.body.email }).then((user) => {
+        if(user) {
+            res.json({
+                "status": 1062
+              });
+            console.log("Email Exists.");
         }
-    });
-});
+        else {
+            newUser.save(function (err, results){
+                if (err) {
+                    console.log(err);
+                    console.log("error");
+                }
+                else {
+                    res.send(results);
+                    console.log(results);
+                }
+            })
+            }
+        });
+  });
 
 
-app.post('/login', function(req, res){
-
-    kafka.make_request('user',{"path": "login", "body": req.body}, function(err,results){
-        console.log('in result');
-        console.log(results);
-        if (err){
-            console.log("Inside err");
-        }else{
-            console.log("Inside results");
-            console.log(results);
-            if (results.status === 200) {
-            res.cookie('cookie',req.body.email,{maxAge: 900000, httpOnly: false, path : '/'});
-            req.session.uemail = req.body.email;
+  app.post('/login', (req, res) => {
+    const useremail = req.body.email;
+    const userpassword = req.body.password;
+    console.log(useremail);
+    console.log(userpassword);
+    const dbUser = (useremail, userpassword)
+    console.log("User Login here");
+    users.findOne({ email: useremail, password: userpassword }, function(err, results) {
+        if(err) {
+            res.send({err: err});
+            console.log(err);
+            // console.log("Error");
+        }
+        if (results) {
+            res.cookie('cookie',useremail,{maxAge: 900000, httpOnly: false, path : '/'});
+            // console.log(results.email);
+            req.session.uemail = results.email;
             req.session.isLoggedIn = true;
             console.log(req.session.uemail);
             console.log(req.session.isLoggedIn);
             // console.log(results);
             req.session.save();   
-            res.send(results);
+            const payload = { _id: results._id, username: results.email};
+            // console.log(payload);
+            const tokenus = jwt.sign(payload, JWT_KEY, {
+                expiresIn: 1008000
+            })
+            let token = jwt.sign({useremail: useremail}, JWT_KEY);
+            res.json({
+                "status": 200,
+                "token": token,
+                "JWT": "JWT" + " " + tokenus
+            });
+            res.end("Successful Login!");
+            return;
             }
-            else {
-                res.send(results);
-            }
+        else {
+            res.json({
+                "status": 403
+            })
+            console.log(results);
         }
     });
 });
 
 
-app.post('/resReg', function(req, res){
-
-    kafka.make_request('resReg',req.body, function(err,results){
-        console.log('in result');
-        console.log(results);
-        if (err){
-            console.log("Inside err");
-        }else{
-            console.log("Inside results");
-            console.log(results);
-            res.send(results);
+app.post('/resReg', async function (req, res) {
+    
+    var newUser = new restaurants({
+        name: req.body.username,
+        location: req.body.location,
+        email: req.body.email,
+        password: req.body.password
+    })
+    console.log("Rest Reg here");
+    restaurants.findOne({ email: req.body.email }).then((user) => {
+        if(user) {
+            res.json({
+                "status": 1062
+              });
+            console.log("Email Exists.");
         }
-    });
-});
+        else {
+            newUser.save(function (err, results){
+                if (err) {
+                    console.log(err);
+                    console.log("error");
+                }
+                else {
+                    res.send(results);
+                    console.log(results);
+                }
+            })
+            }
+        });
+  });
 
-
-app.post('/reslogin', function(req, res){
-
-    kafka.make_request('restaurant',{"path": "reslogin", "body": req.body}, function(err,results){
-        console.log('in result');
-        console.log(results);
-        if (err){
-            console.log("Inside err");
-        }else{
-            console.log("Inside results");
-            console.log(results);
-            if (results.status === 200) {
-            res.cookie('cookie',req.body.email,{maxAge: 900000, httpOnly: false, path : '/'});
-            req.session.remail = req.body.email;
+  app.post('/reslogin', (req, res) => {
+    const useremail = req.body.email;
+    const userpassword = req.body.password;
+    console.log(useremail);
+    console.log(userpassword);
+    const dbUser = (useremail, userpassword)
+    console.log("User Login here");
+    restaurants.findOne({ email: useremail, password: userpassword }, function(err, results) {
+        if(err) {
+            res.send({err: err});
+            console.log(err);
+            // console.log("Error");
+        }
+        if (results) {
+            res.cookie('cookie',useremail,{maxAge: 900000, httpOnly: false, path : '/'});
+            // console.log(results.email);
+            req.session.remail = results.email;
             req.session.isLoggedIn = true;
             console.log(req.session.remail);
             console.log(req.session.isLoggedIn);
-            // console.log(results);
             req.session.save();   
-            res.send(results);
+            const payload = { _id: results._id, username: results.email};
+            // console.log(payload);
+            const tokenr = jwt.sign(payload, JWT_KEY, {
+                expiresIn: 1008000
+            })
+            let token = jwt.sign({useremail: useremail}, JWT_KEY);
+            res.json({
+                "status": 200,
+                "token": token,
+                "JWT": "JWT" + " " + tokenr
+            });
+            res.end("Successful Login!");
+            return;
             }
-            else {
-                res.send(results);
-            }
+        else {
+            res.json({
+                "status": 403
+            })
+            console.log(results);
         }
     });
 });
-
-
-//   app.post('/reslogin', (req, res) => {
-//     const useremail = req.body.email;
-//     const userpassword = req.body.password;
-//     console.log(useremail);
-//     console.log(userpassword);
-//     const dbUser = (useremail, userpassword)
-//     console.log("Rest Login here");
-//     restaurants.findOne({ email: useremail, password: userpassword }, function(err, results) {
-//         if(err) {
-//             res.send({err: err});
-//             console.log(err);
-//             // console.log("Error");
-//         }
-//         if (results) {
-//             res.cookie('cookie',useremail,{maxAge: 900000, httpOnly: false, path : '/'});
-//             // console.log(results.email);
-//             req.session.remail = results.email;
-//             req.session.isLoggedIn = true;
-//             console.log(req.session.remail);
-//             console.log(req.session.isLoggedIn);
-//             req.session.save();   
-//             const payload = { _id: results._id, username: results.email};
-//             // console.log(payload);
-//             const tokenr = jwt.sign(payload, JWT_KEY, {
-//                 expiresIn: 1008000
-//             })
-//             let token = jwt.sign({useremail: useremail}, JWT_KEY);
-//             res.json({
-//                 "status": 200,
-//                 "token": token,
-//                 "JWT": "JWT" + " " + tokenr
-//             });
-//             res.end("Successful Login!");
-//             return;
-//             }
-//         else {
-//             res.json({
-//                 "status": 403
-//             })
-//             console.log(results);
-//         }
-//     });
-// });
 
 
 app.get('/resProfile', checkAuthR, (req, res) => {

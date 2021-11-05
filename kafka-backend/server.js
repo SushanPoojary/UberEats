@@ -2,6 +2,10 @@ var connection =  new require('./kafka/Connection');
 //topics files
 //var signin = require('./services/signin.js');
 var test = require('./services/test.js');
+var userReg = require('./services/userReg.js');
+var user = require('./services/user.js');
+var resReg = require('./services/resReg.js');
+var restaurant = require('./services/restaurant.js');
 
 function handleTopicRequest(topic_name,fname){
     //var topic_name = 'root_topic';
@@ -35,4 +39,8 @@ function handleTopicRequest(topic_name,fname){
 // Add your TOPICs here
 //first argument is topic name
 //second argument is a function that will handle this topic request
-handleTopicRequest("test",test)
+handleTopicRequest("test",test);
+handleTopicRequest("userReg",userReg);
+handleTopicRequest("user",user);
+handleTopicRequest("resReg",resReg);
+handleTopicRequest("restaurant",restaurant);

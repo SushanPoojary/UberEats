@@ -11,6 +11,10 @@
   "dependencies": {
     "bcrypt": "^1.0.3",
     "bcrypt-nodejs": "0.0.3",
+    "cloudinary": "^1.27.1",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-session": "^1.17.2",
     "formidable": "^1.1.1",
     "glob": "^7.1.2",
     "images-upload-middleware": "^1.1.1",
