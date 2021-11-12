@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable arrow-body-style */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable react/destructuring-assignment */
 import React from 'react';
@@ -11,10 +13,11 @@ import {
   Switch,
 } from 'react-router-dom';
 import { Redirect } from 'react-router';
+import { connect } from 'react-redux';
 import styled from 'styled-components';
 import history from './history';
 // eslint-disable-next-line import/no-cycle
-import { UserLogin } from './index';
+import UserLogin from './index';
 import NavBar from '../../NavBar';
 
 const HeadText = styled.h2`
@@ -38,7 +41,7 @@ const OverallText = styled.h2`
     //padding-left: 150px;
 `;
 
-export class userReg extends React.Component {
+class userReg extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -47,7 +50,7 @@ export class userReg extends React.Component {
       email: '',
       password: '',
       // register: false,
-      redirect: null,
+      // redirect: null,
       usernameValid: '',
       contactValid: '',
       emailValid: '',
@@ -178,13 +181,17 @@ export class userReg extends React.Component {
       const status = response.data.status;
       if (status === 1062) {
         this.setState({
-          redirect: false,
+          // redirect: false,
           emailDup: true,
         });
       } else {
         this.setState({
-          redirect: true,
+          // redirect: true,
           emailDup: false,
+        });
+        this.props.dispatch({
+          type: 'USER_REGISTERED',
+          payload: true,
         });
       }
 
@@ -195,7 +202,7 @@ export class userReg extends React.Component {
 
   render() {
     let redirectVar = null;
-    if (this.state.redirect) {
+    if (this.props.redirectUserReg) {
       redirectVar = <Redirect to="/login" />;
     }
     const usernameError = this.state.usernameError;
@@ -308,3 +315,15 @@ export class userReg extends React.Component {
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  return { redirectUserReg: state.redirectUserReg };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    dispatch,
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(userReg);

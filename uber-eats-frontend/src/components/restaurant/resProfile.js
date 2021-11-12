@@ -1,3 +1,5 @@
+/* eslint-disable arrow-body-style */
+/* eslint-disable react/prop-types */
 /* eslint-disable dot-notation */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable react/destructuring-assignment */
@@ -6,8 +8,13 @@ import { Redirect } from 'react-router';
 import cookie from 'react-cookies';
 import Axios from 'axios';
 import { Image } from 'cloudinary-react';
+import { connect } from 'react-redux';
 import styled from 'styled-components';
+import { toast } from 'react-toastify';
 import NavBar from '../../NavBar';
+import 'react-toastify/dist/ReactToastify.css';
+
+toast.configure();
 
 const HeadText = styled.h2`
     font-size: 30px;
@@ -98,6 +105,10 @@ class resProfile extends Component {
       });
     }
 
+    notify = () => {
+      toast.success('Profile Updated!');
+    };
+
     previewFile = (file) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -115,6 +126,10 @@ class resProfile extends Component {
             console.log('Updated');
             this.setState({
               authMessage: true,
+            });
+            this.props.dispatch({
+              type: 'RESTAURANT_PROFILE_UPDATED',
+              payload: true,
             });
           }
         }).catch((err) => {
@@ -145,14 +160,19 @@ class resProfile extends Component {
 
     render() {
       let redirectVar = null;
+      let UpdateToast = null;
       if (!cookie.load('cookie')) {
         redirectVar = <Redirect to="/reslogin" />;
+      }
+      if (this.props.restProfileUpdate) {
+        UpdateToast = this.notify();
       }
       const authMessageE = this.state.authMessageE;
       return (
         <div>
           <NavBar />
           {redirectVar}
+          {UpdateToast}
           <div className="container">
             <form onSubmit={this.handleSubmit}>
               <div className="row">
@@ -272,4 +292,14 @@ class resProfile extends Component {
     }
 }
 
-export default resProfile;
+const mapStateToProps = (state) => {
+  return { restProfileUpdate: state.restProfileUpdate };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    dispatch,
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(resProfile);

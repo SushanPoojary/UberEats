@@ -2,15 +2,15 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 // import history from './history';
 import NavBar from './NavBar';
-import { UserLogin } from './components/customer/index';
-import { userReg } from './components/customer/userReg';
-import { resLogin } from './components/restaurant/index';
-import { resReg } from './components/restaurant/resReg';
-import { resHome } from './components/restaurant/resHome';
+import UserLogin from './components/customer/index';
+import userReg from './components/customer/userReg';
+import resLogin from './components/restaurant/index';
+import resReg from './components/restaurant/resReg';
+import resHome from './components/restaurant/resHome';
 import resProfile from './components/restaurant/resProfile';
 import userProfile from './components/customer/userProfile';
 import resAddItems from './components/restaurant/resAddItems';
-import { addMenu } from './components/restaurant/addMenu';
+import addMenu from './components/restaurant/addMenu';
 import homePage from './components/customer/homepage';
 import seeRestaurant from './components/customer/seeRestaurant';
 import addToCart from './components/customer/addToCart';
@@ -19,7 +19,6 @@ import resorder from './components/restaurant/resorder';
 import resEditMenu from './components/restaurant/resEditMenu';
 import userFavourites from './components/customer/userFavourites';
 import checkout from './components/customer/checkout';
-import temp from './components/customer/temp';
 import rorderdeets from './components/restaurant/rorderdeets';
 import uorderdeets from './components/customer/uorderdeets';
 
@@ -46,7 +45,6 @@ export default class Routes extends Component {
           <Route path="/editmenu" exact component={resEditMenu} />
           <Route path="/favourites" exact component={userFavourites} />
           <Route path="/checkout" exact component={checkout} />
-          <Route path="/temp" exact component={temp} />
           <Route path="/rorderdeets" exact component={rorderdeets} />
           <Route path="/uorderdeets" exact component={uorderdeets} />
         </Switch>

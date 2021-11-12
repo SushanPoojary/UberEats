@@ -1,6 +1,8 @@
 /* eslint-disable dot-notation */
 /* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable camelcase */
+/* eslint-disable arrow-body-style */
+/* eslint-disable react/prop-types */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable max-len */
 /* eslint-disable react/jsx-wrap-multilines */
@@ -8,6 +10,7 @@
 import React from 'react';
 import Axios from 'axios';
 import { Redirect } from 'react-router';
+import { connect } from 'react-redux';
 import {
   Form,
   Button,
@@ -18,7 +21,7 @@ import {
 } from 'react-bootstrap';
 import NavBar from '../../NavBar';
 
-export default class userFavourites extends React.Component {
+class userFavourites extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -44,6 +47,10 @@ export default class userFavourites extends React.Component {
             }
           }
           this.setState({ products: menuList });
+          this.props.dispatch({
+            type: 'USER_FAVOURITES',
+            payload: true,
+          });
         }
       }).catch((err) => {
         throw err;
@@ -129,3 +136,15 @@ export default class userFavourites extends React.Component {
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  return { userFavourites: state.userFavourites };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    dispatch,
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(userFavourites);

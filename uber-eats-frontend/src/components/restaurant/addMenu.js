@@ -1,6 +1,8 @@
 /* eslint-disable dot-notation */
 /* eslint-disable camelcase */
 /* eslint-disable prefer-destructuring */
+/* eslint-disable arrow-body-style */
+/* eslint-disable react/prop-types */
 /* eslint-disable react/destructuring-assignment */
 import React from 'react';
 // import ReactDOM from 'react-dom';
@@ -8,9 +10,14 @@ import 'bootstrap/dist/css/bootstrap.css';
 import Axios from 'axios';
 import { Image } from 'cloudinary-react';
 import { Redirect } from 'react-router';
+import { connect } from 'react-redux';
 import styled from 'styled-components';
 // eslint-disable-next-line import/no-cycle
+import { toast } from 'react-toastify';
 import NavBar from '../../NavBar';
+import 'react-toastify/dist/ReactToastify.css';
+
+toast.configure();
 
 const HeadText = styled.h2`
     font-size: 30px;
@@ -33,7 +40,7 @@ const OverallText = styled.h2`
     //padding-left: 150px;
 `;
 
-export class addMenu extends React.Component {
+class addMenu extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -200,6 +207,10 @@ export class addMenu extends React.Component {
     this.previewFile(file);
   }
 
+  notify = () => {
+    toast.success('Item Added/Updated!');
+  };
+
   previewFile = (file) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -242,6 +253,10 @@ export class addMenu extends React.Component {
         this.setState({
           redirect: true,
         });
+        this.props.dispatch({
+          type: 'RESTAURANT_MENU_ADD',
+          payload: true,
+        });
       }
 
       // props.history.push('/login');
@@ -251,8 +266,12 @@ export class addMenu extends React.Component {
 
   render() {
     let redirectVar = null;
+    let UpdateToast = null;
     if (this.state.redirect) {
       redirectVar = <Redirect to="/resadditems" />;
+    }
+    if (this.props.restaddMenu) {
+      UpdateToast = this.notify();
     }
     const nameError = this.state.nameError;
     const ingredientsError = this.state.ingredientsError;
@@ -263,6 +282,7 @@ export class addMenu extends React.Component {
     return (
       <div>
         {redirectVar}
+        {UpdateToast}
         <NavBar />
         <div className="container">
           <form onSubmit={this.handleSubmit}>
@@ -402,3 +422,15 @@ export class addMenu extends React.Component {
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  return { restaddMenu: state.restaddMenu };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    dispatch,
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(addMenu);

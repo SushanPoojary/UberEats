@@ -4,15 +4,18 @@
 /* eslint-disable camelcase */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable max-len */
+/* eslint-disable arrow-body-style */
+/* eslint-disable react/prop-types */
 /* eslint-disable react/jsx-wrap-multilines */
 /* eslint-disable react/destructuring-assignment */
 import React from 'react';
 import Axios from 'axios';
 import { Redirect } from 'react-router';
+import { connect } from 'react-redux';
 import { Modal, Button, Form } from 'react-bootstrap';
 import NavBar from '../../NavBar';
 
-export default class rorderdeets extends React.Component {
+class rorderdeets extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -37,6 +40,10 @@ export default class rorderdeets extends React.Component {
             }
           }
           this.setState({ products: menuList });
+          this.props.dispatch({
+            type: 'RESTAURANT_ORDER_DETAILS_RECEIPT',
+            payload: true,
+          });
         }
       }).catch((err) => {
         throw err;
@@ -114,3 +121,15 @@ export default class rorderdeets extends React.Component {
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  return { restOrderReceipt: state.restOrderReceipt };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    dispatch,
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(rorderdeets);

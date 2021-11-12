@@ -3,11 +3,14 @@
 /* eslint-disable brace-style */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable max-len */
+/* eslint-disable arrow-body-style */
+/* eslint-disable react/prop-types */
 /* eslint-disable react/jsx-wrap-multilines */
 /* eslint-disable react/destructuring-assignment */
 import React from 'react';
 import Axios from 'axios';
 import { Redirect } from 'react-router';
+import { connect } from 'react-redux';
 import {
   Form,
   Button,
@@ -17,7 +20,7 @@ import {
 } from 'react-bootstrap';
 import NavBar from '../../NavBar';
 
-export default class resorder extends React.Component {
+class resorder extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -45,6 +48,10 @@ export default class resorder extends React.Component {
             }
           }
           this.setState({ products: menuList });
+          this.props.dispatch({
+            type: 'RESTAURANT_ORDER_MANAGEMENT',
+            payload: true,
+          });
         }
       }).catch((err) => {
         throw err;
@@ -296,3 +303,15 @@ export default class resorder extends React.Component {
     }
   }
 }
+
+const mapStateToProps = (state) => {
+  return { restOrders: state.restOrders };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    dispatch,
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(resorder);

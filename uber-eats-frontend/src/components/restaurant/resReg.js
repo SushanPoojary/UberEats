@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable arrow-body-style */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable react/destructuring-assignment */
 import React from 'react';
@@ -11,10 +13,11 @@ import {
   Switch,
 } from 'react-router-dom';
 import { Redirect } from 'react-router';
+import { connect } from 'react-redux';
 import styled from 'styled-components';
 import history from './history';
 // eslint-disable-next-line import/no-cycle
-import { resLogin } from './index';
+import resLogin from './index';
 import NavBar from '../../NavBar';
 
 const HeadText = styled.h2`
@@ -38,7 +41,7 @@ const OverallText = styled.h2`
     //padding-left: 150px;
 `;
 
-export class resReg extends React.Component {
+class resReg extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -47,7 +50,7 @@ export class resReg extends React.Component {
       email: '',
       password: '',
       // register: false,
-      redirect: null,
+      // redirect: null,
       usernameValid: '',
       locationValid: '',
       emailValid: '',
@@ -110,22 +113,6 @@ export class resReg extends React.Component {
       });
     }
   }
-
-  // contactInputHandler = (event) => {
-  //   console.log(event.target.value);
-  //   const contact = event.target.value;
-  //   const contactRegExp = new RegExp(/^[0-9\b]+$/);
-  //   if (contact !== '' && contactRegExp.test(contact) && contact.length === 10) {
-  //     this.setState({
-  //       contact,
-  //       contactValid: true,
-  //     });
-  //   } else {
-  //     this.setState({
-  //       contactValid: false,
-  //     });
-  //   }
-  // }
 
   emailInputHandler = (event) => {
     console.log(event.target.value);
@@ -193,13 +180,17 @@ export class resReg extends React.Component {
       const status = response.data.status;
       if (status === 1062) {
         this.setState({
-          redirect: false,
+          // redirect: false,
           emailDup: true,
         });
       } else {
         this.setState({
-          redirect: true,
+          // redirect: true,
           emailDup: false,
+        });
+        this.props.dispatch({
+          type: 'RESTAURANT_REGISTERED',
+          payload: true,
         });
       }
 
@@ -210,7 +201,7 @@ export class resReg extends React.Component {
 
   render() {
     let redirectVar = null;
-    if (this.state.redirect) {
+    if (this.props.redirectRestReg) {
       redirectVar = <Redirect to="/reslogin" />;
     }
     const usernameError = this.state.usernameError;
@@ -323,3 +314,15 @@ export class resReg extends React.Component {
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  return { redirectRestReg: state.redirectRestReg };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    dispatch,
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(resReg);

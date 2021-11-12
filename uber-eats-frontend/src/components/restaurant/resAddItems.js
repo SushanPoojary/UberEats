@@ -1,9 +1,12 @@
 /* eslint-disable dot-notation */
 /* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable react/jsx-wrap-multilines */
+/* eslint-disable arrow-body-style */
+/* eslint-disable react/prop-types */
 /* eslint-disable react/destructuring-assignment */
 import React from 'react';
 import Axios from 'axios';
+import { connect } from 'react-redux';
 import {
   Form,
   Button,
@@ -15,7 +18,7 @@ import {
 import { Redirect } from 'react-router';
 import NavBar from '../../NavBar';
 
-export default class resAddItems extends React.Component {
+class resAddItems extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -40,6 +43,10 @@ export default class resAddItems extends React.Component {
             }
           }
           this.setState({ products: menuList });
+          this.props.dispatch({
+            type: 'RESTAURANT_MENU',
+            payload: true,
+          });
         }
       }).catch((err) => {
         throw err;
@@ -117,3 +124,15 @@ export default class resAddItems extends React.Component {
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  return { restMenu: state.restMenu };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    dispatch,
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(resAddItems);

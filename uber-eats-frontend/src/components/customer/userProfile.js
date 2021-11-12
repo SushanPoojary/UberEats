@@ -1,3 +1,5 @@
+/* eslint-disable arrow-body-style */
+/* eslint-disable react/prop-types */
 /* eslint-disable dot-notation */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable react/destructuring-assignment */
@@ -6,9 +8,14 @@ import { Redirect } from 'react-router';
 import cookie from 'react-cookies';
 import Axios from 'axios';
 import { Image } from 'cloudinary-react';
+import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { CountryDropdown } from 'react-country-region-selector';
+import { toast } from 'react-toastify';
 import NavBar from '../../NavBar';
+import 'react-toastify/dist/ReactToastify.css';
+
+toast.configure();
 
 const HeadText = styled.h2`
     font-size: 30px;
@@ -104,6 +111,10 @@ class userProfile extends Component {
       });
     }
 
+    notify = () => {
+      toast.success('Profile Updated!');
+    };
+
     previewFile = (file) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -121,6 +132,10 @@ class userProfile extends Component {
             console.log('Updated');
             this.setState({
               authMessage: true,
+            });
+            this.props.dispatch({
+              type: 'USER_PROFILE_UPDATED',
+              payload: true,
             });
           }
         }).catch((err) => {
@@ -158,8 +173,12 @@ class userProfile extends Component {
 
     render() {
       let redirectVar = null;
+      let UpdateToast = null;
       if (!cookie.load('cookie')) {
         redirectVar = <Redirect to="/login" />;
+      }
+      if (this.props.userProfileUpdate) {
+        UpdateToast = this.notify();
       }
       const authMessageE = this.state.authMessageE;
       const { country } = this.state;
@@ -167,6 +186,7 @@ class userProfile extends Component {
         <div>
           <NavBar />
           {redirectVar}
+          {UpdateToast}
           <div className="container">
             <form onSubmit={this.handleSubmit}>
               <div className="row">
@@ -330,4 +350,14 @@ class userProfile extends Component {
     }
 }
 
-export default userProfile;
+const mapStateToProps = (state) => {
+  return { userProfileUpdate: state.userProfileUpdate };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    dispatch,
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(userProfile);

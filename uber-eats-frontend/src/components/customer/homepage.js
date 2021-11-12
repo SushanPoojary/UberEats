@@ -1,5 +1,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-else-return */
+/* eslint-disable arrow-body-style */
+/* eslint-disable react/prop-types */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable react/jsx-indent */
 /* eslint-disable react/jsx-closing-tag-location */
@@ -9,6 +11,7 @@
 import React from 'react';
 import Axios from 'axios';
 import { Redirect } from 'react-router';
+import { connect } from 'react-redux';
 import {
   Form,
   Button,
@@ -20,7 +23,7 @@ import {
 // import { Image as CloudinaryImage } from 'cloudinary-react';
 import NavBar from '../../NavBar';
 
-export default class homepage extends React.Component {
+class homepage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -51,6 +54,10 @@ export default class homepage extends React.Component {
             }
           }
           this.setState({ products: restList });
+          this.props.dispatch({
+            type: 'USER_HOMEPAGE',
+            payload: true,
+          });
         }
       }).catch((err) => {
         throw err;
@@ -296,3 +303,15 @@ export default class homepage extends React.Component {
     }
   }
 }
+
+const mapStateToProps = (state) => {
+  return { userHomepage: state.userHomepage };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    dispatch,
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(homepage);

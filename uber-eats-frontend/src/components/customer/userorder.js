@@ -4,6 +4,8 @@
 /* eslint-disable react/no-unused-state */
 /* eslint-disable object-shorthand */
 /* eslint-disable brace-style */
+/* eslint-disable arrow-body-style */
+/* eslint-disable react/prop-types */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable no-else-return */
 /* eslint-disable max-len */
@@ -13,6 +15,7 @@ import React from 'react';
 import Axios from 'axios';
 import ReactPaginate from 'react-paginate';
 import { Redirect } from 'react-router';
+import { connect } from 'react-redux';
 import {
   Form,
   Button,
@@ -23,7 +26,7 @@ import {
 import './paginate.css';
 import NavBar from '../../NavBar';
 
-export default class userorder extends React.Component {
+class userorder extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -77,6 +80,10 @@ export default class userorder extends React.Component {
           pageCount: Math.ceil(data.length / this.state.perPage),
           products: res.data,
           tabledata: slice,
+        });
+        this.props.dispatch({
+          type: 'USER_ORDER',
+          payload: true,
         });
       });
   }
@@ -346,3 +353,15 @@ export default class userorder extends React.Component {
     }
   }
 }
+
+const mapStateToProps = (state) => {
+  return { userOrders: state.userOrders };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    dispatch,
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(userorder);

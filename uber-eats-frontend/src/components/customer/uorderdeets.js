@@ -1,5 +1,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-restricted-globals */
+/* eslint-disable arrow-body-style */
+/* eslint-disable react/prop-types */
 /* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable camelcase */
 /* eslint-disable prefer-destructuring */
@@ -9,10 +11,11 @@
 import React from 'react';
 import Axios from 'axios';
 import { Redirect } from 'react-router';
+import { connect } from 'react-redux';
 import { Modal, Button, Form } from 'react-bootstrap';
 import NavBar from '../../NavBar';
 
-export default class uorderdeets extends React.Component {
+class uorderdeets extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -37,6 +40,10 @@ export default class uorderdeets extends React.Component {
             }
           }
           this.setState({ products: menuList });
+          this.props.dispatch({
+            type: 'USER_ORDER_DETAILS_RECEIPT',
+            payload: true,
+          });
         }
       }).catch((err) => {
         throw err;
@@ -114,3 +121,15 @@ export default class uorderdeets extends React.Component {
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  return { userOrderReceipt: state.userOrderReceipt };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    dispatch,
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(uorderdeets);

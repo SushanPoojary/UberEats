@@ -1,5 +1,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-shadow */
+/* eslint-disable arrow-body-style */
+/* eslint-disable react/prop-types */
 /* eslint-disable react/no-unused-state */
 /* eslint-disable react/jsx-indent */
 /* eslint-disable react/jsx-closing-tag-location */
@@ -8,6 +10,7 @@
 /* eslint-disable react/destructuring-assignment */
 import React from 'react';
 import Axios from 'axios';
+import { connect } from 'react-redux';
 import {
   Form,
   Button,
@@ -19,7 +22,7 @@ import {
 } from 'react-bootstrap';
 import NavBar from '../../NavBar';
 
-export default class seeRestaurant extends React.Component {
+class seeRestaurant extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -52,6 +55,10 @@ export default class seeRestaurant extends React.Component {
             }
           }
           this.setState({ products: menuList });
+          this.props.dispatch({
+            type: 'USER_RESTAURANT_MENU',
+            payload: true,
+          });
         }
       }).catch((err) => {
         throw err;
@@ -202,3 +209,15 @@ export default class seeRestaurant extends React.Component {
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  return { userRestMenu: state.userRestMenu };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    dispatch,
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(seeRestaurant);

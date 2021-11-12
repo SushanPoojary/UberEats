@@ -1,3 +1,5 @@
+/* eslint-disable arrow-body-style */
+/* eslint-disable react/prop-types */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable react/destructuring-assignment */
 import React from 'react';
@@ -13,9 +15,10 @@ import {
 } from 'react-router-dom';
 import { Redirect } from 'react-router';
 import { Form } from 'react-bootstrap';
+import { connect } from 'react-redux';
 import history from './history';
 // eslint-disable-next-line import/no-cycle
-import { resReg } from './resReg';
+import resReg from './resReg';
 import NavBar from '../../NavBar';
 
 const HeadText = styled.h2`
@@ -39,7 +42,7 @@ const OverallText = styled.h2`
     //padding-left: 150px;
 `;
 
-export class resLogin extends React.Component {
+class resLogin extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -49,7 +52,7 @@ export class resLogin extends React.Component {
       authMessage: '',
       emailValid: '',
       passwordValid: '',
-      redirectHome: '',
+      // redirectHome: '',
       emailError: '',
       passwordError: '',
       authMessageE: '',
@@ -129,7 +132,11 @@ export class resLogin extends React.Component {
             this.setState({
               authFlag: true,
               authMessage: '',
-              redirectHome: <Redirect to="/resHome" />,
+              // redirectHome: <Redirect to="/resHome" />,
+            });
+            this.props.dispatch({
+              type: 'RESTAURANT_LOGGED_IN',
+              payload: <Redirect to="/resHome" />,
             });
           } else if (status === 403) {
             this.setState({
@@ -161,7 +168,7 @@ export class resLogin extends React.Component {
     if (cookie.load('cookie')) {
       redirectVar = <Redirect to="/resHome" />;
     }
-    const redirectHome = this.state.redirectHome;
+    const redirectHome = this.props.redirectRestLoginHome;
     const emailError = this.state.emailError;
     const passwordError = this.state.passwordError;
     const authMessageE = this.state.authMessageE;
@@ -242,3 +249,15 @@ export class resLogin extends React.Component {
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  return { redirectRestLoginHome: state.redirectRestLoginHome };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    dispatch,
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(resLogin);

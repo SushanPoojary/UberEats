@@ -10,7 +10,7 @@ import {
 import { Redirect } from 'react-router';
 import NavBar from '../../NavBar';
 
-export class resHome extends React.Component {
+class resHome extends React.Component {
   render() {
     let redirectVar = null;
     if (!localStorage.getItem('ubereatsResToken')) {

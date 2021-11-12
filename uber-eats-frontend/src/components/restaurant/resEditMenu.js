@@ -1,9 +1,12 @@
 /* eslint-disable prefer-destructuring */
 /* eslint-disable react/destructuring-assignment */
+/* eslint-disable arrow-body-style */
+/* eslint-disable react/prop-types */
 import React, { Component } from 'react';
 import { Redirect } from 'react-router';
 import Axios from 'axios';
 import { Image } from 'cloudinary-react';
+import { connect } from 'react-redux';
 import styled from 'styled-components';
 import NavBar from '../../NavBar';
 
@@ -108,13 +111,10 @@ class resEditMenu extends Component {
               authMessage: true,
               redirect: true,
             });
-            // this.setState({ name: data.name });
-            // this.setState({ location: data.location });
-            // this.setState({ description: data.description });
-            // this.setState({ contact: data.contact });
-            // this.setState({ picture: data.picture });
-            // this.setState({ dishes: data.dishes });
-            // this.setState({ timing: data.timing });
+            this.props.dispatch({
+              type: 'RESTAURANT_MENU_UPDATED',
+              payload: true,
+            });
           }
         }).catch((err) => {
           console.log(`Restaurant Update Menu: ${err}`);
@@ -258,4 +258,14 @@ class resEditMenu extends Component {
     }
 }
 
-export default resEditMenu;
+const mapStateToProps = (state) => {
+  return { restMenuUpdated: state.restMenuUpdated };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    dispatch,
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(resEditMenu);

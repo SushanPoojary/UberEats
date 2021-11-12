@@ -1,3 +1,5 @@
+/* eslint-disable arrow-body-style */
+/* eslint-disable react/prop-types */
 /* eslint-disable dot-notation */
 /* eslint-disable react/no-unused-state */
 /* eslint-disable no-restricted-globals */
@@ -10,10 +12,11 @@
 import React from 'react';
 import Axios from 'axios';
 import { Redirect } from 'react-router';
+import { connect } from 'react-redux';
 import { Modal, Button, Form } from 'react-bootstrap';
 import NavBar from '../../NavBar';
 
-export default class addToCart extends React.Component {
+class addToCart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -40,6 +43,10 @@ export default class addToCart extends React.Component {
             }
           }
           this.setState({ products: menuList });
+          this.props.dispatch({
+            type: 'USER_CART_VISIT',
+            payload: true,
+          });
         }
       }).catch((err) => {
         throw err;
@@ -145,3 +152,15 @@ export default class addToCart extends React.Component {
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  return { userCartVisit: state.userCartVisit };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    dispatch,
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(addToCart);

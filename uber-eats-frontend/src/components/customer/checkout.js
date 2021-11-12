@@ -1,3 +1,5 @@
+/* eslint-disable arrow-body-style */
+/* eslint-disable react/prop-types */
 /* eslint-disable dot-notation */
 /* eslint-disable camelcase */
 /* eslint-disable prefer-destructuring */
@@ -8,6 +10,7 @@ import React from 'react';
 import Axios from 'axios';
 import styled from 'styled-components';
 import { Redirect } from 'react-router';
+import { connect } from 'react-redux';
 import NavBar from '../../NavBar';
 
 const HeadText = styled.h2`
@@ -31,7 +34,7 @@ const OverallText = styled.h2`
     //padding-left: 150px;
 `;
 
-export default class checkout extends React.Component {
+class checkout extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -66,6 +69,10 @@ export default class checkout extends React.Component {
             }
           }
           this.setState({ products: menuList });
+          this.props.dispatch({
+            type: 'USER_CHECKOUT_VISIT',
+            payload: true,
+          });
         }
       }).catch((err) => {
         throw err;
@@ -379,3 +386,15 @@ export default class checkout extends React.Component {
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  return { userCheckoutVisit: state.userCheckoutVisit };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    dispatch,
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(checkout);
