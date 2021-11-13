@@ -282,6 +282,7 @@ function editmenu(msg, callback){
    
     console.log("Inside editmenu kafka backend");
     console.log(msg);
+    // console.log(msg.body.p_id);
     console.log("In handle request:"+ JSON.stringify(msg));
     mongoose.connect(mongo, options, function(err,db){
         if(err){

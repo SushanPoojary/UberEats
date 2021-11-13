@@ -322,7 +322,16 @@ app.post('/addMenu', checkAuthR, async function(req, res) {
                } catch (err) {
                 console.log(err);
                }
-    kafka.make_request('restaurant',{"path": "addMenu", "body": req.body, "uploadPublicID": req.session.uploadPublicID, "uploadURL": req.session.uploadURL}, function(err,results){
+    let body = {
+        p_name: req.body.p_name,
+        p_ingredients: req.body.p_ingredients,
+        p_description: req.body.p_description,
+        p_category: req.body.p_category,
+        p_type: req.body.p_type,
+        p_price: req.body.p_price,
+    }
+    console.log(body);
+    kafka.make_request('restaurant',{"path": "addMenu", "body": body, "uploadPublicID": req.session.uploadPublicID, "uploadURL": req.session.uploadURL}, function(err,results){
         console.log('Menu Add');
         console.log(results);
         if (err){
@@ -379,7 +388,15 @@ app.post('/resupdateMenu', checkAuthR, async function(req, res) {
                } catch (err) {
                 console.log(err);
                }
-    kafka.make_request('restaurant',{"path": "resupdateMenu", "body": req.body, "uploadPublicID": req.session.uploadPublicID, "uploadURL": req.session.uploadURL}, function(err,results){
+    let body = {
+        p_name: req.body.p_name,
+        p_ingredients: req.body.p_ingredients,
+        p_description: req.body.p_description,
+        p_category: req.body.p_category,
+        p_type: req.body.p_type,
+        p_price: req.body.p_price,
+    }
+    kafka.make_request('restaurant',{"path": "resupdateMenu", "body": body, "uploadPublicID": req.session.uploadPublicID, "uploadURL": req.session.uploadURL}, function(err,results){
         console.log('Menu Edit');
         console.log(results);
         if (err){
@@ -649,7 +666,8 @@ app.post('/order', checkAuth, (req, res) => {
   let year = date_ob.getFullYear();
   let hours = ("0" + date_ob.getHours()).slice(-2);
   let minutes = ("0" + date_ob.getMinutes()).slice(-2);
-  let ordertime = year + "-" + month + "-" + date + " " + hours + ":" + minutes;
+  let seconds = ("0" + date_ob.getSeconds()).slice(-2);
+  let ordertime = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
   console.log(ordertime);
 
     kafka.make_request('user', {"path": "order", "body": req.body, "ordertime": ordertime}, function(err,results){

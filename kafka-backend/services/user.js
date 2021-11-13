@@ -663,6 +663,7 @@ function getPrice(msg, callback){
 function getUserDeets(msg, callback){
    
     console.log("Inside getUserDeets kafka backend");
+    console.log(session.uemail);
     console.log(msg);
     console.log("In handle request:"+ JSON.stringify(msg));
     mongoose.connect(mongo, options, function(err,db){
@@ -671,7 +672,7 @@ function getUserDeets(msg, callback){
         }
         else{
             console.log("User getUserDeets Page");
-            users.findOne({user_email: session.uemail},
+            users.findOne({email: session.uemail},
                 (err, results) => {
                 if(err) {
                     callback(null,{err: err})

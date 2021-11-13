@@ -169,7 +169,8 @@ class seeRestaurant extends React.Component {
                 <Card.Body>
                   <Card.Title>{item.p_name}</Card.Title>
                   <Card.Text>
-                    {item.p_description}
+                    {item.p_ingredients}
+                    <br />
                   </Card.Text>
                   <Card.Text>
                     $
