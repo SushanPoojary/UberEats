@@ -762,6 +762,38 @@ app.post('/filteruorders', checkAuth, (req, res) => {
 });
 
 
+app.post('/userorderprof_p', checkAuthR, (req, res) => {
+    console.log(req.body);
+    kafka.make_request('restaurant',{"path": "userorderprof_p", "body": req.body}, function(err,results){
+        console.log('User Profile Fetch');
+        console.log(results);
+        if (err){
+            console.log("Inside err");
+        }else{
+            console.log("Inside results");
+            console.log(results);
+            req.session.prof = results;
+            res.status(200).send(results);
+        }
+    });
+});
+
+app.get('/userorderprof_g', checkAuthR, (req, res) => {
+    console.log(req.session.prof);
+    kafka.make_request('restaurant',{"path": "userorderprof_g", "body": req.session.prof}, function(err,results){
+        console.log('User Profile Fetch');
+        console.log(results);
+        if (err){
+            console.log("Inside err");
+        }else{
+            console.log("Inside results");
+            console.log(results);
+            res.status(200).send(results);
+        }
+    });
+});
+
+
 app.post('/rorderdeets', checkAuthR, (req, res) => {
     req.session.ordertime = req.body.order_id;
     kafka.make_request('restaurant', {"path": "rorderdeets", "body": req.body}, function(err,results){
@@ -856,6 +888,7 @@ app.post('/resorderactions', checkAuthR, (req, res) => {
         }
     });
 });
+
 
 
 // app.get('/', function (req, res) {

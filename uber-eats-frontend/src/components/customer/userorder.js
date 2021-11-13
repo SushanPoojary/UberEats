@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 /* eslint-disable dot-notation */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable react/no-access-state-in-setstate */
@@ -22,9 +23,14 @@ import {
   Container,
   Row,
   Col,
+  Modal,
 } from 'react-bootstrap';
+import { toast } from 'react-toastify';
 import './paginate.css';
 import NavBar from '../../NavBar';
+import 'react-toastify/dist/ReactToastify.css';
+
+toast.configure();
 
 class userorder extends React.Component {
   constructor(props) {
@@ -38,6 +44,9 @@ class userorder extends React.Component {
       perPage: 5,
       currentPage: 0,
       tabledata: [],
+      isOpen: false,
+      redirect: false,
+      toastcancel: false,
       // pageNumber: '',
       // po_id: 0,
       // redirectVar: false,
@@ -54,6 +63,10 @@ class userorder extends React.Component {
       console.log('input changed');
       this.getData();
     }
+  }
+
+  handleOk() {
+    this.setState({ isOpen: false });
   }
 
   handlePageClick = (e) => {
@@ -88,6 +101,12 @@ class userorder extends React.Component {
       });
   }
 
+  openModal = () => this.setState({ isOpen: true });
+
+  closeModal = () => this.setState({
+    isOpen: false,
+  });
+
   handleDelete = (event) => {
     event.preventDefault();
     const orderNum = event.target.id;
@@ -107,11 +126,14 @@ class userorder extends React.Component {
       Axios.post('http://localhost:3001/updateordercan', visitdata)
         .then((res) => {
           console.log(res.status);
+          this.setState({ toastcancel: true });
         });
       this.forceUpdate();
     }
     else {
-      alert('Restaurant has already processed your order');
+      this.setState({
+        isOpen: true,
+      });
     }
   }
 
@@ -162,6 +184,10 @@ class userorder extends React.Component {
       });
   }
 
+  notify = () => {
+    toast.success('Order Cancelled!');
+  };
+
   handleFilter = (e) => {
     e.preventDefault();
     const filData = {
@@ -182,14 +208,40 @@ class userorder extends React.Component {
   render() {
     console.log(this.state.products);
     let redirectVar = null;
+    let CancelToast = null;
     if (this.state.redirect) {
       redirectVar = <Redirect to="/uorderdeets" />;
     }
-    if (!this.state.filter) {
+    if (this.state.toastcancel) {
+      CancelToast = this.notify();
+    }
+    if (this.state.isOpen) {
+      return (
+        <div>
+          {redirectVar}
+          <NavBar />
+          <div>
+            <div><h3 style={{ paddingLeft: '0.5em' }}>Orders</h3></div>
+            <Modal show={this.state.isOpen} onHide={this.closeModal}>
+              <Modal.Header>
+                <Modal.Title>Restaurant has already processed your order!</Modal.Title>
+              </Modal.Header>
+              <Modal.Footer>
+                <Button variant="warning" onClick={() => { this.closeModal(event); this.handleOk(event); }}>
+                  Proceed to Orders
+                </Button>
+              </Modal.Footer>
+            </Modal>
+          </div>
+        </div>
+      );
+    }
+    else if (!this.state.filter) {
       return (
         <div>
           <NavBar />
           {redirectVar}
+          {CancelToast}
           <div>
             <Form inline>
               <Container>
@@ -273,6 +325,7 @@ class userorder extends React.Component {
         <div>
           <NavBar />
           {redirectVar}
+          {CancelToast}
           <div>
             <Form inline>
               <Container>

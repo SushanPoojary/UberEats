@@ -1,3 +1,6 @@
+/* eslint-disable no-restricted-globals */
+/* eslint-disable react/jsx-closing-tag-location */
+/* eslint-disable no-else-return */
 /* eslint-disable arrow-body-style */
 /* eslint-disable react/prop-types */
 /* eslint-disable dot-notation */
@@ -10,6 +13,7 @@ import React from 'react';
 import Axios from 'axios';
 import styled from 'styled-components';
 import { Redirect } from 'react-router';
+import { Modal, Button } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import NavBar from '../../NavBar';
 
@@ -50,6 +54,7 @@ class checkout extends React.Component {
       add1: '',
       add2: '',
       currentDateTime: Date().toLocaleString(),
+      isOpen: false,
     //   finalorder: 0,
     };
   }
@@ -110,6 +115,10 @@ class checkout extends React.Component {
     this.setState({ [e.target.name]: e.target.value });
   }
 
+  handleSuccess() {
+    this.setState({ redirect: true });
+  }
+
   updateProfile = (data) => {
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
@@ -158,7 +167,8 @@ class checkout extends React.Component {
           });
         } else {
           this.setState({
-            redirect: true,
+            // redirect: true,
+            isOpen: true,
           });
           this.updateIns();
         }
@@ -175,9 +185,10 @@ class checkout extends React.Component {
             redirect: false,
           });
         } else {
-          this.setState({
-            redirect: true,
-          });
+          // this.setState({
+          //   redirect: true,
+          // });
+          console.log('Done!');
         }
       });
   }
@@ -216,6 +227,10 @@ class checkout extends React.Component {
       });
   }
 
+  openModal = () => this.setState({ isOpen: true });
+
+  closeModal = () => this.setState({ isOpen: false, redirect: true });
+
   updateIns() {
     console.log('Here');
     const {
@@ -233,9 +248,10 @@ class checkout extends React.Component {
             redirect: false,
           });
         } else {
-          this.setState({
-            redirect: true,
-          });
+          // this.setState({
+          //   redirect: true,
+          // });
+          console.log('SP INS Added!');
         }
       });
   }
@@ -253,137 +269,159 @@ class checkout extends React.Component {
     if (this.state.redirect) {
       redirectVar = <Redirect to="/order" />;
     }
-    return (
-      <div>
-        {redirectVar}
-        <NavBar />
+    if (!this.state.isOpen) {
+      return (
         <div>
-          <div><h3 style={{ paddingLeft: '0.5em' }}>Checkout</h3></div>
-          <table>
-            <thead>
-              <tr>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>CID</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Restaurant Name</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Dish Name</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Quantity</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Price</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Total Price</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Special Instructions</td>
-                <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Delete from Cart</td>
-                {/* <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Delete</td> */}
-              </tr>
-            </thead>
-            <tbody>
-              {this.state.products.map((item, i) =>
-              // eslint-disable-next-line implicit-arrow-linebreak
+          {redirectVar}
+          <NavBar />
+          <div>
+            <div><h3 style={{ paddingLeft: '0.5em' }}>Checkout</h3></div>
+            <table>
+              <thead>
                 <tr>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{i + 1}</td>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.name}</td>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.p_name}</td>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.quantity}</td>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{item.p_price}</td>
-                  <td style={{ textAlign: 'left', padding: '1em' }}>{Math.round(((item.p_price * item.quantity) + Number.EPSILON) * 100) / 100}</td>
-                  <td><input type="text" id={item.po_id} placeholder="Add a note for the store" style={{ width: '390px', height: '35px' }} onChange={this.handleInstructions} /></td>
-                  <td><input type="button" id={item.po_id} value="Delete" style={{ width: '100px', height: '30px', backgroundColor: '#fc465a' }} onClick={this.handleDelete} /></td>
-                  {/* <td><input type="button" value="Delete" style={{ width: '100px', height: '30px', backgroundColor: '#FF0000' }} /></td> */}
-                </tr>)}
-            </tbody>
-          </table>
-          <div>
-            Subtotal:
-            $
-            {orderValue}
-          </div>
-          <div>
-            Taxes:
-            $
-            {taxes}
-          </div>
-          <div>
-            Service Fee:
-            $
-            { serviceFee }
-          </div>
-          <div>
-            Total Price:
-            $
-            { totalordervalue }
-          </div>
-          <br />
-          <div>
-            <form onSubmit={this.handleSubmit}>
-              <div className="row">
-                <div className="col-xs" />
-                <div className="col-xs">
-                  <HeadText>
-                    Confirm Delivery Details
-                    <br />
-                  </HeadText>
-                </div>
-              </div>
-              <div className="row">
-                <div className="col-xs" />
-                <div className="col-xs">
-                  <OverallText>
-                    Name
-                    <br />
-                    <input type="text" name="name" defaultValue={this.state.name} placeholder=" Name " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
-                    <br />
-                  </OverallText>
-                </div>
-              </div>
-              <div className="row">
-                <div className="col-xs" />
-                <div className="col-xs">
-                  <OverallText>
-                    Contact
-                    <br />
-                    <input type="text" name="contact" defaultValue={this.state.contact} placeholder=" Contact " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
-                    <br />
-                  </OverallText>
-                </div>
-              </div>
-              <div className="row">
-                <div className="col-xs" />
-                <div className="col-xs">
-                  <OverallText>
-                    Email
-                    <br />
-                    <input type="text" name="email" defaultValue={this.state.email} placeholder=" Email " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
-                    <br />
-                  </OverallText>
-                </div>
-              </div>
-              <div className="row">
-                <div className="col-xs" />
-                <div className="col-xs">
-                  <OverallText>
-                    Address
-                    <br />
-                    <input type="text" name="add1" defaultValue={this.state.add1} placeholder=" Address " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
-                    <br />
-                  </OverallText>
-                </div>
-              </div>
-              <div className="row">
-                <div className="col-xs" />
-                <div className="col-xs">
-                  <OverallText>
-                    New Address?
-                    <br />
-                    <input type="text" name="add2" defaultValue={this.state.add2} placeholder=" New Address? " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
-                    <br />
-                  </OverallText>
-                </div>
-              </div>
-              <button type="submit" onClick={this.updateUser} style={{ width: '390px', height: '35px', backgroundColor: '#7bb420' }}>Update</button>
-            </form>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>CID</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Restaurant Name</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Dish Name</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Quantity</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Price</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Total Price</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Special Instructions</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Delete from Cart</td>
+                  {/* <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Delete</td> */}
+                </tr>
+              </thead>
+              <tbody>
+                {this.state.products.map((item, i) =>
+                // eslint-disable-next-line implicit-arrow-linebreak
+                  <tr>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{i + 1}</td>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.name}</td>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.p_name}</td>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.quantity}</td>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{item.p_price}</td>
+                    <td style={{ textAlign: 'left', padding: '1em' }}>{Math.round(((item.p_price * item.quantity) + Number.EPSILON) * 100) / 100}</td>
+                    <td><input type="text" id={item.po_id} placeholder="Add a note for the store" style={{ width: '390px', height: '35px' }} onChange={this.handleInstructions} /></td>
+                    <td><input type="button" id={item.po_id} value="Delete" style={{ width: '100px', height: '30px', backgroundColor: '#fc465a' }} onClick={this.handleDelete} /></td>
+                    {/* <td><input type="button" value="Delete" style={{ width: '100px', height: '30px', backgroundColor: '#FF0000' }} /></td> */}
+                  </tr>)}
+              </tbody>
+            </table>
+            <div>
+              Subtotal:
+              $
+              {orderValue}
+            </div>
+            <div>
+              Taxes:
+              $
+              {taxes}
+            </div>
+            <div>
+              Service Fee:
+              $
+              { serviceFee }
+            </div>
+            <div>
+              Total Price:
+              $
+              { totalordervalue }
+            </div>
             <br />
+            <div>
+              <form onSubmit={this.handleSubmit}>
+                <div className="row">
+                  <div className="col-xs" />
+                  <div className="col-xs">
+                    <HeadText>
+                      Confirm Delivery Details
+                      <br />
+                    </HeadText>
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-xs" />
+                  <div className="col-xs">
+                    <OverallText>
+                      Name
+                      <br />
+                      <input type="text" name="name" defaultValue={this.state.name} placeholder=" Name " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
+                      <br />
+                    </OverallText>
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-xs" />
+                  <div className="col-xs">
+                    <OverallText>
+                      Contact
+                      <br />
+                      <input type="text" name="contact" defaultValue={this.state.contact} placeholder=" Contact " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
+                      <br />
+                    </OverallText>
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-xs" />
+                  <div className="col-xs">
+                    <OverallText>
+                      Email
+                      <br />
+                      <input type="text" name="email" defaultValue={this.state.email} placeholder=" Email " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
+                      <br />
+                    </OverallText>
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-xs" />
+                  <div className="col-xs">
+                    <OverallText>
+                      Address
+                      <br />
+                      <input type="text" name="add1" defaultValue={this.state.add1} placeholder=" Address " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
+                      <br />
+                    </OverallText>
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-xs" />
+                  <div className="col-xs">
+                    <OverallText>
+                      New Address?
+                      <br />
+                      <input type="text" name="add2" defaultValue={this.state.add2} placeholder=" New Address? " style={{ width: '390px', height: '35px' }} onChange={this.handleChange} required />
+                      <br />
+                    </OverallText>
+                  </div>
+                </div>
+                <button type="submit" onClick={this.updateUser} style={{ width: '390px', height: '35px', backgroundColor: '#7bb420' }}>Update</button>
+              </form>
+              <br />
+            </div>
+            <input type="button" id={totalordervalue} value="Order" style={{ width: '100px', height: '35px', backgroundColor: '#7bb420' }} onClick={this.handleSubmit} />
           </div>
-          <input type="button" id={totalordervalue} value="Order" style={{ width: '100px', height: '35px', backgroundColor: '#7bb420' }} onClick={this.handleSubmit} />
         </div>
-      </div>
-    );
+      );
+    } else {
+      return (
+        <div>
+          {redirectVar}
+          <NavBar />
+          <div>
+            <div><h3 style={{ paddingLeft: '0.5em' }}>Checkout</h3></div>
+            <Modal show={this.state.isOpen} onHide={this.closeModal}>
+              <Modal.Header>
+                <Modal.Title>Order placed successfully!</Modal.Title>
+              </Modal.Header>
+              <Modal.Footer>
+                <Button variant="success" onClick={() => { this.closeModal(event); this.handleSuccess(event); }}>
+                  Proceed to Orders
+                </Button>
+              </Modal.Footer>
+            </Modal>
+          </div>
+        </div>
+      );
+    }
   }
 }
 

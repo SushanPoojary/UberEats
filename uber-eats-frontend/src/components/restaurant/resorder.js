@@ -1,3 +1,6 @@
+/* eslint-disable react/jsx-closing-tag-location */
+/* eslint-disable no-shadow */
+/* eslint-disable no-restricted-globals */
 /* eslint-disable dot-notation */
 /* eslint-disable no-else-return */
 /* eslint-disable brace-style */
@@ -17,8 +20,14 @@ import {
   Container,
   Row,
   Col,
+  Card,
+  Modal,
 } from 'react-bootstrap';
+import { toast } from 'react-toastify';
 import NavBar from '../../NavBar';
+import 'react-toastify/dist/ReactToastify.css';
+
+toast.configure();
 
 class resorder extends React.Component {
   constructor(props) {
@@ -30,6 +39,10 @@ class resorder extends React.Component {
       redirect: false,
       inOS: '',
       filter: false,
+      isOpen: false,
+      notifyUpdate: false,
+      modalOpen: false,
+      customerProf: [],
     };
   }
 
@@ -63,6 +76,16 @@ class resorder extends React.Component {
   //     console.log('input changed');
   //   }
   // }
+  handleOk() {
+    this.setState({ isOpen: false, modalOpen: false });
+  }
+
+  openModal = () => this.setState({ isOpen: true, modalOpen: true });
+
+  closeModal = () => this.setState({
+    isOpen: false,
+    modalOpen: false,
+  });
 
   finalFilter = (filData) => {
     console.log(filData);
@@ -87,6 +110,7 @@ class resorder extends React.Component {
       .then((res) => {
         if (res.status === 200) {
           // console.log('A');
+          this.setState({ notifyUpdate: false });
         } else {
           // this.setState({ search: false });
         }
@@ -114,8 +138,16 @@ class resorder extends React.Component {
       order_id: this.state.order_id,
       actions: this.state.actions,
     };
-    this.finalActions(actionData);
+    if (e.target.value === 'Cancelled') {
+      this.setState({ isOpen: true });
+    } else {
+      this.finalActions(actionData);
+    }
   }
+
+  notify = () => {
+    toast.success('Order Status Updated!');
+  };
 
   handleFilter = (e) => {
     e.preventDefault();
@@ -145,17 +177,124 @@ class resorder extends React.Component {
       });
   }
 
+  profileVisit = (event) => {
+    event.preventDefault();
+    const userProfile = event.target.id;
+    const visitdata = {
+      user_email: userProfile,
+    };
+    console.log(visitdata);
+    Axios.defaults.withCredentials = true;
+    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
+    Axios.post('http://localhost:3001/userorderprof_p', visitdata)
+      .then((res) => {
+        console.log(res.status);
+        Axios.defaults.withCredentials = true;
+        Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
+        Axios.get('http://localhost:3001/userorderprof_g', visitdata)
+          .then((res) => {
+            console.log(res.data);
+            this.setState({ customerProf: res.data });
+            this.setState({ modalOpen: true });
+          });
+        // this.setState({ redirect: true });
+      });
+  }
+
   render() {
     console.log(this.state.products);
     let redirectVar = null;
+    let UpdateNotif = null;
     if (this.state.redirect) {
       redirectVar = <Redirect to="/rorderdeets" />;
     }
-    if (!this.state.filter) {
+    if (this.state.notifyUpdate) {
+      UpdateNotif = this.notify();
+    }
+    if (this.state.isOpen) {
+      return (
+        <div>
+          {redirectVar}
+          <NavBar />
+          <div>
+            <div><h3 style={{ paddingLeft: '0.5em' }}>Orders</h3></div>
+            <Modal show={this.state.isOpen} onHide={this.closeModal}>
+              <Modal.Header>
+                <Modal.Title>Order has been Cancelled!</Modal.Title>
+              </Modal.Header>
+              <Modal.Footer>
+                <Button variant="warning" onClick={() => { this.closeModal(event); this.handleOk(event); }}>
+                  Proceed to Orders
+                </Button>
+              </Modal.Footer>
+            </Modal>
+          </div>
+        </div>
+      );
+    }
+    else if (this.state.modalOpen) {
+      return (
+        <div>
+          {redirectVar}
+          <NavBar />
+          <div>
+            <div><h3 style={{ paddingLeft: '0.5em' }}>Customer Profile</h3></div>
+            <Modal show={this.state.modalOpen} onHide={this.closeModal}>
+              <Modal.Header>
+                <Modal.Title>Customer Profile</Modal.Title>
+              </Modal.Header>
+              <div>
+                <Form.Group>
+                  <Modal.Body>
+                    Name: &nbsp;
+                    {this.state.customerProf.name}
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    Contact: &nbsp;
+                    {this.state.customerProf.contact}
+                    <br />
+                    Email: &nbsp;
+                    {this.state.customerProf.email}
+                    <br />
+                    Address: &nbsp;
+                    {this.state.customerProf.add1}
+                    <br />
+                    Delivery Address: &nbsp;
+                    {this.state.customerProf.add2}
+                    <br />
+                    Nickname: &nbsp;
+                    {this.state.customerProf.nickname}
+                    <br />
+                    About: &nbsp;
+                    {this.state.customerProf.about}
+                    <br />
+                    State: &nbsp;
+                    {this.state.customerProf.state}
+                    <br />
+                    Customer Pic: &nbsp;
+                    <Card.Img
+                      variant="top"
+                      src={this.state.customerProf.uploadURL}
+                      style={{ height: '300px', width: '370px' }}
+                    />
+                  </Modal.Body>
+                </Form.Group>
+              </div>
+              <Modal.Footer>
+                <Button variant="warning" onClick={() => { this.closeModal(event); this.handleOk(event); }}>
+                  View Orders
+                </Button>
+              </Modal.Footer>
+            </Modal>
+          </div>
+        </div>
+      );
+    }
+    else if (!this.state.filter) {
       return (
         <div>
           <NavBar />
           {redirectVar}
+          {UpdateNotif}
           <div>
             <Form inline>
               <Container>
@@ -186,6 +325,7 @@ class resorder extends React.Component {
                 <tr>
                   <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>OID</td>
                   <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Customer Name</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Profile</td>
                   <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Location</td>
                   <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Contact</td>
                   <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Order Time</td>
@@ -200,6 +340,7 @@ class resorder extends React.Component {
                   <tr>
                     <td style={{ textAlign: 'left', padding: '1em' }}>{i + 1}</td>
                     <td style={{ textAlign: 'left', padding: '1em' }}>{item.name}</td>
+                    <Button variant="info" id={item.email} onClick={this.profileVisit}>View</Button>
                     <td style={{ textAlign: 'left', padding: '1em' }}>{item.location}</td>
                     <td style={{ textAlign: 'left', padding: '1em' }}>{item.contact}</td>
                     <td style={{ textAlign: 'left', padding: '1em' }}>{item.ordertime}</td>
@@ -218,7 +359,7 @@ class resorder extends React.Component {
                       </select>
                     </label>
                         &nbsp; &nbsp; &nbsp;
-                    <Button type="submit" id={item.ordertime} onClick={this.handleActions}>Confirm Action</Button>
+                    <Button type="submit" id={item.ordertime} value={item.order_status} onClick={this.handleActions}>Confirm Action</Button>
                   </tr>)}
               </tbody>
             </table>
@@ -231,6 +372,7 @@ class resorder extends React.Component {
         <div>
           <NavBar />
           {redirectVar}
+          {UpdateNotif}
           <div>
             <Form inline>
               <Container>
@@ -261,6 +403,7 @@ class resorder extends React.Component {
                 <tr>
                   <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>OID</td>
                   <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Customer Name</td>
+                  <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Profile</td>
                   <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Location</td>
                   <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Contact</td>
                   <td style={{ textAlign: 'left', padding: '1em', paddingTop: '2em' }}>Order Time</td>
@@ -275,6 +418,7 @@ class resorder extends React.Component {
                   <tr>
                     <td style={{ textAlign: 'left', padding: '1em' }}>{i + 1}</td>
                     <td style={{ textAlign: 'left', padding: '1em' }}>{item.name}</td>
+                    <Button variant="info" id={item.email} onClick={this.profileVisit}>View</Button>
                     <td style={{ textAlign: 'left', padding: '1em' }}>{item.location}</td>
                     <td style={{ textAlign: 'left', padding: '1em' }}>{item.contact}</td>
                     <td style={{ textAlign: 'left', padding: '1em' }}>{item.ordertime}</td>

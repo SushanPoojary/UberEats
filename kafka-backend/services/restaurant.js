@@ -77,6 +77,12 @@ exports.handle_request = function restaurant(msg, callback) {
         case "resorderactions":
             resorderactions(msg, callback);
             break;
+        case "userorderprof_p":
+            userorderprof_p(msg, callback);
+            break;
+        case "userorderprof_g":
+            userorderprof_g(msg, callback);
+            break;
     }
 };
 
@@ -590,5 +596,42 @@ function resorderactions(msg, callback){
                             console.log("No results found");
                             }
                         });
+            }})
+};
+
+function userorderprof_p(msg, callback){
+   
+    console.log("Inside userorderprof_p kafka backend");
+    console.log(msg);
+    console.log("In handle request:"+ JSON.stringify(msg));
+    session.prof = msg.body.user_email;
+    let results = session.prof;
+    callback(null, results)
+};
+
+function userorderprof_g(msg, callback){
+   
+    console.log("Inside userorderprof_g kafka backend");
+    console.log(msg);
+    console.log("In handle request:"+ JSON.stringify(msg));
+    mongoose.connect(mongo, options, function(err,db){
+        if(err){
+            callback(null,"Cannot connect to db");
+        }
+        else{
+            console.log("Rest Profile here");
+            users.findOne({ email: session.prof}, function(err, results) {
+                if(err) {
+                    callback(null,{err: err})
+                    console.log(err);
+                    // console.log("Error");
+                }
+                if (results) {
+                    callback(null, results);
+                    }
+                else {
+                    console.log("Can't find user for profile page!");
+                }
+            });
             }})
 };
