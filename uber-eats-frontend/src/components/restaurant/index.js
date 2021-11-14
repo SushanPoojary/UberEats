@@ -120,7 +120,7 @@ class resLogin extends React.Component {
 
     console.log(logdata);
     Axios.defaults.withCredentials = true;
-    Axios.post('http://localhost:3001/reslogin', logdata)
+    Axios.post('http://18.144.88.204:3001/reslogin', logdata)
       .then((response) => {
         console.log('Status Code : ', response.status);
         if (response.status === 200) {

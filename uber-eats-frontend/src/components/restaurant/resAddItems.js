@@ -32,7 +32,7 @@ class resAddItems extends React.Component {
     const menuList = [];
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.get('http://localhost:3001/resAddItems')
+    Axios.get('http://18.144.88.204:3001/resAddItems')
       .then((res) => {
         if (res) {
           console.log(res.data);
@@ -67,7 +67,7 @@ class resAddItems extends React.Component {
     console.log(this.state.redirect);
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.post('http://localhost:3001/editmenu', visitdata)
+    Axios.post('http://18.144.88.204:3001/editmenu', visitdata)
       .then((res) => {
         console.log(res.status);
         this.setState({ redirect: true });

@@ -119,7 +119,7 @@ class UserLogin extends React.Component {
 
     console.log(logdata);
     Axios.defaults.withCredentials = true;
-    Axios.post('http://localhost:3001/login', logdata)
+    Axios.post('http://18.144.88.204:3001/login', logdata)
       .then((response) => {
         console.log('Status Code : ', response.data.status);
         if (response.status === 200) {

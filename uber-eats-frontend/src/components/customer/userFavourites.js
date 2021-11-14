@@ -36,7 +36,7 @@ class userFavourites extends React.Component {
     const menuList = [];
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.get('http://localhost:3001/getFavourites')
+    Axios.get('http://18.144.88.204:3001/getFavourites')
       .then((res) => {
         if (res) {
           console.log(res.data);
@@ -71,7 +71,7 @@ class userFavourites extends React.Component {
     console.log(this.state.redirect);
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.post('http://localhost:3001/sr', visitdata)
+    Axios.post('http://18.144.88.204:3001/sr', visitdata)
       .then((res) => {
         console.log(res.status);
       });
@@ -89,7 +89,7 @@ class userFavourites extends React.Component {
     console.log(this.state.remail);
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.post('http://localhost:3001/deletefromfav', visitdata)
+    Axios.post('http://18.144.88.204:3001/deletefromfav', visitdata)
       .then((res) => {
         console.log(res.status);
       });

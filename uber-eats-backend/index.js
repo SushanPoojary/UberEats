@@ -13,7 +13,7 @@ var constants = require('./config.json');
 var cors = require('cors');
 var jwt = require('jsonwebtoken');
 var kafka = require('./kafka/client');
-app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
+app.use(cors({credentials: true, origin: 'http://18.144.88.204:3000'}));
 
 // var ipAdd='localhost';
 // `http://${ipAdd}:3000`
@@ -72,7 +72,7 @@ mongoose.connect(mongo, options, (err, res) => {
 
 
 app.use(function(req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.setHeader('Access-Control-Allow-Origin', 'http://18.144.88.204:3000');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT,DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers');

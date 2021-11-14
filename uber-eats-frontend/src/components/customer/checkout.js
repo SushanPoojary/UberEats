@@ -63,7 +63,7 @@ class checkout extends React.Component {
     const menuList = [];
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.get('http://localhost:3001/getCart')
+    Axios.get('http://18.144.88.204:3001/getCart')
       .then((res) => {
         if (res) {
           console.log(res.data);
@@ -85,7 +85,7 @@ class checkout extends React.Component {
 
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.get('http://localhost:3001/getPrice')
+    Axios.get('http://18.144.88.204:3001/getPrice')
       .then((res) => {
         if (res) {
           console.log(res.data);
@@ -97,7 +97,7 @@ class checkout extends React.Component {
 
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.get('http://localhost:3001/getUserDeets')
+    Axios.get('http://18.144.88.204:3001/getUserDeets')
       .then((res) => {
         if (res) {
           this.setState({ name: res.data.name });
@@ -122,7 +122,7 @@ class checkout extends React.Component {
   updateProfile = (data) => {
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.post('http://localhost:3001/updateordProfile', data)
+    Axios.post('http://18.144.88.204:3001/updateordProfile', data)
       .then((res) => {
         if (res) {
           console.log('Updated');
@@ -156,7 +156,7 @@ class checkout extends React.Component {
     console.log(products);
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.post('http://localhost:3001/order', products)
+    Axios.post('http://18.144.88.204:3001/order', products)
       .then((response) => {
         console.log('Status Code : ', response.status);
         console.log(response);
@@ -175,7 +175,7 @@ class checkout extends React.Component {
       });
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.post('http://localhost:3001/cartorder', products)
+    Axios.post('http://18.144.88.204:3001/cartorder', products)
       .then((response) => {
         console.log('Status Code : ', response.status);
         console.log(response);
@@ -221,7 +221,7 @@ class checkout extends React.Component {
     console.log(this.state.redirectVar);
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.post('http://localhost:3001/deletefromcart', visitdata)
+    Axios.post('http://18.144.88.204:3001/deletefromcart', visitdata)
       .then((res) => {
         console.log(res.status);
       });
@@ -238,7 +238,7 @@ class checkout extends React.Component {
     } = this.state;
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.post('http://localhost:3001/orderIns', SplInv)
+    Axios.post('http://18.144.88.204:3001/orderIns', SplInv)
       .then((response) => {
         console.log('Status Code : ', response.status);
         console.log(response);

@@ -29,7 +29,7 @@ class uorderdeets extends React.Component {
     const menuList = [];
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.get('http://localhost:3001/uorderdeets')
+    Axios.get('http://18.144.88.204:3001/uorderdeets')
       .then((res) => {
         if (res) {
           console.log(res.data);

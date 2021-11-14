@@ -85,7 +85,7 @@ class userorder extends React.Component {
     // const menuList = [];
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.get('http://localhost:3001/orderstatus')
+    Axios.get('http://18.144.88.204:3001/orderstatus')
       .then((res) => {
         const data = res.data;
         const slice = data.slice(this.state.offset, this.state.offset + this.state.perPage);
@@ -123,7 +123,7 @@ class userorder extends React.Component {
     if (event.target.value === 'Ordered') {
       Axios.defaults.withCredentials = true;
       Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-      Axios.post('http://localhost:3001/updateordercan', visitdata)
+      Axios.post('http://18.144.88.204:3001/updateordercan', visitdata)
         .then((res) => {
           console.log(res.status);
           this.setState({ toastcancel: true });
@@ -150,7 +150,7 @@ class userorder extends React.Component {
     console.log(this.state.order_id);
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.post('http://localhost:3001/uorderdeets', visitdata)
+    Axios.post('http://18.144.88.204:3001/uorderdeets', visitdata)
       .then((res) => {
         console.log(res.status);
         this.setState({ redirect: true });
@@ -173,7 +173,7 @@ class userorder extends React.Component {
     console.log(filData);
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.post('http://localhost:3001/filteruorders', filData)
+    Axios.post('http://18.144.88.204:3001/filteruorders', filData)
       .then((res) => {
         if (res.status === 200) {
           this.setState({ products: res.data });
