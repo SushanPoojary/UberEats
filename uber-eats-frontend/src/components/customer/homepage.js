@@ -43,7 +43,7 @@ class homepage extends React.Component {
   componentDidMount() {
     const restList = [];
     Axios.defaults.withCredentials = true;
-    Axios.get('http://18.144.88.204:3001/allrest')
+    Axios.get('http://54.153.48.19:3001/allrest')
       .then((res) => {
         if (res) {
           console.log(res.data);
@@ -67,7 +67,7 @@ class homepage extends React.Component {
   finalSearch = (userData) => {
     console.log(userData);
     Axios.defaults.withCredentials = true;
-    Axios.post('http://18.144.88.204:3001/searchItem', userData)
+    Axios.post('http://54.153.48.19:3001/searchItem', userData)
       .then((res) => {
         if (res.status === 200) {
           console.log(res.data);
@@ -116,7 +116,7 @@ class homepage extends React.Component {
     console.log(this.state.remail);
     console.log(this.state.redirectVar);
     Axios.defaults.withCredentials = true;
-    Axios.post('http://18.144.88.204:3001/sr', visitdata)
+    Axios.post('http://54.153.48.19:3001/sr', visitdata)
       .then((res) => {
         console.log(res.status);
       });
@@ -134,7 +134,7 @@ class homepage extends React.Component {
     console.log(this.state.remail);
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.post('http://18.144.88.204:3001/markfavourite', visitdata)
+    Axios.post('http://54.153.48.19:3001/markfavourite', visitdata)
       .then((res) => {
         console.log(res.status);
       });
@@ -146,7 +146,7 @@ class homepage extends React.Component {
     const code = event.keyCode || event.which;
     if (code === 13) {
       Axios.defaults.withCredentials = true;
-      Axios.post('http://18.144.88.204:3001/searchOI', ser)
+      Axios.post('http://54.153.48.19:3001/searchOI', ser)
         .then((res) => {
           if (res.status === 200) {
             console.log(res.data);

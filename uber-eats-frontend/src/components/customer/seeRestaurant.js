@@ -44,7 +44,7 @@ class seeRestaurant extends React.Component {
   componentDidMount() {
     const menuList = [];
     Axios.defaults.withCredentials = true;
-    Axios.get('http://18.144.88.204:3001/sr')
+    Axios.get('http://54.153.48.19:3001/sr')
       .then((res) => {
         if (res) {
           console.log(res.data);
@@ -64,7 +64,7 @@ class seeRestaurant extends React.Component {
         throw err;
       });
     Axios.defaults.withCredentials = true;
-    Axios.get('http://18.144.88.204:3001/sr1')
+    Axios.get('http://54.153.48.19:3001/sr1')
       .then((res) => {
         if (res.status === 200) {
           this.setState({ name: res.data[0].name });
@@ -95,7 +95,7 @@ class seeRestaurant extends React.Component {
     console.log(this.state.redirectVar);
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.get('http://18.144.88.204:3001/getCart')
+    Axios.get('http://54.153.48.19:3001/getCart')
       .then((res) => {
         if (res.data.length > 0) {
           if (res.data[0].name !== this.state.name) {
@@ -105,7 +105,7 @@ class seeRestaurant extends React.Component {
           } else {
             Axios.defaults.withCredentials = true;
             Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-            Axios.post('http://18.144.88.204:3001/addtocart', visitdata)
+            Axios.post('http://54.153.48.19:3001/addtocart', visitdata)
               .then((res) => {
                 console.log(res.status);
                 this.setState({ redirectVar: true });
@@ -114,7 +114,7 @@ class seeRestaurant extends React.Component {
         } else {
           Axios.defaults.withCredentials = true;
           Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-          Axios.post('http://18.144.88.204:3001/addtocart', visitdata)
+          Axios.post('http://54.153.48.19:3001/addtocart', visitdata)
             .then((res) => {
               console.log(res.status);
               this.setState({ redirectVar: true });
@@ -126,7 +126,7 @@ class seeRestaurant extends React.Component {
   handleNew = (e) => {
     console.log(e.target.value);
     Axios.defaults.withCredentials = true;
-    Axios.post('http://18.144.88.204:3001/cartorder')
+    Axios.post('http://54.153.48.19:3001/cartorder')
       .then((response) => {
         console.log('Status Code : ', response.status);
         console.log(response);

@@ -65,7 +65,7 @@ class userProfile extends Component {
   componentDidMount() {
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.get('http://18.144.88.204:3001/userProfile')
+    Axios.get('http://54.153.48.19:3001/userProfile')
       .then((res) => {
         if (res) {
           this.setState({ name: res.data.name });
@@ -126,7 +126,7 @@ class userProfile extends Component {
     updateProfile = (data) => {
       Axios.defaults.withCredentials = true;
       Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-      Axios.post('http://18.144.88.204:3001/updateProfile', data)
+      Axios.post('http://54.153.48.19:3001/updateProfile', data)
         .then((res) => {
           if (res) {
             console.log('Updated');

@@ -29,7 +29,7 @@ class rorderdeets extends React.Component {
     const menuList = [];
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.get('http://18.144.88.204:3001/rorderdeets')
+    Axios.get('http://54.153.48.19:3001/rorderdeets')
       .then((res) => {
         if (res) {
           console.log(res.data);

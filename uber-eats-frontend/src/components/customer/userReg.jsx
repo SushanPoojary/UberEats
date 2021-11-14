@@ -170,7 +170,7 @@ class userReg extends React.Component {
       password,
     } = this.state;
     console.log(username, contact, email, password);
-    Axios.post('http://18.144.88.204:3001/userReg', {
+    Axios.post('http://54.153.48.19:3001/userReg', {
       username,
       contact,
       email,

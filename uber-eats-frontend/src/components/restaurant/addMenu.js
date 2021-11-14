@@ -233,7 +233,7 @@ class addMenu extends React.Component {
     console.log(p_name, p_ingredients, p_description, p_category, p_type, p_price);
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.post('http://18.144.88.204:3001/addMenu', {
+    Axios.post('http://54.153.48.19:3001/addMenu', {
       p_name,
       p_ingredients,
       p_description,

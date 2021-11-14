@@ -32,7 +32,7 @@ class addToCart extends React.Component {
     const menuList = [];
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.get('http://18.144.88.204:3001/getCart')
+    Axios.get('http://54.153.48.19:3001/getCart')
       .then((res) => {
         if (res) {
           console.log(res.data);
@@ -82,7 +82,7 @@ class addToCart extends React.Component {
     console.log(upquantity);
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.post('http://18.144.88.204:3001/updatequantity', upquantity)
+    Axios.post('http://54.153.48.19:3001/updatequantity', upquantity)
       .then((res) => {
         console.log(res.status);
       });

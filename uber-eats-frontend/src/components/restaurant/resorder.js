@@ -50,7 +50,7 @@ class resorder extends React.Component {
     const menuList = [];
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.get('http://18.144.88.204:3001/resorderstatus')
+    Axios.get('http://54.153.48.19:3001/resorderstatus')
       .then((res) => {
         if (res) {
           console.log(res.data);
@@ -91,7 +91,7 @@ class resorder extends React.Component {
     console.log(filData);
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.post('http://18.144.88.204:3001/filteresorders', filData)
+    Axios.post('http://54.153.48.19:3001/filteresorders', filData)
       .then((res) => {
         if (res.status === 200) {
           this.setState({ products: res.data });
@@ -106,7 +106,7 @@ class resorder extends React.Component {
     console.log(actionData);
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.post('http://18.144.88.204:3001/resorderactions', actionData)
+    Axios.post('http://54.153.48.19:3001/resorderactions', actionData)
       .then((res) => {
         if (res.status === 200) {
           // console.log('A');
@@ -170,7 +170,7 @@ class resorder extends React.Component {
     console.log(this.state.order_id);
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.post('http://18.144.88.204:3001/rorderdeets', visitdata)
+    Axios.post('http://54.153.48.19:3001/rorderdeets', visitdata)
       .then((res) => {
         console.log(res.status);
         this.setState({ redirect: true });
@@ -186,12 +186,12 @@ class resorder extends React.Component {
     console.log(visitdata);
     Axios.defaults.withCredentials = true;
     Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.post('http://18.144.88.204:3001/userorderprof_p', visitdata)
+    Axios.post('http://54.153.48.19:3001/userorderprof_p', visitdata)
       .then((res) => {
         console.log(res.status);
         Axios.defaults.withCredentials = true;
         Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-        Axios.get('http://18.144.88.204:3001/userorderprof_g', visitdata)
+        Axios.get('http://54.153.48.19:3001/userorderprof_g', visitdata)
           .then((res) => {
             console.log(res.data);
             this.setState({ customerProf: res.data });
