@@ -4,7 +4,7 @@ FullStack UberEats Prototype.
 Tech: React, Express, NodeJS, MYSQL, MongoDB, Kafka.
 
 Steps to Clone:
-git clone --branch <branchname> https://github.com/SushanPoojary/UberEats.git
+git clone --branch branchname https://github.com/SushanPoojary/UberEats.git
 
 Steps to run:
 1. Install all dependencies using npm install on frontend, backend and kafka.
