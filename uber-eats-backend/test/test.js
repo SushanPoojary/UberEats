@@ -1,4 +1,4 @@
-var app = require('../index.js');
+var app = require('../indexk.js');
 var assert = require('chai').assert;
 var chai = require('chai');
 chai.use(require('chai-http'));

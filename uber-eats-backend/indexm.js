@@ -12,7 +12,7 @@ const mongoose = require('mongoose');
 var constants = require('./config.json');
 var cors = require('cors');
 var jwt = require('jsonwebtoken');
-var kafka = require('./kafka/client');
+//var kafka = require('./kafka/client');
 app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
 
 // var ipAdd='localhost';

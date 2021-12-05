@@ -1,3 +1,5 @@
+/* eslint-disable no-class-assign */
+/* eslint-disable react/no-unused-state */
 /* eslint-disable react/prop-types */
 /* eslint-disable arrow-body-style */
 /* eslint-disable prefer-destructuring */
@@ -5,7 +7,7 @@
 import React from 'react';
 // import ReactDOM from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.css';
-import Axios from 'axios';
+// import Axios from 'axios';
 import {
   BrowserRouter as Router,
   Link,
@@ -13,12 +15,15 @@ import {
   Switch,
 } from 'react-router-dom';
 import { Redirect } from 'react-router';
-import { connect } from 'react-redux';
+// import { connect } from 'react-redux';
 import styled from 'styled-components';
+import { graphql } from 'react-apollo';
+import { flowRight as compose } from 'lodash';
 import history from './history';
 // eslint-disable-next-line import/no-cycle
 import UserLogin from './index';
 import NavBar from '../../NavBar';
+import { userRegMutation } from '../../mutations/mutations';
 
 const HeadText = styled.h2`
     font-size: 30px;
@@ -50,7 +55,7 @@ class userReg extends React.Component {
       email: '',
       password: '',
       // register: false,
-      // redirect: null,
+      redirect: null,
       usernameValid: '',
       contactValid: '',
       emailValid: '',
@@ -163,46 +168,58 @@ class userReg extends React.Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-    const {
-      username,
-      contact,
-      email,
-      password,
-    } = this.state;
-    console.log(username, contact, email, password);
-    Axios.post('http://localhost:3001/userReg', {
-      username,
-      contact,
-      email,
-      password,
-    }).then((response) => {
-      console.log('Status Code : ', response.data.status);
-      console.log(response);
-      const status = response.data.status;
-      if (status === 1062) {
+    this.props.userRegMutation({
+      variables: {
+        name: this.state.username,
+        contact: this.state.contact,
+        email: this.state.email,
+        password: this.state.password,
+      },
+    })
+      .then((res) => {
+        console.log('Frontend');
+        console.log(res);
+        this.setState({
+          redirect: true,
+          emailDup: false,
+        });
+      }).catch((err) => {
+        console.log(err);
         this.setState({
           // redirect: false,
           emailDup: true,
         });
-      } else {
-        this.setState({
-          // redirect: true,
-          emailDup: false,
-        });
-        this.props.dispatch({
-          type: 'USER_REGISTERED',
-          payload: true,
-        });
-      }
+      });
+    // Axios.post('http://localhost:3001/userReg', data)
+    //   .then((response) => {
+    //     console.log('Status Code : ', response.data.status);
+    //     console.log(response);
+    //     const status = response.data.status;
+    //     if (status === 1062) {
+    //       this.setState({
+    //       // redirect: false,
+    //         emailDup: true,
+    //       });
+    //     } else {
+    //       this.setState({
+    //         redirect: true,
+    //         emailDup: false,
+    //       });
+    //       // this.props.dispatch({
+    //       //   type: 'USER_REGISTERED',
+    //       //   payload: true,
+    //       // });
+    //     }
 
-      // props.history.push('/login');
-      // <Redirect to='/login'/>
-    }); this.handleValidation();
+    //   // props.history.push('/login');
+    //   // <Redirect to='/login'/>
+    //   });
+    this.handleValidation();
   }
 
   render() {
     let redirectVar = null;
-    if (this.props.redirectUserReg) {
+    if (this.state.redirect) {
       redirectVar = <Redirect to="/login" />;
     }
     const usernameError = this.state.usernameError;
@@ -316,14 +333,6 @@ class userReg extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return { redirectUserReg: state.redirectUserReg };
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    dispatch,
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(userReg);
+export default compose(
+  graphql(userRegMutation, { name: 'userRegMutation' }),
+)(userReg);

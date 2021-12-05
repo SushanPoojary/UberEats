@@ -5,8 +5,8 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import styled from 'styled-components';
-import cookie from 'react-cookies';
-import Axios from 'axios';
+// import cookie from 'react-cookies';
+// import Axios from 'axios';
 import {
   BrowserRouter as Router,
   Link,
@@ -15,11 +15,14 @@ import {
 } from 'react-router-dom';
 import { Redirect } from 'react-router';
 import { Form } from 'react-bootstrap';
-import { connect } from 'react-redux';
+import { graphql } from 'react-apollo';
+import { flowRight as compose } from 'lodash';
+// import { connect } from 'react-redux';
 import history from './history';
 // eslint-disable-next-line import/no-cycle
 import userReg from './userReg';
 import NavBar from '../../NavBar';
+import { UserLoginMutation } from '../../mutations/mutations';
 
 const HeadText = styled.h2`
     font-size: 30px;
@@ -118,55 +121,57 @@ class UserLogin extends React.Component {
     };
 
     console.log(logdata);
-    Axios.defaults.withCredentials = true;
-    Axios.post('http://localhost:3001/login', logdata)
+    // Axios.defaults.withCredentials = true;
+    // Axios.post('http://localhost:3001/login', logdata)
+    this.props.UserLoginMutation({ variables: logdata })
       .then((response) => {
+        console.log(response);
         console.log('Status Code : ', response.data.status);
-        if (response.status === 200) {
-          const status = response.data.status;
-          if (status === 200) {
-            // console.log(response);
-            const { token } = response.data;
-            localStorage.setItem('ubereatsUserToken', token);
-            localStorage.setItem('token', response.data.JWT);
-            this.props.dispatch({
-              type: 'USER_LOGGED_IN',
-              payload: <Redirect to="/homepage" />,
-            });
-            this.setState({
-              authFlag: true,
-              authMessage: '',
-              // redirectHome: <Redirect to="/homepage" />,
-            });
-          } else if (status === 403) {
-            this.setState({
-              authFlag: false,
-              authMessage: 'Invalid Credentials',
-            });
-          } else if (status === 404) {
-            this.setState({
-              authFlag: false,
-              authMessage: response.data.message,
-            });
-          } else {
-            this.setState({
-              authFlag: false,
-              authMessage: response.data.message,
-            });
-          }
-        } else {
-          this.setState({
-            authFlag: false,
-            authMessage: 'DB Error',
-          });
-        }
+        // if (response.status === 200) {
+        // const status = response.data.status;
+        // if (status === 200) {
+        // console.log(response);
+        // const { token } = response.data;
+        localStorage.setItem('ubereatsUserToken', 'UberEatsSP');
+        // localStorage.setItem('token', response.data.JWT);
+        // this.props.dispatch({
+        //   type: 'USER_LOGGED_IN',
+        //   payload: <Redirect to="/homepage" />,
+        // });
+        this.setState({
+          authFlag: true,
+          authMessage: '',
+          // redirectHome: <Redirect to="/homepage" />,
+        });
+        // } else if (status === 403) {
+        //   this.setState({
+        //     authFlag: false,
+        //     authMessage: 'Invalid Credentials',
+        //   });
+      //     } else if (status === 404) {
+      //       this.setState({
+      //         authFlag: false,
+      //         authMessage: response.data.message,
+      //       });
+      //     } else {
+      //       this.setState({
+      //         authFlag: false,
+      //         authMessage: response.data.message,
+      //       });
+      //     }
+      //   } else {
+      //     this.setState({
+      //       authFlag: false,
+      //       authMessage: 'DB Error',
+      //     });
+      //   }
       }); this.handleValidation();
   }
 
   render() {
     let redirectVar = null;
-    if (cookie.load('cookie')) {
-      console.log('cookie');
+    if (this.state.authFlag) {
+      // console.log('cookie');
       redirectVar = <Redirect to="/" />;
     }
     // console.log(this.props.redirectHome);
@@ -252,14 +257,6 @@ class UserLogin extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return { redirectUserLoginHome: state.redirectUserLoginHome };
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    dispatch,
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(UserLogin);
+export default compose(
+  graphql(UserLoginMutation, { name: 'UserLoginMutation' }),
+)(UserLogin);
