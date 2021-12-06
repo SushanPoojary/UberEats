@@ -1,7 +1,6 @@
 const graphql = require('graphql');
 
 const users = require('../models/user');
-const test = require('../models/test');
 const restaurants = require('../models/restaurant');
 const menus = require('../models/menu');
 const favourites = require('../models/favourite');
@@ -20,6 +19,8 @@ const {
     GraphQLDate
 } = graphql;
 
+var globalSessionUemail;
+
 const userRegType = new GraphQLObjectType({
     name: 'userReg',
     fields: () => ({
@@ -27,19 +28,32 @@ const userRegType = new GraphQLObjectType({
         contact: { type: GraphQLString },
         email: { type: GraphQLString },
         password: { type: GraphQLString },
+        location: { type: GraphQLString },
+        state: { type: GraphQLString },
+        country: { type: GraphQLString },
+        nickname: { type: GraphQLString },
+        dob: { type: GraphQLString },
+        about: { type: GraphQLString },
+        add1: { type: GraphQLString },
+        add2: { type: GraphQLString },
+        uploadPublicID: { type: GraphQLString },
+        uploadURL: { type: GraphQLString },
     })
 })
 
 const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
-        user: {
+        userDeets: {
             type: userRegType,
-            args: { id: { type: GraphQLID } },
+            args: { email: { type: GraphQLString } },
             resolve: async function (parent, args, { req, res }) {
-                const user = await users.findOne({ email: 'sushan@gmail.com' })
+                console.log(req.session.uemail);
+                console.log(globalSessionUemail);
+                const user = await users.findOne({ email: globalSessionUemail })
+                // console.log(user);
                 if (user) {
-                    console.log('QUERY USER: ' + user);
+                    console.log(user);
                     return user;
                 }
             }
@@ -88,6 +102,7 @@ const Mutation = new GraphQLObjectType({
                 if (user) {
                     res.cookie('cookie',user.email,{maxAge: 900000, httpOnly: false, path : '/'});
                     req.session.uemail = user.email;
+                    globalSessionUemail = user.email;
                     req.session.isLoggedIn = true;
                     console.log(req.session.uemail);
                     console.log(req.session.isLoggedIn);

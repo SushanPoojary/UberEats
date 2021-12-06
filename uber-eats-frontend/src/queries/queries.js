@@ -1,0 +1,22 @@
+import { gql } from 'apollo-boost';
+
+const getUserQuery = gql`
+{
+    userDeets {
+        name
+        email
+        contact
+        add1
+        add2
+        location
+        state
+        country
+        nickname
+        dob
+        about
+        uploadPublicID
+    }
+}
+`;
+
+export { getUserQuery };

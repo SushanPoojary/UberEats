@@ -15,7 +15,7 @@ var schema = require('./graphqlSchema/schema');
 var cors = require('cors');
 var jwt = require('jsonwebtoken');
 // var kafka = require('./kafka/client');
-app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
+app.use(cors());
 
 // var ipAdd='localhost';
 // `http://${ipAdd}:3000`
