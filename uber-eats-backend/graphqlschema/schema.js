@@ -112,9 +112,28 @@ const orderResType = new GraphQLObjectType({
     name: 'orderRes',
     fields: () => ({
         name: { type: GraphQLString },
+        email: { type: GraphQLString },
         location: { type: GraphQLString },
         contact: { type: GraphQLString },
         order_status: { type: GraphQLString },
+        ordertime: { type: GraphQLString },
+    })
+})
+
+const userReceiptType = new GraphQLObjectType({
+    name: 'userReceipt',
+    fields: () => ({
+        name: { type: GraphQLString },
+        email: { type: GraphQLString },
+        location: { type: GraphQLString },
+        contact: { type: GraphQLString },
+        order_status: { type: GraphQLString },
+        quantity: { type: GraphQLString },
+        p_name: { type: GraphQLString },
+        p_price: { type: GraphQLString },
+        add1: { type: GraphQLString },
+        add2: { type: GraphQLString },
+        sp_inst: { type: GraphQLString },
         ordertime: { type: GraphQLString },
     })
 })
@@ -223,6 +242,65 @@ const RootQuery = new GraphQLObjectType({
                     {"$match": {"user_email": globalSessionUemail}},
                     {"$project": {"_id": 0, "Search1.name": 1, "Search1.location": 1, "Search1.contact": 1, "order_status": 1, "ordertime": 1}},
                     {"$group": {_id: {name: "$Search1.name",  location: "$Search1.location", contact: "$Search1.contact", order_status: "$order_status", ordertime: "$ordertime"}}},
+                    {"$replaceRoot": {newRoot: '$_id'}}],)
+                if (order) {
+                    console.log(order);
+                    return order;
+                }
+            }
+        },
+        getUserReceipt: {
+            type: new GraphQLList(userReceiptType),
+            args: { email: { type: GraphQLString } },
+            resolve: async function (parent, args, { req, res }) {
+                const receipt = await orders.aggregate([
+                    {"$lookup": {
+                    "from": "menus",
+                    "localField": "po_id",
+                    "foreignField": "p_id",
+                    as: "Search"
+                    }},
+                    {"$unwind": "$Search"},
+                    {"$lookup": {
+                        "from": "users",
+                        "localField": "user_email",
+                        "foreignField": "email",
+                        as: "Search1"
+                        }},
+                    {"$unwind": "$Search1"},
+                    {"$match": {$and: [{"user_email": globalSessionUemail}, {"ordertime": globalOrderID}]}},
+                    {"$project": {"_id": 0, "Search1.name": 1, "Search1.email": 1, "Search1.location": 1, "Search1.contact": 1, "order_status": 1, "quantity": 1, "Search.p_name": 1, "Search.p_price": 1, "Search1.add1": 1, "Search1.add2": 1, "sp_inst": 1}},
+                    {"$group": {_id: {name: "$Search1.name", email: "$Search1.email", location: "$Search1.location", contact: "$Search1.contact", order_status: "$order_status", quantity: "$quantity", p_name: "$Search.p_name", p_price: "$Search.p_price", add1: "$Search1.add1", add2: "$Search1.add2", sp_inst: "$sp_inst"}}},
+                    {"$replaceRoot": {newRoot: '$_id'}}
+                ],)
+                if (receipt) {
+                    console.log(receipt);
+                    return receipt;
+                }
+            }
+        },
+        getResAllOrders: {
+            type: new GraphQLList(orderResType),
+            args: { email: { type: GraphQLString } },
+            resolve: async function (parent, args, { req, res }) {
+                const order = await orders.aggregate([
+                    {"$lookup": {
+                    "from": "menus",
+                    "localField": "po_id",
+                    "foreignField": "p_id",
+                    as: "Search"
+                    }},
+                    {"$unwind": "$Search"},
+                    {"$lookup": {
+                        "from": "users",
+                        "localField": "user_email",
+                        "foreignField": "email",
+                        as: "Search1"
+                        }},
+                    {"$unwind": "$Search1"},
+                    {"$match": {"Search.email": globalSessionRemail}},
+                    {"$project": {"_id": 0, "Search1.name": 1, "Search1.email": 1, "Search1.location": 1, "Search1.contact": 1, "order_status": 1, "ordertime": 1}},
+                    {"$group": {_id: {name: "$Search1.name", email: "$Search1.email", location: "$Search1.location", contact: "$Search1.contact", order_status: "$order_status", ordertime: "$ordertime"}}},
                     {"$replaceRoot": {newRoot: '$_id'}}],)
                 if (order) {
                     console.log(order);
@@ -599,7 +677,7 @@ const Mutation = new GraphQLObjectType({
                         });
                         }
                     },
-                    userReciept: {
+            userReciept: {
                 type: orderType,
                 args: {
                     ordertime: { type: GraphQLString },
@@ -611,6 +689,31 @@ const Mutation = new GraphQLObjectType({
                         console.log('User Clicks Reciept!')
                         console.log(globalOrderID);
                         return globalOrderID;
+                        }
+                    },
+            resOrderActions: {
+                type: orderResType,
+                args: {
+                    order_status: { type: GraphQLString },
+                    ordertime: { type: GraphQLString },
+                },
+                resolve: async function (parent, args, {req, res}) {
+                        console.log("Inside Restaurant Order Processing Mutation!");
+                        orders.findOneAndUpdate({ ordertime: args.ordertime}, 
+                            { $set : 
+                                {order_status: args.order_status}
+                            }, { returnOriginal: false },
+                            (err, documents) => {
+                            if (err) {
+                                throw err;
+                            } else {
+                                console.log("Restaurant changed the order status successfully!");
+                                console.log(documents);
+                                var retData = { order_status: documents.order_status, ordertime: documents.ordertime}
+                                console.log(retData);
+                                return retData;
+                            }
+                        });
                         }
                     },
     }

@@ -241,6 +241,21 @@ mutation userReciept(
     }
 `;
 
+const resOrderActionsMutation = gql`
+mutation resOrderActions(
+    $ordertime: String,
+    $order_status: String,) {
+        resOrderActions(
+            ordertime: $ordertime,
+            order_status: $order_status
+        )
+        {
+            ordertime
+            order_status
+        }
+    }
+`;
+
 export {
   userRegMutation,
   UserLoginMutation,
@@ -254,4 +269,5 @@ export {
   orderMutation,
   cartDelMutation,
   userRecieptMutation,
+  resOrderActionsMutation,
 };

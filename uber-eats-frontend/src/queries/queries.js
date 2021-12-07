@@ -97,6 +97,35 @@ const getAllOrdersQuery = gql`
 }
 `;
 
+const getUserReceipt = gql`
+{
+    getUserReceipt {
+        name
+        email
+        location
+        contact
+        order_status
+        quantity
+        p_name
+        p_price
+        add1
+        sp_inst
+    }
+}
+`;
+
+const getResAllOrdersQuery = gql`
+{
+    getResAllOrders {
+        name
+        location
+        contact
+        order_status
+        ordertime
+    }
+}
+`;
+
 export {
   getUserQuery,
   getResQuery,
@@ -104,4 +133,6 @@ export {
   getResMenuQuery,
   getCartQuery,
   getAllOrdersQuery,
+  getUserReceipt,
+  getResAllOrdersQuery,
 };
