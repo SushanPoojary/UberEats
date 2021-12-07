@@ -96,8 +96,32 @@ const orderType = new GraphQLObjectType({
     })
 })
 
+const cartOrderType = new GraphQLObjectType({
+    name: 'cartorder',
+    fields: () => ({
+        po_id: { type: GraphQLInt },
+        name: { type: GraphQLString },
+        quantity: { type: GraphQLString },
+        p_name: { type: GraphQLString },
+        p_category: { type: GraphQLString },
+        p_price: { type: GraphQLString },
+    })
+})
+
+const orderResType = new GraphQLObjectType({
+    name: 'orderRes',
+    fields: () => ({
+        name: { type: GraphQLString },
+        location: { type: GraphQLString },
+        contact: { type: GraphQLString },
+        order_status: { type: GraphQLString },
+        ordertime: { type: GraphQLString },
+    })
+})
+
 var globalSessionUemail;
 var globalSessionRemail;
+var globalOrderID;
 
 const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
@@ -145,6 +169,64 @@ const RootQuery = new GraphQLObjectType({
                 if (menu) {
                     console.log(menu);
                     return menu;
+                }
+            }
+        },
+        getCart: {
+            type: new GraphQLList(cartOrderType),
+            args: { email: { type: GraphQLString } },
+            resolve: async function (parent, args, { req, res }) {
+                const cart = await carts.aggregate([
+                    {"$lookup": {
+                    "from": "menus",
+                    "localField": "po_id",
+                    "foreignField": "p_id",
+                    as: "Search"
+                    }},
+                    {"$unwind": "$Search"},
+                    {"$lookup": {
+                        "from": "restaurants",
+                        "localField": "owner_email",
+                        "foreignField": "email",
+                        as: "Search1"
+                        }},
+                    {"$unwind": "$Search1"},
+                    {"$match": {"user_email": globalSessionUemail}},
+                    {"$project": {"_id": 0, "po_id": 1, "Search1.name": 1, "quantity": 1, "Search.p_name": 1, "Search.p_category": 1, "Search.p_price": 1}},
+                    {"$group": {_id: {po_id: "$po_id", name: "$Search1.name",  quantity: "$quantity", p_name: "$Search.p_name", p_category: "$Search.p_category", p_price: "$Search.p_price"}}},
+                    {"$replaceRoot": {newRoot: '$_id'}}])
+                if (cart) {
+                    console.log(cart);
+                    return cart;
+                }
+            }
+        },
+        getAllOrders: {
+            type: new GraphQLList(orderResType),
+            args: { email: { type: GraphQLString } },
+            resolve: async function (parent, args, { req, res }) {
+                const order = await orders.aggregate([
+                    {"$lookup": {
+                    "from": "menus",
+                    "localField": "po_id",
+                    "foreignField": "p_id",
+                    as: "Search"
+                    }},
+                    {"$unwind": "$Search"},
+                    {"$lookup": {
+                        "from": "restaurants",
+                        "localField": "Search.email",
+                        "foreignField": "email",
+                        as: "Search1"
+                        }},
+                    {"$unwind": "$Search1"},
+                    {"$match": {"user_email": globalSessionUemail}},
+                    {"$project": {"_id": 0, "Search1.name": 1, "Search1.location": 1, "Search1.contact": 1, "order_status": 1, "ordertime": 1}},
+                    {"$group": {_id: {name: "$Search1.name",  location: "$Search1.location", contact: "$Search1.contact", order_status: "$order_status", ordertime: "$ordertime"}}},
+                    {"$replaceRoot": {newRoot: '$_id'}}],)
+                if (order) {
+                    console.log(order);
+                    return order;
                 }
             }
         },
@@ -469,6 +551,68 @@ const Mutation = new GraphQLObjectType({
                         }
                     
                 },
+            order: {
+            type: orderType,
+            args: {
+                po_id: { type: GraphQLInt }
+            },
+            resolve: async function (parent, args, {req, res}) {
+                    console.log("Inside Order Mutation");
+                    let date_ob = new Date();
+                    let date = ("0" + date_ob.getDate()).slice(-2);
+                    let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
+                    let year = date_ob.getFullYear();
+                    let hours = ("0" + date_ob.getHours()).slice(-2);
+                    let minutes = ("0" + date_ob.getMinutes()).slice(-2);
+                    let ordertime = year + "-" + month + "-" + date + " " + hours + ":" + minutes;
+                    console.log(ordertime);
+                    var order = new orders({
+                        po_id: args.po_id,
+                        user_email: globalSessionUemail,
+                        ordertime: ordertime,
+                        order_status: 'Ordered',
+                    });
+                    // console.log(user);
+                    order.save()
+                        .then(() => {
+                                    console.log('Ordered Successfully!');
+                                })
+                        .catch(err => console.log(err))
+                        return order;
+                        }
+                    
+                },
+            cartDel: {
+                type: cartType,
+                args: {
+                    po_id: { type: GraphQLInt }
+                },
+                resolve: async function (parent, args, {req, res}) {
+                        console.log("Inside Delete Cart After Order Mutation");
+                        carts.deleteMany({user_email: globalSessionUemail}, (err, results) => {
+                            if (err) {
+                                throw err;
+                            } else {
+                                console.log("Deleted from cart, Post order!");
+                                return results;
+                            }
+                        });
+                        }
+                    },
+                    userReciept: {
+                type: orderType,
+                args: {
+                    ordertime: { type: GraphQLString },
+                },
+                resolve: async function (parent, args, {req, res}) {
+                        console.log("Inside User View Reciept Click Mutation!");
+                        globalOrderID = args.ordertime;
+                        // console.log(user);
+                        console.log('User Clicks Reciept!')
+                        console.log(globalOrderID);
+                        return globalOrderID;
+                        }
+                    },
     }
 })
 

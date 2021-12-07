@@ -72,9 +72,36 @@ const getResMenuQuery = gql`
 }
 `;
 
+const getCartQuery = gql`
+{
+    getCart {
+        po_id
+        name
+        quantity
+        p_name
+        p_category
+        p_price
+    }
+}
+`;
+
+const getAllOrdersQuery = gql`
+{
+    getAllOrders {
+        name
+        location
+        contact
+        order_status
+        ordertime
+    }
+}
+`;
+
 export {
   getUserQuery,
   getResQuery,
   getAllResQuery,
   getResMenuQuery,
+  getCartQuery,
+  getAllOrdersQuery,
 };

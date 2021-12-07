@@ -202,6 +202,45 @@ mutation addToCart(
     }
 `;
 
+const orderMutation = gql`
+mutation order(
+    $po_id: Int,
+    ) {
+        order(
+            po_id: $po_id,
+        )
+        {
+            po_id
+        }
+    }
+`;
+
+const cartDelMutation = gql`
+mutation cartDel(
+    $po_id: Int,
+    ) {
+        cartDel(
+            po_id: $po_id,
+        )
+        {
+            po_id
+        }
+    }
+`;
+
+const userRecieptMutation = gql`
+mutation userReciept(
+    $ordertime: String,
+    ) {
+        userReciept(
+            ordertime: $ordertime,
+        )
+        {
+            ordertime
+        }
+    }
+`;
+
 export {
   userRegMutation,
   UserLoginMutation,
@@ -212,4 +251,7 @@ export {
   addMenuMutation,
   UserRestaurant,
   addToCartMutation,
+  orderMutation,
+  cartDelMutation,
+  userRecieptMutation,
 };
