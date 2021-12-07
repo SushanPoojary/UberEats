@@ -106,10 +106,8 @@ const RootQuery = new GraphQLObjectType({
             type: userRegType,
             args: { email: { type: GraphQLString } },
             resolve: async function (parent, args, { req, res }) {
-                // console.log(req.session.uemail);
                 console.log(globalSessionUemail);
                 const user = await users.findOne({ email: globalSessionUemail })
-                // console.log(user);
                 if (user) {
                     console.log(user);
                     return user;
@@ -120,13 +118,22 @@ const RootQuery = new GraphQLObjectType({
             type: restaurantRegType,
             args: { email: { type: GraphQLString } },
             resolve: async function (parent, args, { req, res }) {
-                // console.log(req.session.uemail);
                 console.log(globalSessionRemail);
                 const user = await restaurants.findOne({ email: globalSessionRemail })
-                // console.log(user);
                 if (user) {
                     console.log(user);
                     return user;
+                }
+            }
+        },
+        userHomeAllRes: {
+            type: new GraphQLList(restaurantRegType),
+            args: { email: { type: GraphQLString } },
+            resolve: async function (parent, args, { req, res }) {
+                const rest = await restaurants.find({})
+                if (rest) {
+                    console.log(rest);
+                    return rest;
                 }
             }
         },
@@ -176,13 +183,7 @@ const Mutation = new GraphQLObjectType({
                     globalSessionUemail = user.email;
                     req.session.isLoggedIn = true;
 
-                    req.session.save();   
-                    // const payload = { _id: user._id, name: user.email};
-                    // console.log(payload);
-                    // const tokenus = jwt.sign(payload, JWT_KEY, {
-                    //     expiresIn: 1008000
-                    // })
-                    // let token = jwt.sign({email: user.email}, JWT_KEY);
+                    req.session.save();
                     res.status(200);
                       }
                 else {
@@ -230,13 +231,7 @@ const Mutation = new GraphQLObjectType({
                     globalSessionRemail = user.email;
                     console.log(globalSessionRemail);
                     req.session.isLoggedIn = true;
-                    req.session.save();   
-                    // const payload = { _id: user._id, name: user.email};
-                    // console.log(payload);
-                    // const tokenus = jwt.sign(payload, JWT_KEY, {
-                    //     expiresIn: 1008000
-                    // })
-                    // let token = jwt.sign({email: user.email}, JWT_KEY);
+                    req.session.save();
                     res.status(200);
                       }
                 else {

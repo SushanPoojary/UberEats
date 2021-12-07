@@ -37,7 +37,26 @@ const getResQuery = gql`
 }
 `;
 
+const getAllResQuery = gql`
+{
+    userHomeAllRes {
+        name
+        email
+        password
+        location
+        description
+        contact
+        timings
+        delivery
+        pickup
+        uploadURL
+        uploadPublicID
+    }
+}
+`;
+
 export {
   getUserQuery,
   getResQuery,
+  getAllResQuery,
 };
