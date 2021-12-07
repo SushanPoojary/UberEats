@@ -19,4 +19,25 @@ const getUserQuery = gql`
 }
 `;
 
-export { getUserQuery };
+const getResQuery = gql`
+{
+    resDeets {
+        name
+        email
+        password
+        location
+        description
+        contact
+        timings
+        delivery
+        pickup
+        uploadURL
+        uploadPublicID
+    }
+}
+`;
+
+export {
+  getUserQuery,
+  getResQuery,
+};

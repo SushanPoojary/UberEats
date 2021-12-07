@@ -7,13 +7,16 @@
 import React from 'react';
 // import ReactDOM from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.css';
-import Axios from 'axios';
+// import Axios from 'axios';
 import { Image } from 'cloudinary-react';
 import { Redirect } from 'react-router';
-import { connect } from 'react-redux';
+// import { connect } from 'react-redux';
 import styled from 'styled-components';
-// eslint-disable-next-line import/no-cycle
+import { graphql } from 'react-apollo';
+import { flowRight as compose } from 'lodash';
 import { toast } from 'react-toastify';
+import { addMenuMutation } from '../../mutations/mutations';
+// eslint-disable-next-line import/no-cycle
 import NavBar from '../../NavBar';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -66,6 +69,7 @@ class addMenu extends React.Component {
       categoryError: '',
       typeError: '',
       priceError: '',
+      toastUp: false,
     };
     this.nameInputHandler = this.nameInputHandler.bind(this);
     this.ingredientsInputHandler = this.ingredientsInputHandler.bind(this);
@@ -221,47 +225,65 @@ class addMenu extends React.Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-    const {
-      p_name,
-      p_ingredients,
-      p_description,
-      p_category,
-      p_type,
-      p_price,
-      preview,
-    } = this.state;
-    console.log(p_name, p_ingredients, p_description, p_category, p_type, p_price);
-    Axios.defaults.withCredentials = true;
-    Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-    Axios.post('http://localhost:3001/addMenu', {
-      p_name,
-      p_ingredients,
-      p_description,
-      p_category,
-      p_type,
-      p_price,
-      preview,
-    }).then((response) => {
-      console.log('Status Code : ', response.status);
-      console.log(response);
-      const status = response.data.status;
-      if (status === 1062) {
+    const data = {
+      p_name: this.state.p_name,
+      p_ingredients: this.state.p_ingredients,
+      p_description: this.state.p_description,
+      p_category: this.state.p_category,
+      p_type: this.state.p_type,
+      p_price: this.state.p_price,
+      preview: this.state.preview,
+    };
+    console.log(data);
+    this.props.addMenuMutation({
+      variables: data,
+    })
+      .then((res) => {
+        console.log('Frontend');
+        console.log(res);
+        this.setState({
+          redirect: true,
+          toastUp: true,
+        });
+      }).catch((err) => {
+        console.log(err);
         this.setState({
           redirect: false,
         });
-      } else {
-        this.setState({
-          redirect: true,
-        });
-        this.props.dispatch({
-          type: 'RESTAURANT_MENU_ADD',
-          payload: true,
-        });
-      }
+        this.handleValidation();
+      });
+    // Axios.defaults.withCredentials = true;
+    // Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
+    // Axios.post('http://localhost:3001/addMenu', {
+    //   p_name,
+    //   p_ingredients,
+    //   p_description,
+    //   p_category,
+    //   p_type,
+    //   p_price,
+    //   preview,
+    // }).then((response) => {
+    //   console.log('Status Code : ', response.status);
+    //   console.log(response);
+    //   const status = response.data.status;
+    //   if (status === 1062) {
+    //     this.setState({
+    //       redirect: false,
+    //     });
+    //   } else {
+    //     this.setState({
+    //       redirect: true,
+    //     });
+    //     this.props.dispatch({
+    //       type: 'RESTAURANT_MENU_ADD',
+    //       payload: true,
+    //     });
+    //   }
 
-      // props.history.push('/login');
-      // <Redirect to='/login'/>
-    }); this.handleValidation();
+    //   // props.history.push('/login');
+    //   // <Redirect to='/login'/>
+    // });
+    this.handleValidation();
   }
 
   render() {
@@ -270,7 +292,7 @@ class addMenu extends React.Component {
     if (this.state.redirect) {
       redirectVar = <Redirect to="/resadditems" />;
     }
-    if (this.props.restaddMenu) {
+    if (this.state.toastUp) {
       UpdateToast = this.notify();
     }
     const nameError = this.state.nameError;
@@ -423,14 +445,6 @@ class addMenu extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return { restaddMenu: state.restaddMenu };
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    dispatch,
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(addMenu);
+export default compose(
+  graphql(addMenuMutation, { name: 'addMenuMutation' }),
+)(addMenu);

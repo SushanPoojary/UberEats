@@ -5,8 +5,8 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import styled from 'styled-components';
-import cookie from 'react-cookies';
-import Axios from 'axios';
+// import cookie from 'react-cookies';
+// import Axios from 'axios';
 import {
   BrowserRouter as Router,
   Link,
@@ -15,11 +15,14 @@ import {
 } from 'react-router-dom';
 import { Redirect } from 'react-router';
 import { Form } from 'react-bootstrap';
-import { connect } from 'react-redux';
+import { graphql } from 'react-apollo';
+import { flowRight as compose } from 'lodash';
+// import { connect } from 'react-redux';
 import history from './history';
 // eslint-disable-next-line import/no-cycle
 import resReg from './resReg';
 import NavBar from '../../NavBar';
+import { RestaurantLoginMutation } from '../../mutations/mutations';
 
 const HeadText = styled.h2`
     font-size: 30px;
@@ -119,53 +122,22 @@ class resLogin extends React.Component {
     };
 
     console.log(logdata);
-    Axios.defaults.withCredentials = true;
-    Axios.post('http://localhost:3001/reslogin', logdata)
+    this.props.RestaurantLoginMutation({ variables: logdata })
       .then((response) => {
-        console.log('Status Code : ', response.status);
-        if (response.status === 200) {
-          const { status } = response.data;
-          if (status === 200) {
-            const { token } = response.data;
-            localStorage.setItem('ubereatsResToken', token);
-            localStorage.setItem('token', response.data.JWT);
-            this.setState({
-              authFlag: true,
-              authMessage: '',
-              // redirectHome: <Redirect to="/resHome" />,
-            });
-            this.props.dispatch({
-              type: 'RESTAURANT_LOGGED_IN',
-              payload: <Redirect to="/resHome" />,
-            });
-          } else if (status === 403) {
-            this.setState({
-              authFlag: false,
-              authMessage: 'Invalid Credentials',
-            });
-          } else if (status === 404) {
-            this.setState({
-              authFlag: false,
-              authMessage: response.data.message,
-            });
-          } else {
-            this.setState({
-              authFlag: false,
-              authMessage: response.data.message,
-            });
-          }
-        } else {
-          this.setState({
-            authFlag: false,
-            authMessage: 'DB Error',
-          });
-        }
-      }); this.handleValidation();
+        console.log(response);
+        console.log('Status Code : ', response.data.status);
+        localStorage.setItem('ubereatsResToken', 'UberEatsSP');
+        this.setState({
+          authFlag: true,
+          authMessage: '',
+        });
+      });
+    this.handleValidation();
   }
 
   render() {
     let redirectVar = null;
-    if (cookie.load('cookie')) {
+    if (this.state.authFlag) {
       redirectVar = <Redirect to="/resHome" />;
     }
     const redirectHome = this.props.redirectRestLoginHome;
@@ -250,14 +222,6 @@ class resLogin extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return { redirectRestLoginHome: state.redirectRestLoginHome };
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    dispatch,
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(resLogin);
+export default compose(
+  graphql(RestaurantLoginMutation, { name: 'RestaurantLoginMutation' }),
+)(resLogin);

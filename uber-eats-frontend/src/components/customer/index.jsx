@@ -121,50 +121,15 @@ class UserLogin extends React.Component {
     };
 
     console.log(logdata);
-    // Axios.defaults.withCredentials = true;
-    // Axios.post('http://localhost:3001/login', logdata)
     this.props.UserLoginMutation({ variables: logdata })
       .then((response) => {
         console.log(response);
         console.log('Status Code : ', response.data.status);
-        // if (response.status === 200) {
-        // const status = response.data.status;
-        // if (status === 200) {
-        // console.log(response);
-        // const { token } = response.data;
         localStorage.setItem('ubereatsUserToken', 'UberEatsSP');
-        // localStorage.setItem('token', response.data.JWT);
-        // this.props.dispatch({
-        //   type: 'USER_LOGGED_IN',
-        //   payload: <Redirect to="/homepage" />,
-        // });
         this.setState({
           authFlag: true,
           authMessage: '',
-          // redirectHome: <Redirect to="/homepage" />,
         });
-        // } else if (status === 403) {
-        //   this.setState({
-        //     authFlag: false,
-        //     authMessage: 'Invalid Credentials',
-        //   });
-      //     } else if (status === 404) {
-      //       this.setState({
-      //         authFlag: false,
-      //         authMessage: response.data.message,
-      //       });
-      //     } else {
-      //       this.setState({
-      //         authFlag: false,
-      //         authMessage: response.data.message,
-      //       });
-      //     }
-      //   } else {
-      //     this.setState({
-      //       authFlag: false,
-      //       authMessage: 'DB Error',
-      //     });
-      //   }
       }); this.handleValidation();
   }
 
@@ -172,7 +137,7 @@ class UserLogin extends React.Component {
     let redirectVar = null;
     if (this.state.authFlag) {
       // console.log('cookie');
-      redirectVar = <Redirect to="/" />;
+      redirectVar = <Redirect to="/homepage" />;
     }
     // console.log(this.props.redirectHome);
     const redirectHome = this.props.redirectUserLoginHome;
