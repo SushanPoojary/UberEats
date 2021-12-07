@@ -137,6 +137,17 @@ const RootQuery = new GraphQLObjectType({
                 }
             }
         },
+        getResMenu: {
+            type: new GraphQLList(menuType),
+            args: { email: { type: GraphQLString } },
+            resolve: async function (parent, args, { req, res }) {
+                const menu = await menus.find({ email: globalSessionRemail })
+                if (menu) {
+                    console.log(menu);
+                    return menu;
+                }
+            }
+        },
     }
 });
 
@@ -417,6 +428,44 @@ const Mutation = new GraphQLObjectType({
                                 })
                         .catch(err => console.log(err))
                         return menu;
+                        }
+                    
+                },
+        UserRestaurant: {
+            type: restaurantRegType,
+            args: {
+                email: { type: GraphQLString },
+            },
+            resolve: async function (parent, args, {req, res}) {
+                    console.log("Inside User Rest Visit Mutation");
+                    globalSessionRemail = args.email;
+                    // console.log(user);
+                    console.log('User Visits Rest!')
+                    console.log(globalSessionRemail);
+                    return globalSessionRemail;
+                    }
+                },
+        addToCart: {
+            type: cartType,
+            args: {
+                po_id: { type: GraphQLInt },
+                price: { type: GraphQLString }
+            },
+            resolve: async function (parent, args, {req, res}) {
+                    console.log("Inside Add to Cart Mutation");
+                    var cart = new carts({
+                        po_id: args.po_id,
+                        price: args.price,
+                        user_email: globalSessionUemail,
+                        owner_email: globalSessionRemail,
+                    });
+                    // console.log(user);
+                    cart.save()
+                        .then(() => {
+                                    console.log('Added to cart Successfully!');
+                                })
+                        .catch(err => console.log(err))
+                        return cart;
                         }
                     
                 },

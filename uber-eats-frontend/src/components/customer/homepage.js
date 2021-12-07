@@ -11,7 +11,7 @@
 /* eslint-disable react/jsx-wrap-multilines */
 /* eslint-disable react/destructuring-assignment */
 import React from 'react';
-import Axios from 'axios';
+// import Axios from 'axios';
 import { Redirect } from 'react-router';
 import {
   Form,
@@ -24,6 +24,7 @@ import {
 import { graphql } from 'react-apollo';
 import { flowRight as compose } from 'lodash';
 import { getAllResQuery } from '../../queries/queries';
+import { UserRestaurant } from '../../mutations/mutations';
 // import { Image as CloudinaryImage } from 'cloudinary-react';
 import NavBar from '../../NavBar';
 
@@ -127,15 +128,16 @@ class homepage extends React.Component {
     };
     console.log(visitdata);
     this.setState({
-      remail: visitdata,
       redirectVar: true,
     });
-    console.log(this.state.remail);
-    console.log(this.state.redirectVar);
-    Axios.defaults.withCredentials = true;
-    Axios.post('http://localhost:3001/sr', visitdata)
+    this.props.UserRestaurant({
+      variables: visitdata,
+    })
       .then((res) => {
-        console.log(res.status);
+        console.log('Frontend');
+        console.log(res);
+      }).catch((err) => {
+        console.log(err);
       });
   }
 
@@ -150,5 +152,5 @@ class homepage extends React.Component {
 
 export default compose(
   graphql(getAllResQuery),
-  // graphql(userProfileMutation, { name: 'userProfileMutation' }),
+  graphql(UserRestaurant, { name: 'UserRestaurant' }),
 )(homepage);

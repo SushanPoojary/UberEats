@@ -304,26 +304,6 @@ class userProfile extends Component {
           });
           this.handleValidation();
         });
-      // Axios.defaults.withCredentials = true;
-      // Axios.defaults.headers.common['authorization'] = localStorage.getItem('token');
-      // Axios.post('http://localhost:3001/updateProfile', data)
-      //   .then((res) => {
-      //     if (res) {
-      //       console.log('Updated');
-      //       this.setState({
-      //         authMessage: true,
-      //       });
-      //       this.props.dispatch({
-      //         type: 'USER_PROFILE_UPDATED',
-      //         payload: true,
-      //       });
-      //     }
-      //   }).catch((err) => {
-      //     console.log(`User Update Profile: ${err}`);
-      //     this.setState({
-      //       authMessage: false,
-      //     });
-      //   });
     }
 
     updateUser = (e) => {

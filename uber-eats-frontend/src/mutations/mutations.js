@@ -174,6 +174,34 @@ mutation addMenu(
     }
 `;
 
+const UserRestaurant = gql`
+mutation UserRestaurant(
+    $email: String
+    ) {
+        UserRestaurant(
+            email: $email
+        )
+        {
+            email
+        }
+    }
+`;
+
+const addToCartMutation = gql`
+mutation addToCart(
+    $po_id: Int,
+    $price: String,) {
+        addToCart(
+            po_id: $po_id,
+            price: $price
+        )
+        {
+            po_id
+            price
+        }
+    }
+`;
+
 export {
   userRegMutation,
   UserLoginMutation,
@@ -182,4 +210,6 @@ export {
   userProfileMutation,
   resProfileMutation,
   addMenuMutation,
+  UserRestaurant,
+  addToCartMutation,
 };

@@ -55,8 +55,26 @@ const getAllResQuery = gql`
 }
 `;
 
+const getResMenuQuery = gql`
+{
+    getResMenu {
+        p_id
+        p_name
+        p_ingredients
+        p_description
+        p_category
+        p_type
+        p_price
+        email
+        uploadPublicID
+        uploadURL
+    }
+}
+`;
+
 export {
   getUserQuery,
   getResQuery,
   getAllResQuery,
+  getResMenuQuery,
 };
