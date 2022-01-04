@@ -9,7 +9,7 @@ Main Branch: React, Express, NodeJS, MYSQL.
 
 Lab2: React, Express, NodeJS, MYSQL, MongoDB, Kafka.
 
-Lab3: React, NodeJS, MongoDB, GraphQL
+Lab3: React, NodeJS, MongoDB, GraphQL.
 
 
 Steps to Clone:
