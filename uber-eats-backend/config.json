@@ -1,10 +1,10 @@
 {
     "DB": {
-        "host": "ubereats.ctmgfbkir702.us-west-1.rds.amazonaws.com",
+        "host": "ub",
         "username": "admin",
-        "password": "admin123",
+        "password": "admin",
         "port": 3306,
-        "database": "uber_eats"
+        "database": "uats"
     }
 
 }
